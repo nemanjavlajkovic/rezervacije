@@ -9,7 +9,7 @@ DATA_DIR   = os.path.join(os.path.dirname(__file__), 'data')
 USERS_F    = os.path.join(DATA_DIR, 'users.json')
 BOOKINGS_F = os.path.join(DATA_DIR, 'bookings.json')
 
-KLUB_IME  = 'RCC Termini'
+KLUB_IME  = 'Byford Country Club'
 TELEFON   = '063-3-6666-4'
 START_SAT = 7
 END_SAT   = 23
