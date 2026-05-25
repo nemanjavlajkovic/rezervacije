@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="sr-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezervacije – {{ klub }}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:13px;background:#f0f0f0;color:#222}
+#hdr{background:#1a5276;color:#fff;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+#hdr .logo{font-size:18px;font-weight:bold}
+#hdr .sub{font-size:12px;opacity:.8}
+#info{background:#d5e8f7;border-bottom:1px solid #b0cce0;padding:5px 14px;font-size:12px;display:flex;flex-wrap:wrap;gap:6px 24px}
+#info a{color:#1a5276;text-decoration:none}
+#lbar{background:#eaf3fb;border-bottom:1px solid #cde0f0;padding:6px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px}
+#lbar input{border:1px solid #aac;padding:3px 6px;border-radius:3px;font-size:12px;width:160px}
+.btn{display:inline-block;padding:4px 12px;border:none;border-radius:3px;cursor:pointer;font-size:12px}
+.btn-blue{background:#1a5276;color:#fff}.btn-blue:hover{background:#154360}
+.btn-red{background:#922b21;color:#fff}.btn-red:hover{background:#7b241c}
+#lerr{color:#c0392b;font-size:12px}
+.uinfo{color:#1e8449;font-weight:bold}
+#dnav{background:#1a5276;color:#fff;display:flex;align-items:center;justify-content:center;gap:18px;padding:7px 14px;font-size:14px}
+.arr{cursor:pointer;font-size:22px;user-select:none;padding:0 6px}.arr:hover{opacity:.7}
+#dlbl{font-weight:bold;min-width:230px;text-align:center}
+.btn-today{background:#2e86c1;border:none;color:#fff;padding:3px 12px;border-radius:3px;cursor:pointer;font-size:12px}
+#twrap{overflow-x:auto;padding:10px 6px 16px}
+table.sc{border-collapse:collapse;min-width:700px;width:100%}
+table.sc th,table.sc td{border:1px solid #bcd;padding:4px 6px;text-align:center;white-space:nowrap;font-size:12px}
+tr.rdate th{background:#1a5276;color:#fff;font-size:13px;padding:6px}
+tr.rcourt th{background:#2e86c1;color:#fff;font-weight:bold}
+th.tc,td.tc{background:#dce8f5;font-weight:bold;color:#1a5276;min-width:110px}
+tr.rcourt th.tc{background:#1a5276}
+tfoot tr.rcourt td{background:#2e86c1;color:#fff;font-weight:bold}
+tfoot tr.rcourt td.tc{background:#1a5276}
+td.sl{min-width:72px;transition:filter .12s}
+td.sl.free{background:#d4efdf;color:#1e8449;font-weight:bold;cursor:pointer}
+td.sl.taken{background:#fadbd8;color:#922b21;font-weight:bold}
+td.sl.sub{background:#fdebd0;color:#935116;font-weight:bold}
+td.sl.past{background:#e8e8e8;color:#999;font-style:italic}
+td.sl.free:hover{filter:brightness(.92)}
+#leg{display:flex;gap:14px;flex-wrap:wrap;padding:6px 14px 12px;font-size:12px;align-items:center}
+.lb{display:inline-block;width:14px;height:14px;border:1px solid #aaa;vertical-align:middle;margin-right:4px;border-radius:2px}
+#load{text-align:center;padding:30px;color:#666;font-style:italic;display:none}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.ov.on{display:flex}
+.mod{background:#fff;border-radius:6px;padding:22px 28px;max-width:390px;width:90%;box-shadow:0 4px 24px rgba(0,0,0,.22)}
+.mod h3{margin-bottom:14px;color:#1a5276}
+.mod p{margin-bottom:8px;font-size:13px}
+.mbtns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.bc{background:#1a5276;color:#fff;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:13px}
+.bc:hover{background:#154360}
+.bx{background:#e8e8e8;color:#333;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:13px}
+.mok{color:#1e8449;font-weight:bold;margin-top:8px}
+.merr{color:#c0392b;font-weight:bold;margin-top:8px}
+#foot{text-align:center;padding:10px;font-size:11px;color:#777;border-top:1px solid #ddd}
+#foot a{color:#1a5276}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div><div class="logo">🎾 {{ klub }}</div><div class="sub">Rezervacije termina</div></div>
+  <div id="alink"></div>
+</div>
+
+<div id="info">
+  <span>Rezerviši ili otkaži telefonom: <a href="tel:{{ tel }}"><strong>{{ tel }}</strong></a></span>
+  <span id="mylink"></span>
+</div>
+
+<div id="lbar">
+  <span>Prijavite se da rezervišete:</span>
+  <input type="email" id="iem" placeholder="E-Mail" onkeydown="if(event.key==='Enter')login()">
+  <input type="password" id="ipw" placeholder="Lozinka" onkeydown="if(event.key==='Enter')login()">
+  <button class="btn btn-blue" onclick="login()">Prijava</button>
+  <span id="lerr"></span>
+</div>
+
+<div id="dnav">
+  <span class="arr" onclick="chDate(-1)">&#9664;</span>
+  <button class="btn-today" onclick="goToday()">Danas</button>
+  <span id="dlbl"></span>
+  <span class="arr" onclick="chDate(1)">&#9654;</span>
+</div>
+
+<div id="load">⏳ Učitavam...</div>
+<div id="twrap">
+  <table class="sc">
+    <thead id="th"></thead>
+    <tbody id="tb"></tbody>
+    <tfoot id="tf"></tfoot>
+  </table>
+</div>
+
+<div id="leg">
+  <span><span class="lb" style="background:#d4efdf"></span>Slobodno</span>
+  <span><span class="lb" style="background:#fadbd8"></span>Zauzeto</span>
+  <span><span class="lb" style="background:#fdebd0"></span>Pretplata</span>
+  <span><span class="lb" style="background:#e8e8e8"></span>Prošlo</span>
+</div>
+
+<!-- Modal rezervacija -->
+<div class="ov" id="mov">
+  <div class="mod">
+    <h3>Rezervacija termina</h3>
+    <p id="minfo"></p>
+    <div id="mmsg"></div>
+    <div class="mbtns">
+      <button class="bx" onclick="closeM()">Zatvori</button>
+      <button class="bc" id="mbtn" onclick="confirmRez()">Rezerviši</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal moje rezervacije -->
+<div class="ov" id="myov">
+  <div class="mod" style="max-width:520px">
+    <h3>Moje rezervacije</h3>
+    <div id="mylist" style="max-height:320px;overflow-y:auto;margin:10px 0;font-size:12px"></div>
+    <div class="mbtns"><button class="bx" onclick="document.getElementById('myov').classList.remove('on')">Zatvori</button></div>
+  </div>
+</div>
+
+<div id="foot">© {{ klub }} {% raw %}{% endraw %}</div>
+
+<script>
+const S={{ start }}, E={{ end }};
+const DANI=['nedjelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
+const MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
+let cd=new Date();cd.setHours(0,0,0,0);
+let cu=null, ps=null;
+
+function fd(d){return `${DANI[d.getDay()]} ${d.getDate()}. ${MES[d.getMonth()]} ${d.getFullYear()}.`}
+function iso(d){return d.toISOString().slice(0,10)}
+function fh(h){return `${String(h).padStart(2,'0')}:00 do ${String(h+1).padStart(2,'0')}:00`}
+
+async function api(url,data,method='GET'){
+  let o={method,credentials:'include'};
+  if(method==='POST'){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(data);}
+  const r=await fetch(url,o);return r.json();
+}
+
+async function checkMe(){
+  const r=await api('/api/me');
+  if(r.ok&&r.user)setIn(r.user);
+}
+
+function setIn(u){
+  cu=u;
+  document.getElementById('lbar').innerHTML=`
+    <span class="uinfo">✓ Prijavljeni ste kao <strong>${u.name}</strong></span>
+    <button class="btn btn-red" onclick="logout()">Odjava</button>
+    ${u.role==='admin'?'<a href="/admin/" style="margin-left:8px;color:#1a5276;font-weight:bold">⚙ Admin panel</a>':''}`;
+  document.getElementById('mylink').innerHTML='<a href="#" onclick="showMy();return false">📋 Moje rezervacije</a>';
+  render();
+}
+
+async function login(){
+  const em=document.getElementById('iem')?.value?.trim();
+  const pw=document.getElementById('ipw')?.value;
+  if(!em||!pw){document.getElementById('lerr').textContent='Unesite email i lozinku.';return;}
+  const r=await api('/api/login',{email:em,password:pw},'POST');
+  if(r.ok)setIn(r.user);
+  else document.getElementById('lerr').textContent=r.error||'Greška.';
+}
+
+async function logout(){
+  await api('/api/logout',{},'POST');
+  cu=null;location.reload();
+}
+
+async function render(){
+  const ds=iso(cd);
+  document.getElementById('dlbl').textContent=fd(cd);
+  document.getElementById('load').style.display='block';
+  document.getElementById('tb').innerHTML='';
+  const r=await api(`/api/raspored?date=${ds}`);
+  document.getElementById('load').style.display='none';
+  if(!r.ok)return;
+  const cs=r.courts,ids=Object.keys(cs);
+  document.getElementById('th').innerHTML=`
+    <tr class="rdate"><th class="tc">Teren</th><th colspan="${ids.length}">${fd(cd)}</th></tr>
+    <tr class="rcourt"><th class="tc"></th>${ids.map(i=>`<th>${cs[i].name}</th>`).join('')}</tr>`;
+  let body='';
+  for(let h=S;h<E;h++){
+    body+=`<tr><td class="tc">${fh(h)}</td>`;
+    for(const id of ids){
+      const sl=cs[id].slots[h],st=sl.status;
+      const lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Prošlo'}[st]||st;
+      const tt=sl.booked_by?`title="Rezervisao: ${sl.booked_by}"`:'';
+      const cl=st==='free'?`onclick="openM('${id}','${cs[id].name}',${h})"`:''
+      body+=`<td class="sl ${st}" ${cl} ${tt}>${lbl}</td>`;
+    }
+    body+='</tr>';
+  }
+  document.getElementById('tb').innerHTML=body;
+  document.getElementById('tf').innerHTML=`<tr class="rcourt"><td class="tc">Teren</td>${ids.map(i=>`<td>${cs[i].name}</td>`).join('')}</tr>`;
+}
+
+function chDate(d){cd.setDate(cd.getDate()+d);render();}
+function goToday(){cd=new Date();cd.setHours(0,0,0,0);render();}
+
+function openM(cid,cname,h){
+  if(!cu){alert('Prijavite se da rezervišete termin.');return;}
+  ps={date:iso(cd),court:cid,hour:h};
+  document.getElementById('minfo').innerHTML=`<strong>Teren:</strong> ${cname}<br><strong>Datum:</strong> ${fd(cd)}<br><strong>Vreme:</strong> ${fh(h)}<br><br>Da li želite da rezervišete ovaj termin?`;
+  document.getElementById('mmsg').innerHTML='';
+  document.getElementById('mbtn').style.display='';
+  document.getElementById('mov').classList.add('on');
+}
+function closeM(){document.getElementById('mov').classList.remove('on');ps=null;}
+
+async function confirmRez(){
+  if(!ps)return;
+  const r=await api('/api/rezervisi',ps,'POST');
+  const m=document.getElementById('mmsg');
+  if(r.ok){m.innerHTML=`<p class="mok">✓ ${r.message}</p>`;document.getElementById('mbtn').style.display='none';render();}
+  else m.innerHTML=`<p class="merr">✗ ${r.error}</p>`;
+}
+
+async function showMy(){
+  if(!cu)return;
+  const r=await api('/api/admin/rezervacije');
+  let html='';
+  if(r.ok&&r.rezervacije.length){
+    const mine=r.rezervacije.filter(x=>x.user_email===cu.email||cu.role==='admin');
+    if(!mine.length){html='<p style="color:#888">Nemate rezervacija.</p>';}
+    else{
+      html='<table style="width:100%;border-collapse:collapse"><tr style="background:#dce8f5"><th style="padding:4px 6px;border:1px solid #bcd">Datum</th><th style="padding:4px 6px;border:1px solid #bcd">Teren</th><th style="padding:4px 6px;border:1px solid #bcd">Vreme</th><th style="padding:4px 6px;border:1px solid #bcd">Akcija</th></tr>';
+      for(const b of mine)
+        html+=`<tr><td style="padding:4px 6px;border:1px solid #bcd">${b.date}</td><td style="padding:4px 6px;border:1px solid #bcd">${b.court_name}</td><td style="padding:4px 6px;border:1px solid #bcd">${fh(parseInt(b.hour))}</td><td style="padding:4px 6px;border:1px solid #bcd;text-align:center"><button onclick="otkaziM('${b.date}','${b.court_id}',${parseInt(b.hour)})" style="background:#922b21;color:#fff;border:none;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:11px">Otkaži</button></td></tr>`;
+      html+='</table>';
+    }
+  }else html='<p style="color:#888">Nemate rezervacija.</p>';
+  document.getElementById('mylist').innerHTML=html;
+  document.getElementById('myov').classList.add('on');
+}
+
+async function otkaziM(date,court,hour){
+  if(!confirm('Otkazati ovu rezervaciju?'))return;
+  const r=await api('/api/otkazi',{date,court,hour},'POST');
+  if(r.ok){showMy();render();}else alert(r.error);
+}
+
+document.getElementById('mov').addEventListener('click',e=>{if(e.target===e.currentTarget)closeM();});
+document.getElementById('myov').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('myov').classList.remove('on');});
+
+(async()=>{await checkMe();render();})();
+</script>
+</body>
+</html>
