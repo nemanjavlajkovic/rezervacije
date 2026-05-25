@@ -87,7 +87,8 @@ def admin():
         return redirect('/')
     return render_template('admin.html',
         klub=KLUB_IME, tereni=TERENI,
-        start=START_SAT, end=END_SAT)
+        start=START_SAT, end=END_SAT,
+        range=range)
 
 # ── API ───────────────────────────────────────────────────────────────────────
 
