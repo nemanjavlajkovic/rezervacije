@@ -55,36 +55,34 @@ td.asl.past{background:#e8e8e8;color:#999;cursor:default}
 </head>
 <body>
 <div id="hdr">
-  <h1>⚙ Admin – {{ klub }}</h1>
-  <a href="/">← Nazad na raspored</a>
+  <h1>&#9881; Admin – {{ klub }}</h1>
+  <a href="/">&#8592; Nazad na raspored</a>
 </div>
 <div class="tabs">
-  <div class="tab on" onclick="showTab('rez',this)">📋 Rezervacije</div>
-  <div class="tab" onclick="showTab('rasp',this)">🗓 Raspored</div>
-  <div class="tab" onclick="showTab('usr',this)">👥 Korisnici</div>
+  <div class="tab on" onclick="showTab('rez',this)">&#128203; Rezervacije</div>
+  <div class="tab" onclick="showTab('rasp',this)">&#128197; Raspored</div>
+  <div class="tab" onclick="showTab('usr',this)">&#128101; Korisnici</div>
 </div>
 
-<!-- Rezervacije -->
 <div class="pg on" id="pg-rez">
   <h2>Sve rezervacije</h2>
   <div style="margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <input type="text" id="fi" placeholder="Pretraži..." style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:260px" oninput="filterR()">
-    <button class="btn bb" onclick="loadR()">Osveži</button>
+    <input type="text" id="fi" placeholder="Pretrazi..." style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:260px" oninput="filterR()">
+    <button class="btn bb" onclick="loadR()">Osvezi</button>
   </div>
   <div id="rmsg"></div>
   <table class="tbl"><thead><tr><th>Datum</th><th>Teren</th><th>Vreme</th><th>Korisnik</th><th>Email</th><th>Status</th><th>Kreirano</th><th>Akcija</th></tr></thead>
   <tbody id="rb"></tbody></table>
 </div>
 
-<!-- Raspored -->
 <div class="pg" id="pg-rasp">
   <h2>Upravljanje rasporedom</h2>
   <div class="card">
-    <h3>Klikni na termin da promeniš status</h3>
+    <h3>Klikni na termin da promenis status</h3>
     <div id="adnav">
-      <button class="btn bb" onclick="adChDate(-1)">◀</button>
+      <button class="btn bb" onclick="adChDate(-1)">&#9664;</button>
       <input type="date" id="addi" onchange="adRender()">
-      <button class="btn bb" onclick="adChDate(1)">▶</button>
+      <button class="btn bb" onclick="adChDate(1)">&#9654;</button>
       <button class="btn bb" onclick="adToday()">Danas</button>
       <span id="adlbl"></span>
     </div>
@@ -92,24 +90,24 @@ td.asl.past{background:#e8e8e8;color:#999;cursor:default}
     <div id="agw"><table class="asc" id="ag"></table></div>
   </div>
   <div class="card">
-    <h3>Ručno postavi termin</h3>
+    <h3>Rucno postavi termin</h3>
     <div class="fr">
       <div><label>Datum</label><input type="date" id="sd"></div>
       <div><label>Teren</label>
         <select id="sc" style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px">
-          {% for id, name in tereni.items() %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
+          {% for tid, name in tereni.items() %}<option value="{{ tid }}">{{ name }}</option>{% endfor %}
         </select>
       </div>
       <div><label>Sat</label>
         <select id="sh" style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px">
-          {% for h in range(start, end) %}<option value="{{ h }}">{{ '%02d'|format(h) }}:00–{{ '%02d'|format(h+1) }}:00</option>{% endfor %}
+          {% for h in slots %}<option value="{{ h }}">{{ h }}:00 - {{ h+1 }}:00</option>{% endfor %}
         </select>
       </div>
       <div><label>Status</label>
         <select id="ss" style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px">
           <option value="taken">Zauzeto</option>
           <option value="sub">Pretplata</option>
-          <option value="free">Slobodno (briši)</option>
+          <option value="free">Slobodno (brisi)</option>
         </select>
       </div>
       <div style="padding-top:16px"><button class="btn bb" onclick="setSlot()">Postavi</button></div>
@@ -118,7 +116,6 @@ td.asl.past{background:#e8e8e8;color:#999;cursor:default}
   </div>
 </div>
 
-<!-- Korisnici -->
 <div class="pg" id="pg-usr">
   <h2>Korisnici sistema</h2>
   <div class="card">
@@ -144,23 +141,24 @@ td.asl.past{background:#e8e8e8;color:#999;cursor:default}
 
 <script>
 const S={{ start }},E={{ end }};
-const DANI=['nedjelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
+const DANI=['nedjelja','ponedeljak','utorak','sreda','cetvrtak','petak','subota'];
 const MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
 let allR=[],adDate=new Date();adDate.setHours(0,0,0,0);
 
-function fd(d){return `${DANI[d.getDay()]} ${d.getDate()}. ${MES[d.getMonth()]} ${d.getFullYear()}.`}
-function iso(d){return d.toISOString().slice(0,10)}
-function fh(h){return `${String(h).padStart(2,'0')}:00–${String(h+1).padStart(2,'0')}:00`}
+function fd(d){return DANI[d.getDay()]+' '+d.getDate()+'. '+MES[d.getMonth()]+' '+d.getFullYear()+'.';}
+function iso(d){return d.toISOString().slice(0,10);}
+function fh(h){return String(h).padStart(2,'0')+':00 - '+String(h+1).padStart(2,'0')+':00';}
 
-async function api(url,data,method='GET'){
-  let o={method,credentials:'include'};
+async function api(url,data,method){
+  method=method||'GET';
+  var o={method:method,credentials:'include'};
   if(method==='POST'){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(data);}
-  const r=await fetch(url,o);return r.json();
+  var r=await fetch(url,o);return r.json();
 }
 
 function showTab(name,el){
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   document.getElementById('pg-'+name).classList.add('on');
   el.classList.add('on');
   if(name==='rez')loadR();
@@ -168,43 +166,49 @@ function showTab(name,el){
   if(name==='usr')loadU();
 }
 
-// Rezervacije
 async function loadR(){
-  const r=await api('/api/admin/rezervacije');
+  var r=await api('/api/admin/rezervacije');
   if(!r.ok)return;
   allR=r.rezervacije;renderR(allR);
 }
-function filterR(){const q=document.getElementById('fi').value.toLowerCase();renderR(allR.filter(x=>x.user_name.toLowerCase().includes(q)||x.user_email.toLowerCase().includes(q)||x.date.includes(q)||x.court_name.toLowerCase().includes(q)));}
+function filterR(){
+  var q=document.getElementById('fi').value.toLowerCase();
+  renderR(allR.filter(function(x){return x.user_name.toLowerCase().includes(q)||x.user_email.toLowerCase().includes(q)||x.date.includes(q)||x.court_name.toLowerCase().includes(q);}));
+}
 function renderR(data){
-  const sl={taken:'Zauzeto',sub:'Pretplata'};
-  let h=data.length?'':'<tr><td colspan="8" style="text-align:center;padding:20px;color:#888">Nema rezervacija.</td></tr>';
-  for(const b of data)h+=`<tr><td>${b.date}</td><td>${b.court_name}</td><td>${fh(parseInt(b.hour))}</td><td>${b.user_name}</td><td>${b.user_email}</td><td><span class="bdg b${b.status[0]}">${sl[b.status]||b.status}</span></td><td style="font-size:11px;color:#888">${b.created_at}</td><td><button class="btn br sm" onclick="delR('${b.date}','${b.court_id}',${parseInt(b.hour)})">Otkaži</button></td></tr>`;
+  var sl={taken:'Zauzeto',sub:'Pretplata'};
+  var h=data.length?'':'<tr><td colspan="8" style="text-align:center;padding:20px;color:#888">Nema rezervacija.</td></tr>';
+  for(var i=0;i<data.length;i++){
+    var b=data[i];
+    h+='<tr><td>'+b.date+'</td><td>'+b.court_name+'</td><td>'+fh(parseInt(b.hour))+'</td><td>'+b.user_name+'</td><td>'+b.user_email+'</td><td><span class="bdg b'+b.status[0]+'">'+(sl[b.status]||b.status)+'</span></td><td style="font-size:11px;color:#888">'+b.created_at+'</td><td><button class="btn br sm" onclick="delR(\''+b.date+'\',\''+b.court_id+'\','+parseInt(b.hour)+')">Otkazi</button></td></tr>';
+  }
   document.getElementById('rb').innerHTML=h;
 }
 async function delR(date,court,hour){
   if(!confirm('Otkazati?'))return;
-  const r=await api('/api/otkazi',{date,court,hour},'POST');
+  var r=await api('/api/otkazi',{date:date,court:court,hour:hour},'POST');
   if(r.ok){loadR();sm('rmsg','Otkazano.',true);}else sm('rmsg',r.error,false);
 }
 
-// Admin raspored
 function syncAd(){
-  const s=iso(adDate);document.getElementById('addi').value=s;document.getElementById('adlbl').textContent=fd(adDate);
+  var s=iso(adDate);
+  document.getElementById('addi').value=s;
+  document.getElementById('adlbl').textContent=fd(adDate);
 }
 function adChDate(d){adDate.setDate(adDate.getDate()+d);syncAd();adRender();}
 function adToday(){adDate=new Date();adDate.setHours(0,0,0,0);syncAd();adRender();}
 async function adRender(){
-  const v=document.getElementById('addi').value;
+  var v=document.getElementById('addi').value;
   if(v)adDate=new Date(v+'T00:00:00');syncAd();
-  const r=await api(`/api/raspored?date=${iso(adDate)}`);if(!r.ok)return;
-  const cs=r.courts,ids=Object.keys(cs);
-  let h=`<thead><tr class="h1"><th style="min-width:90px">Sat/Teren</th><th colspan="${ids.length}">${fd(adDate)}</th></tr><tr class="h2"><th></th>${ids.map(i=>`<th>${cs[i].name}</th>`).join('')}</tr></thead><tbody>`;
-  for(let s=S;s<E;s++){
-    h+=`<tr><td class="atc">${fh(s)}</td>`;
-    for(const id of ids){
-      const st=cs[id].slots[s].status,lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Prošlo'}[st]||st;
-      const cl=st!=='past'?`onclick="adToggle('${id}','${iso(adDate)}',${s},'${st}')"`:''
-      h+=`<td class="asl ${st}" ${cl}>${lbl}</td>`;
+  var r=await api('/api/raspored?date='+iso(adDate));if(!r.ok)return;
+  var cs=r.courts,ids=Object.keys(cs);
+  var h='<thead><tr class="h1"><th style="min-width:90px">Sat/Teren</th><th colspan="'+ids.length+'">'+fd(adDate)+'</th></tr><tr class="h2"><th></th>'+ids.map(function(i){return '<th>'+cs[i].name+'</th>';}).join('')+'</tr></thead><tbody>';
+  for(var s=S;s<E;s++){
+    h+='<tr><td class="atc">'+fh(s)+'</td>';
+    for(var j=0;j<ids.length;j++){
+      var id=ids[j],st=cs[id].slots[s].status,lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Proslo'}[st]||st;
+      var cl=st!=='past'?' onclick="adToggle(\''+id+'\',\''+iso(adDate)+'\','+s+',\''+st+'\')"':'';
+      h+='<td class="asl '+st+'"'+cl+'>'+lbl+'</td>';
     }
     h+='</tr>';
   }
@@ -212,48 +216,49 @@ async function adRender(){
   document.getElementById('ag').innerHTML=h;
 }
 async function adToggle(cid,date,hour,cur){
-  const nx=cur==='free'?'taken':cur==='taken'?'sub':'free';
-  const r=await api('/api/admin/set',{date,court:cid,hour,status:nx},'POST');
+  var nx=cur==='free'?'taken':cur==='taken'?'sub':'free';
+  var r=await api('/api/admin/set',{date:date,court:cid,hour:hour,status:nx},'POST');
   if(r.ok)adRender();else sm('agmsg',r.error,false);
 }
 async function setSlot(){
-  const date=document.getElementById('sd').value,court=document.getElementById('sc').value,
-        hour=document.getElementById('sh').value,status=document.getElementById('ss').value;
+  var date=document.getElementById('sd').value,court=document.getElementById('sc').value,
+      hour=document.getElementById('sh').value,status=document.getElementById('ss').value;
   if(!date){sm('smsg','Izaberite datum.',false);return;}
-  const r=await api('/api/admin/set',{date,court,hour,status},'POST');
+  var r=await api('/api/admin/set',{date:date,court:court,hour:hour,status:status},'POST');
   if(r.ok){sm('smsg','Postavljeno!',true);adRender();}else sm('smsg',r.error,false);
 }
 
-// Korisnici
 async function loadU(){
-  const r=await api('/api/admin/korisnici');if(!r.ok)return;
-  let h='';
-  for(const u of r.korisnici)
-    h+=`<tr><td>${u.id}</td><td>${u.name}</td><td>${u.email}</td><td><span class="bdg ${u.role==='admin'?'ba':'bu'}">${u.role==='admin'?'Admin':'Korisnik'}</span></td><td style="display:flex;gap:6px;padding:5px 10px"><button class="btn bb sm" onclick="chPass(${u.id},'${u.name}')">Lozinka</button><button class="btn br sm" onclick="delU(${u.id},'${u.name}')">Obriši</button></td></tr>`;
+  var r=await api('/api/admin/korisnici');if(!r.ok)return;
+  var h='';
+  for(var i=0;i<r.korisnici.length;i++){
+    var u=r.korisnici[i];
+    h+='<tr><td>'+u.id+'</td><td>'+u.name+'</td><td>'+u.email+'</td><td><span class="bdg '+(u.role==='admin'?'ba':'bu')+'\">'+(u.role==='admin'?'Admin':'Korisnik')+'</span></td><td style="display:flex;gap:6px;padding:5px 10px"><button class="btn bb sm" onclick="chPass('+u.id+',\''+u.name+'\')">Lozinka</button><button class="btn br sm" onclick="delU('+u.id+',\''+u.name+'\')">Obrisi</button></td></tr>';
+  }
   document.getElementById('ub').innerHTML=h||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#888">Nema korisnika.</td></tr>';
 }
 async function addUser(){
-  const name=document.getElementById('nn').value.trim(),email=document.getElementById('ne').value.trim(),
-        pw=document.getElementById('np').value,role=document.getElementById('nr').value;
-  const r=await api('/api/admin/dodaj_korisnika',{name,email,password:pw,role},'POST');
-  if(r.ok){sm('aumsg','Korisnik dodat!',true);['nn','ne','np'].forEach(i=>document.getElementById(i).value='');loadU();}
+  var name=document.getElementById('nn').value.trim(),email=document.getElementById('ne').value.trim(),
+      pw=document.getElementById('np').value,role=document.getElementById('nr').value;
+  var r=await api('/api/admin/dodaj_korisnika',{name:name,email:email,password:pw,role:role},'POST');
+  if(r.ok){sm('aumsg','Korisnik dodat!',true);['nn','ne','np'].forEach(function(i){document.getElementById(i).value='';});loadU();}
   else sm('aumsg',r.error,false);
 }
 async function delU(id,name){
-  if(!confirm(`Obrisati "${name}"?`))return;
-  const r=await api('/api/admin/brisi_korisnika',{id},'POST');
+  if(!confirm('Obrisati "'+name+'"?'))return;
+  var r=await api('/api/admin/brisi_korisnika',{id:id},'POST');
   if(r.ok)loadU();else sm('umsg',r.error,false);
 }
 async function chPass(id,name){
-  const p=prompt(`Nova lozinka za "${name}":`);if(!p)return;
-  const r=await api('/api/admin/promeni_lozinku',{id,password:p},'POST');
+  var p=prompt('Nova lozinka za "'+name+'":');if(!p)return;
+  var r=await api('/api/admin/promeni_lozinku',{id:id,password:p},'POST');
   if(r.ok)sm('umsg','Lozinka promenjena!',true);else sm('umsg',r.error,false);
 }
 
 function sm(id,msg,ok){
-  const e=document.getElementById(id);if(!e)return;
-  e.innerHTML=`<div class="msg ${ok?'mok':'mer'}">${msg}</div>`;
-  setTimeout(()=>e.innerHTML='',4000);
+  var e=document.getElementById(id);if(!e)return;
+  e.innerHTML='<div class="msg '+(ok?'mok':'mer')+'">'+msg+'</div>';
+  setTimeout(function(){e.innerHTML='';},4000);
 }
 
 loadR();syncAd();
