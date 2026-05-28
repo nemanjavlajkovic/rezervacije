@@ -86,9 +86,9 @@ def admin():
     if not u or u['role'] != 'admin':
         return redirect('/')
     return render_template('admin.html',
-        klub=KLUB_IME, tereni=TERENI,
-        start=START_SAT, end=END_SAT,
-        range=range)
+    klub=KLUB_IME, tereni=TERENI,
+    start=START_SAT, end=END_SAT,
+    slots=list(range(START_SAT, END_SAT)))
 
 # ── API ───────────────────────────────────────────────────────────────────────
 
