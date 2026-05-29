@@ -199,7 +199,7 @@ function adChDate(d){var nd=new Date(adDate.getFullYear(),adDate.getMonth(),adDa
 function adToday(){var t=new Date();adDate=new Date(t.getFullYear(),t.getMonth(),t.getDate());syncAd();adRender();}
 async function adRender(){
   var v=document.getElementById('addi').value;
-  if(v){var p=v.split('-');adDate=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));syncAd();}
+syncAd();
   var r=await api('/api/raspored?date='+iso(adDate));if(!r.ok)return;
   var cs=r.courts,ids=Object.keys(cs);
   var h='<thead><tr class="h1"><th style="min-width:90px">Sat/Teren</th><th colspan="'+ids.length+'">'+fd(adDate)+'</th></tr><tr class="h2"><th></th>'+ids.map(function(i){return '<th>'+cs[i].name+'</th>';}).join('')+'</tr></thead><tbody>';
