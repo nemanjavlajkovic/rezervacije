@@ -195,8 +195,8 @@ function syncAd(){
   document.getElementById('addi').value=s;
   document.getElementById('adlbl').textContent=fd(adDate);
 }
-function adChDate(d){adDate=new Date(adDate.getTime());adDate.setDate(adDate.getDate()+d);syncAd();adRender();}
-function adToday(){adDate=new Date();adDate.setHours(0,0,0,0);syncAd();adRender();}
+function adChDate(d){var nd=new Date(adDate.getFullYear(),adDate.getMonth(),adDate.getDate()+d);adDate=nd;syncAd();adRender();}
+function adToday(){var t=new Date();adDate=new Date(t.getFullYear(),t.getMonth(),t.getDate());syncAd();adRender();}
 async function adRender(){
   var v=document.getElementById('addi').value;
   if(v){var p=v.split('-');adDate=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));}syncAd();
