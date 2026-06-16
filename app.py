@@ -64,12 +64,18 @@ def err(msg, code=400):
 def ensure_admin():
     users = read(USERS_F)
     if not users:
-        write(USERS_F, [{
-            'id': 1, 'email': 'admin@klub.rs',
-            'password': hp('password'),
-            'name': 'Administrator', 'role': 'admin'
-        }])
-
+        write(USERS_F, [
+            {
+                'id': 1, 'email': 'admin@klub.rs',
+                'password': hp('password'),
+                'name': 'Administrator', 'role': 'admin'
+            },
+            {
+                'id': 2, 'email': 'ivanajovanovic07@gmail.com',
+                'password': hp('Ivana07'),
+                'name': 'Ivana Jovanovic', 'role': 'user'
+            }
+        ])
 # ── Pages ─────────────────────────────────────────────────────────────────────
 
 @app.route('/')
