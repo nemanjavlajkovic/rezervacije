@@ -71,7 +71,7 @@ def ensure_admin():
                 'name': 'Administrator', 'role': 'admin'
             },
             {
-                'id': 2, 'email': 'ivanajovanovic07@gmail.com',
+                'id': 2, 'email': 'ivanajovanovicc07@gmail.com',
                 'password': hp('Ivana07'),
                 'name': 'Ivana Jovanovic', 'role': 'user'
             }
