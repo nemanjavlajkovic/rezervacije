@@ -124,8 +124,9 @@ def api_logout():
 def api_raspored():
     date_str = request.args.get('date', str(date.today()))
     bookings = read(BOOKINGS_F)
-    now = datetime.now()    
-    result = {}
+    from zoneinfo import ZoneInfo
+        now = datetime.now(ZoneInfo('Europe/Belgrade')).replace(tzinfo=None)    
+        result = {}
     for cid, cname in TERENI.items():
         result[cid] = {'name': cname, 'slots': {}}
         for h in range(START_SAT, END_SAT):
