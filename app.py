@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, session, render_template, redirect
 import json, os, hashlib
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
