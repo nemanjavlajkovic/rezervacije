@@ -215,11 +215,14 @@ if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal
     h+='</tr>';
   }
   h+='</tbody>';
-  document.getElementById('ag').innerHTML=h;
-}
-async function adToggle(cid,date,hour,cur){
+  async function adToggle(cid,date,hour,cur){
   var nx=cur==='free'?'taken':cur==='taken'?'sub':'free';
-  var r=await api('/api/admin/set',{date:date,court:cid,hour:hour,status:nx},'POST');
+  var name='';
+  if(nx==='taken'||nx==='sub'){
+    name=prompt('Ime osobe za rezervaciju (opciono):');
+    if(name===null)return;
+  }
+  var r=await api('/api/admin/set',{date:date,court:cid,hour:hour,status:nx,name:name||'Admin'},'POST');
   if(r.ok)adRender();else sm('agmsg',r.error,false);
 }
 async function setSlot(){
