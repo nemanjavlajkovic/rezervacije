@@ -124,7 +124,7 @@ def api_logout():
 def api_raspored():
     date_str = request.args.get('date', str(date.today()))
     bookings = read(BOOKINGS_F)
-    now = datetime.now()
+    now = datetime.utcnow() + timedelta(hours=2)    
     result = {}
     for cid, cname in TERENI.items():
         result[cid] = {'name': cname, 'slots': {}}
