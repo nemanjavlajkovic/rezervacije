@@ -110,6 +110,7 @@ td.asl.past{background:#e8e8e8;color:#999;cursor:default}
           <option value="free">Slobodno (brisi)</option>
         </select>
       </div>
+      <div><label>Ime osobe</label><input type="text" id="sn" placeholder="Ime i prezime" style="width:160px"></div>
       <div style="padding-top:16px"><button class="btn bb" onclick="setSlot()">Postavi</button></div>
     </div>
     <div id="smsg"></div>
@@ -140,20 +141,24 @@ td.asl.past{background:#e8e8e8;color:#999;cursor:default}
 </div>
 
 <script>
-const S={{ start }},E={{ end }};
-const DANI=['nedjelja','ponedeljak','utorak','sreda','cetvrtak','petak','subota'];
-const MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
-let allR=[],adDate=new Date();adDate.setHours(0,0,0,0);
+var S={{ start }}, E={{ end }};
+var DANI=['nedjelja','ponedeljak','utorak','sreda','cetvrtak','petak','subota'];
+var MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
+var allR=[], adDate=new Date();
+adDate=new Date(adDate.getFullYear(),adDate.getMonth(),adDate.getDate());
 
 function fd(d){return DANI[d.getDay()]+' '+d.getDate()+'. '+MES[d.getMonth()]+' '+d.getFullYear()+'.';}
-function iso(d){return d.toISOString().slice(0,10);}
+function iso(d){
+  var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dd;
+}
 function fh(h){return String(h).padStart(2,'0')+':00 - '+String(h+1).padStart(2,'0')+':00';}
 
-async function api(url,data,method){
+function api(url,data,method,cb){
   method=method||'GET';
   var o={method:method,credentials:'include'};
   if(method==='POST'){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(data);}
-  var r=await fetch(url,o);return r.json();
+  fetch(url,o).then(function(r){return r.json();}).then(cb);
 }
 
 function showTab(name,el){
@@ -166,15 +171,20 @@ function showTab(name,el){
   if(name==='usr')loadU();
 }
 
-async function loadR(){
-  var r=await api('/api/admin/rezervacije');
-  if(!r.ok)return;
-  allR=r.rezervacije;renderR(allR);
+function loadR(){
+  api('/api/admin/rezervacije',null,'GET',function(r){
+    if(!r.ok)return;
+    allR=r.rezervacije;renderR(allR);
+  });
 }
+
 function filterR(){
   var q=document.getElementById('fi').value.toLowerCase();
-  renderR(allR.filter(function(x){return x.user_name.toLowerCase().includes(q)||x.user_email.toLowerCase().includes(q)||x.date.includes(q)||x.court_name.toLowerCase().includes(q);}));
+  renderR(allR.filter(function(x){
+    return x.user_name.toLowerCase().includes(q)||x.user_email.toLowerCase().includes(q)||x.date.includes(q)||x.court_name.toLowerCase().includes(q);
+  }));
 }
+
 function renderR(data){
   var sl={taken:'Zauzeto',sub:'Pretplata'};
   var h=data.length?'':'<tr><td colspan="8" style="text-align:center;padding:20px;color:#888">Nema rezervacija.</td></tr>';
@@ -184,80 +194,119 @@ function renderR(data){
   }
   document.getElementById('rb').innerHTML=h;
 }
-async function delR(date,court,hour){
+
+function delR(date,court,hour){
   if(!confirm('Otkazati?'))return;
-  var r=await api('/api/otkazi',{date:date,court:court,hour:hour},'POST');
-  if(r.ok){loadR();sm('rmsg','Otkazano.',true);}else sm('rmsg',r.error,false);
+  api('/api/otkazi',{date:date,court:court,hour:hour},'POST',function(r){
+    if(r.ok){loadR();sm('rmsg','Otkazano.',true);}else sm('rmsg',r.error,false);
+  });
 }
 
 function syncAd(){
-  var s=iso(adDate);
-  document.getElementById('addi').value=s;
+  document.getElementById('addi').value=iso(adDate);
   document.getElementById('adlbl').textContent=fd(adDate);
 }
-function adChDate(d){var nd=new Date(adDate.getFullYear(),adDate.getMonth(),adDate.getDate()+d);adDate=nd;syncAd();adRender();}
-function adToday(){var t=new Date();adDate=new Date(t.getFullYear(),t.getMonth(),t.getDate());syncAd();adRender();}
-async function adRender(){
+
+function adChDate(d){
+  adDate=new Date(adDate.getFullYear(),adDate.getMonth(),adDate.getDate()+d);
+  syncAd();adRender();
+}
+
+function adToday(){
+  var t=new Date();
+  adDate=new Date(t.getFullYear(),t.getMonth(),t.getDate());
+  syncAd();adRender();
+}
+
+function adRender(){
   var v=document.getElementById('addi').value;
-syncAd();
-  var r=await api('/api/raspored?date='+iso(adDate));if(!r.ok)return;
-  var cs=r.courts,ids=Object.keys(cs);
-  var h='<thead><tr class="h1"><th style="min-width:90px">Sat/Teren</th><th colspan="'+ids.length+'">'+fd(adDate)+'</th></tr><tr class="h2"><th></th>'+ids.map(function(i){return '<th>'+cs[i].name+'</th>';}).join('')+'</tr></thead><tbody>';
-  for(var s=S;s<E;s++){
-    h+='<tr><td class="atc">'+fh(s)+'</td>';
-    for(var j=0;j<ids.length;j++){
-      var id=ids[j],slot=cs[id].slots[s],st=slot.status,lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Proslo'}[st]||st;
-if(slot.booked_by&&st==='taken')lbl='Zauzeto<br><small style="font-weight:normal">'+slot.booked_by+'</small>';
-if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal">'+slot.booked_by+'</small>';
-      var cl=st!=='past'?' onclick="adToggle(\''+id+'\',\''+iso(adDate)+'\','+s+',\''+st+'\')"':'';
-      h+='<td class="asl '+st+'"'+cl+'>'+lbl+'</td>';
-    }
-    h+='</tr>';
+  if(v){
+    var p=v.split('-');
+    adDate=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
   }
-  h+='</tbody>';
-  async function adToggle(cid,date,hour,cur){
+  syncAd();
+  api('/api/raspored?date='+iso(adDate),null,'GET',function(r){
+    if(!r.ok)return;
+    var cs=r.courts,ids=Object.keys(cs);
+    var h='<thead><tr class="h1"><th style="min-width:90px">Sat/Teren</th><th colspan="'+ids.length+'">'+fd(adDate)+'</th></tr><tr class="h2"><th></th>';
+    for(var i=0;i<ids.length;i++)h+='<th>'+cs[ids[i]].name+'</th>';
+    h+='</tr></thead><tbody>';
+    for(var s=S;s<E;s++){
+      h+='<tr><td class="atc">'+fh(s)+'</td>';
+      for(var j=0;j<ids.length;j++){
+        var id=ids[j],slot=cs[id].slots[s],st=slot.status;
+        var lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Proslo'}[st]||st;
+        if(slot.booked_by&&st==='taken')lbl='Zauzeto<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
+        if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
+        var cl=st!=='past'?' onclick="adToggle(\''+id+'\',\''+iso(adDate)+'\','+s+',\''+st+'\')"':'';
+        h+='<td class="asl '+st+'"'+cl+'>'+lbl+'</td>';
+      }
+      h+='</tr>';
+    }
+    h+='</tbody>';
+    document.getElementById('ag').innerHTML=h;
+  });
+}
+
+function adToggle(cid,date,hour,cur){
   var nx=cur==='free'?'taken':cur==='taken'?'sub':'free';
   var name='';
   if(nx==='taken'||nx==='sub'){
     name=prompt('Ime osobe za rezervaciju (opciono):');
     if(name===null)return;
   }
-  var r=await api('/api/admin/set',{date:date,court:cid,hour:hour,status:nx,name:name||'Admin'},'POST');
-  if(r.ok)adRender();else sm('agmsg',r.error,false);
-}
-async function setSlot(){
-  var date=document.getElementById('sd').value,court=document.getElementById('sc').value,
-      hour=document.getElementById('sh').value,status=document.getElementById('ss').value;
-  if(!date){sm('smsg','Izaberite datum.',false);return;}
-  var r=await api('/api/admin/set',{date:date,court:court,hour:hour,status:status},'POST');
-  if(r.ok){sm('smsg','Postavljeno!',true);adRender();}else sm('smsg',r.error,false);
+  api('/api/admin/set',{date:date,court:cid,hour:hour,status:nx,name:name||'Admin'},'POST',function(r){
+    if(r.ok)adRender();else sm('agmsg',r.error,false);
+  });
 }
 
-async function loadU(){
-  var r=await api('/api/admin/korisnici');if(!r.ok)return;
-  var h='';
-  for(var i=0;i<r.korisnici.length;i++){
-    var u=r.korisnici[i];
-    h+='<tr><td>'+u.id+'</td><td>'+u.name+'</td><td>'+u.email+'</td><td><span class="bdg '+(u.role==='admin'?'ba':'bu')+'\">'+(u.role==='admin'?'Admin':'Korisnik')+'</span></td><td style="display:flex;gap:6px;padding:5px 10px"><button class="btn bb sm" onclick="chPass('+u.id+',\''+u.name+'\')">Lozinka</button><button class="btn br sm" onclick="delU('+u.id+',\''+u.name+'\')">Obrisi</button></td></tr>';
-  }
-  document.getElementById('ub').innerHTML=h||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#888">Nema korisnika.</td></tr>';
+function setSlot(){
+  var date=document.getElementById('sd').value;
+  var court=document.getElementById('sc').value;
+  var hour=document.getElementById('sh').value;
+  var status=document.getElementById('ss').value;
+  var name=document.getElementById('sn').value||'Admin';
+  if(!date){sm('smsg','Izaberite datum.',false);return;}
+  api('/api/admin/set',{date:date,court:court,hour:hour,status:status,name:name},'POST',function(r){
+    if(r.ok){sm('smsg','Postavljeno!',true);adRender();}else sm('smsg',r.error,false);
+  });
 }
-async function addUser(){
-  var name=document.getElementById('nn').value.trim(),email=document.getElementById('ne').value.trim(),
-      pw=document.getElementById('np').value,role=document.getElementById('nr').value;
-  var r=await api('/api/admin/dodaj_korisnika',{name:name,email:email,password:pw,role:role},'POST');
-  if(r.ok){sm('aumsg','Korisnik dodat!',true);['nn','ne','np'].forEach(function(i){document.getElementById(i).value='';});loadU();}
-  else sm('aumsg',r.error,false);
+
+function loadU(){
+  api('/api/admin/korisnici',null,'GET',function(r){
+    if(!r.ok)return;
+    var h='';
+    for(var i=0;i<r.korisnici.length;i++){
+      var u=r.korisnici[i];
+      h+='<tr><td>'+u.id+'</td><td>'+u.name+'</td><td>'+u.email+'</td><td><span class="bdg '+(u.role==='admin'?'ba':'bu')+'">'+(u.role==='admin'?'Admin':'Korisnik')+'</span></td><td style="display:flex;gap:6px;padding:5px 10px"><button class="btn bb sm" onclick="chPass('+u.id+',\''+u.name+'\')">Lozinka</button><button class="btn br sm" onclick="delU('+u.id+',\''+u.name+'\')">Obrisi</button></td></tr>';
+    }
+    document.getElementById('ub').innerHTML=h||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#888">Nema korisnika.</td></tr>';
+  });
 }
-async function delU(id,name){
+
+function addUser(){
+  var name=document.getElementById('nn').value.trim();
+  var email=document.getElementById('ne').value.trim();
+  var pw=document.getElementById('np').value;
+  var role=document.getElementById('nr').value;
+  api('/api/admin/dodaj_korisnika',{name:name,email:email,password:pw,role:role},'POST',function(r){
+    if(r.ok){sm('aumsg','Korisnik dodat!',true);['nn','ne','np'].forEach(function(i){document.getElementById(i).value='';});loadU();}
+    else sm('aumsg',r.error,false);
+  });
+}
+
+function delU(id,name){
   if(!confirm('Obrisati "'+name+'"?'))return;
-  var r=await api('/api/admin/brisi_korisnika',{id:id},'POST');
-  if(r.ok)loadU();else sm('umsg',r.error,false);
+  api('/api/admin/brisi_korisnika',{id:id},'POST',function(r){
+    if(r.ok)loadU();else sm('umsg',r.error,false);
+  });
 }
-async function chPass(id,name){
+
+function chPass(id,name){
   var p=prompt('Nova lozinka za "'+name+'":');if(!p)return;
-  var r=await api('/api/admin/promeni_lozinku',{id:id,password:p},'POST');
-  if(r.ok)sm('umsg','Lozinka promenjena!',true);else sm('umsg',r.error,false);
+  api('/api/admin/promeni_lozinku',{id:id,password:p},'POST',function(r){
+    if(r.ok)sm('umsg','Lozinka promenjena!',true);else sm('umsg',r.error,false);
+  });
 }
 
 function sm(id,msg,ok){
@@ -266,7 +315,8 @@ function sm(id,msg,ok){
   setTimeout(function(){e.innerHTML='';},4000);
 }
 
-loadR();syncAd();
+loadR();
+syncAd();
 </script>
 </body>
 </html>
