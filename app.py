@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, session, render_template, redirect
 import json, os, hashlib
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
@@ -124,7 +124,7 @@ def api_logout():
 def api_raspored():
     date_str = request.args.get('date', str(date.today()))
     bookings = read(BOOKINGS_F)
-    now = datetime.utcnow() + timedelta(hours=9)    
+    now = datetime.now()    
     result = {}
     for cid, cname in TERENI.items():
         result[cid] = {'name': cname, 'slots': {}}
