@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session, render_template, redirect
 import json, os, hashlib
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
@@ -123,10 +124,8 @@ def api_logout():
 @app.route('/api/raspored')
 def api_raspored():
     date_str = request.args.get('date', str(date.today()))
-    bookings = read(BOOKINGS_F)
-    from zoneinfo import ZoneInfo
-        now = datetime.now(ZoneInfo('Europe/Belgrade')).replace(tzinfo=None)    
-        result = {}
+    now = datetime.now(ZoneInfo('Europe/Belgrade')).replace(tzinfo=None)
+    result = {}
     for cid, cname in TERENI.items():
         result[cid] = {'name': cname, 'slots': {}}
         for h in range(START_SAT, END_SAT):
