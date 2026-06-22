@@ -206,7 +206,9 @@ syncAd();
   for(var s=S;s<E;s++){
     h+='<tr><td class="atc">'+fh(s)+'</td>';
     for(var j=0;j<ids.length;j++){
-      var id=ids[j],st=cs[id].slots[s].status,lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Proslo'}[st]||st;
+      var id=ids[j],slot=cs[id].slots[s],st=slot.status,lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Proslo'}[st]||st;
+if(slot.booked_by&&st==='taken')lbl='Zauzeto<br><small style="font-weight:normal">'+slot.booked_by+'</small>';
+if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal">'+slot.booked_by+'</small>';
       var cl=st!=='past'?' onclick="adToggle(\''+id+'\',\''+iso(adDate)+'\','+s+',\''+st+'\')"':'';
       h+='<td class="asl '+st+'"'+cl+'>'+lbl+'</td>';
     }
