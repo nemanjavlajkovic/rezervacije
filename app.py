@@ -73,7 +73,7 @@ def ensure_admin():
             'name': 'Administrator', 'role': 'admin'
         })
         changed = True
-    if 'ivanajovanovic07@gmail.com' not in emails:
+    if 'ivanajovanovicc07@gmail.com' not in emails:
         users.append({
             'id': 2, 'email': 'ivanajovanovicc07@gmail.com',
             'password': hp('Ivana07'),
