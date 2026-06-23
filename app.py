@@ -64,19 +64,24 @@ def err(msg, code=400):
 
 def ensure_admin():
     users = read(USERS_F)
-    if not users:
-        write(USERS_F, [
-            {
-                'id': 1, 'email': 'admin@klub.rs',
-                'password': hp('password'),
-                'name': 'Administrator', 'role': 'admin'
-            },
-            {
-                'id': 2, 'email': 'ivanajovanovicc07@gmail.com',
-                'password': hp('Ivana07'),
-                'name': 'Ivana Jovanovic', 'role': 'admin'
-            }
-        ])
+    emails = [u['email'].lower() for u in users]
+    changed = False
+    if 'admin@klub.rs' not in emails:
+        users.append({
+            'id': 1, 'email': 'admin@klub.rs',
+            'password': hp('password'),
+            'name': 'Administrator', 'role': 'admin'
+        })
+        changed = True
+    if 'ivanajovanovic07@gmail.com' not in emails:
+        users.append({
+            'id': 2, 'email': 'ivanajovanovic07@gmail.com',
+            'password': hp('Ivana07'),
+            'name': 'Ivana Jovanovic', 'role': 'admin'
+        })
+        changed = True
+    if changed:
+        write(USERS_F, users)
 # ── Pages ─────────────────────────────────────────────────────────────────────
 
 @app.route('/')
