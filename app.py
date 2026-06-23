@@ -75,7 +75,7 @@ def ensure_admin():
         changed = True
     if 'ivanajovanovic07@gmail.com' not in emails:
         users.append({
-            'id': 2, 'email': 'ivanajovanovic07@gmail.com',
+            'id': 2, 'email': 'ivanajovanovicc07@gmail.com',
             'password': hp('Ivana07'),
             'name': 'Ivana Jovanovic', 'role': 'admin'
         })
