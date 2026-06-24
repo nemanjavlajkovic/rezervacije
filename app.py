@@ -288,3 +288,52 @@ def api_lozinka():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+# ── Klijenti ──────────────────────────────────────────────────────────────────
+
+@app.route('/api/klijenti')
+def api_klijenti():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
+    q = request.args.get('q','').lower()
+    if q:
+        klijenti = [k for k in klijenti if q in k['ime'].lower()]
+    return ok({'klijenti': klijenti})
+
+@app.route('/api/dodaj_klijenta', methods=['POST'])
+def api_dodaj_klijenta():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    d = request.json or {}
+    ime = (d.get('ime') or '').strip()
+    pretplatnik = bool(d.get('pretplatnik', False))
+    if not ime: return err('Unesite ime.')
+    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
+    new_id = max((k['id'] for k in klijenti), default=0) + 1
+    klijenti.append({'id': new_id, 'ime': ime, 'pretplatnik': pretplatnik})
+    write(KLIJENTI_F, klijenti)
+    return ok({'message': 'Klijent dodat.'})
+
+@app.route('/api/brisi_klijenta', methods=['POST'])
+def api_brisi_klijenta():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    kid = int((request.json or {}).get('id', 0))
+    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
+    klijenti = [k for k in klijenti if k['id'] != kid]
+    write(KLIJENTI_F, klijenti)
+    return ok()
+
+@app.route('/api/promeni_klijenta', methods=['POST'])
+def api_promeni_klijenta():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    d = request.json or {}
+    kid = int(d.get('id', 0))
+    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
+    for k in klijenti:
+        if k['id'] == kid:
+            k['pretplatnik'] = not k['pretplatnik']
+    write(KLIJENTI_F, klijenti)
+    return ok()
