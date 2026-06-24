@@ -169,9 +169,13 @@ def api_rezervisi():
     bookings = read(BOOKINGS_F)
     if key in bookings and bookings[key]['status'] in ('taken','sub'):
         return err('Termin je već zauzet.')
+    ime = d.get('name', u['name'])
+    status_rez = d.get('status', 'taken')
+    if status_rez not in ('taken', 'sub'):
+        status_rez = 'taken'
     bookings[key] = {
-        'status': 'taken',
-        'user_id': u['id'], 'user_name': u['name'],
+        'status': status_rez,
+        'user_id': u['id'], 'user_name': ime,
         'user_email': u['email'],
         'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
