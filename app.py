@@ -9,6 +9,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
 DATA_DIR   = os.path.join(os.path.dirname(__file__), 'data')
 USERS_F    = os.path.join(DATA_DIR, 'users.json')
 BOOKINGS_F = os.path.join(DATA_DIR, 'bookings.json')
+KLIJENTI_F = os.path.join(DATA_DIR, 'klijenti.json')
 
 KLUB_IME  = 'Byford Country Club'
 TELEFON   = '063-3-6666-4'
