@@ -1,3 +1,4 @@
+cat > /home/claude/flask-app/templates/index_new.html << 'ENDOFFILE'
 <!DOCTYPE html>
 <html lang="sr-Latn">
 <head>
@@ -41,17 +42,57 @@ td.sl.free:hover{filter:brightness(.92)}
 #leg{display:flex;gap:14px;flex-wrap:wrap;padding:6px 14px 12px;font-size:12px;align-items:center}
 .lb{display:inline-block;width:14px;height:14px;border:1px solid #aaa;vertical-align:middle;margin-right:4px;border-radius:2px}
 #load{text-align:center;padding:30px;color:#666;font-style:italic;display:none}
+
+/* Klijenti sekcija */
+#klijenti-wrap{padding:0 6px 20px;display:none}
+.card{background:#fff;border-radius:6px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:14px}
+.card h3{font-size:13px;color:#1a5276;margin-bottom:10px;border-bottom:1px solid #eee;padding-bottom:6px}
+.fr{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px}
+.fr label{font-size:12px;color:#555;display:block;margin-bottom:3px}
+.fr input{border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:200px}
+.tbl{border-collapse:collapse;width:100%}
+.tbl th{background:#2e86c1;color:#fff;padding:7px 10px;text-align:left;font-size:12px}
+.tbl td{padding:6px 10px;border-bottom:1px solid #e8e8e8;font-size:12px}
+.tbl tr:hover td{background:#f5f9ff}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold;cursor:pointer}
+.badge-pret{background:#fdebd0;color:#935116}
+.badge-reg{background:#e8e8e8;color:#666}
+.msg-ok{color:#1e8449;font-size:12px;margin-top:6px}
+.msg-err{color:#c0392b;font-size:12px;margin-top:6px}
+
+/* Modal */
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
 .ov.on{display:flex}
-.mod{background:#fff;border-radius:6px;padding:22px 28px;max-width:390px;width:90%;box-shadow:0 4px 24px rgba(0,0,0,.22)}
+.mod{background:#fff;border-radius:6px;padding:22px 28px;max-width:420px;width:90%;box-shadow:0 4px 24px rgba(0,0,0,.22)}
 .mod h3{margin-bottom:14px;color:#1a5276}
 .mod p{margin-bottom:8px;font-size:13px}
+.minfo{background:#f0f4f8;border-radius:4px;padding:10px 14px;margin-bottom:14px;font-size:13px;line-height:1.8}
 .mbtns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
 .bc{background:#1a5276;color:#fff;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:13px}
 .bc:hover{background:#154360}
 .bx{background:#e8e8e8;color:#333;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:13px}
-.mok{color:#1e8449;font-weight:bold;margin-top:8px}
-.merr{color:#c0392b;font-weight:bold;margin-top:8px}
+.mok{color:#1e8449;font-weight:bold;margin-top:8px;font-size:13px}
+.merr{color:#c0392b;font-weight:bold;margin-top:8px;font-size:13px}
+
+/* Autocomplete */
+.ac-wrap{position:relative}
+.ac-wrap input{width:100%;border:1px solid #aac;padding:6px 10px;border-radius:3px;font-size:13px}
+.ac-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #aac;border-radius:3px;margin-top:2px;z-index:200;max-height:200px;overflow-y:auto}
+.ac-item{padding:8px 12px;cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f0f0}
+.ac-item:hover{background:#f0f4f8}
+.ac-tag{font-size:11px;background:#fdebd0;color:#935116;padding:2px 7px;border-radius:10px}
+.selected-klijent{display:none;margin-top:6px;align-items:center;gap:6px;flex-wrap:wrap}
+.sel-name{background:#d5e8f7;color:#1a5276;font-size:12px;padding:3px 10px;border-radius:10px;font-weight:bold}
+.sel-pret{background:#fdebd0;color:#935116;font-size:11px;padding:2px 7px;border-radius:10px}
+.sel-clear{background:none;border:none;cursor:pointer;color:#888;font-size:16px;line-height:1}
+
+/* Status dugmad */
+.status-btns{display:flex;gap:8px;margin-top:10px}
+.sbtn{flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;cursor:pointer;font-size:12px;text-align:center;font-weight:bold;transition:all .15s}
+.sbtn.active-taken{background:#fadbd8;color:#922b21;border-color:#e59a9a}
+.sbtn.active-sub{background:#fdebd0;color:#935116;border-color:#e5c990}
+.sbtn.inactive{background:#f5f5f5;color:#888;border-color:#ddd}
+
 #foot{text-align:center;padding:10px;font-size:11px;color:#777;border-top:1px solid #ddd}
 #foot a{color:#1a5276}
 </style>
@@ -60,7 +101,7 @@ td.sl.free:hover{filter:brightness(.92)}
 
 <div id="hdr">
   <div><div class="logo">🎾 {{ klub }}</div><div class="sub">Rezervacije termina</div></div>
-  <div id="alink"></div>
+  <div id="admin-link-wrap"></div>
 </div>
 
 <div id="info">
@@ -99,11 +140,68 @@ td.sl.free:hover{filter:brightness(.92)}
   <span><span class="lb" style="background:#e8e8e8"></span>Prošlo</span>
 </div>
 
+<!-- Klijenti sekcija -->
+<div id="klijenti-wrap">
+  <div style="padding:0 6px">
+    <div class="card">
+      <h3>➕ Dodaj novog klijenta</h3>
+      <div class="fr">
+        <div>
+          <label>Ime i prezime</label>
+          <input type="text" id="k-ime" placeholder="Npr. Marko Petrović">
+        </div>
+        <div>
+          <label>Tip klijenta</label>
+          <div style="display:flex;gap:6px;margin-top:2px">
+            <button id="btn-reg" onclick="setTip('regular')" class="btn btn-blue" style="font-size:12px;padding:5px 12px">Regularni</button>
+            <button id="btn-pret" onclick="setTip('pretplatnik')" class="btn" style="font-size:12px;padding:5px 12px;background:#e8e8e8;color:#555">Pretplatnik</button>
+          </div>
+        </div>
+        <button class="btn btn-blue" onclick="dodajKlijenta()" style="padding:5px 16px">Dodaj</button>
+      </div>
+      <div id="k-msg"></div>
+    </div>
+
+    <div class="card">
+      <h3>👥 Lista klijenata</h3>
+      <div style="margin-bottom:10px">
+        <input type="text" id="k-search" placeholder="Pretraži klijente..." oninput="renderKlijenti()" style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:240px">
+      </div>
+      <table class="tbl">
+        <thead><tr><th>Ime i prezime</th><th>Tip</th><th>Akcija</th></tr></thead>
+        <tbody id="k-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- Modal rezervacija -->
 <div class="ov" id="mov">
   <div class="mod">
     <h3>Rezervacija termina</h3>
-    <p id="minfo"></p>
+    <div id="minfo" class="minfo"></div>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Ime klijenta</label>
+      <div class="ac-wrap">
+        <input type="text" id="ac-input" placeholder="Počni da kucaš ime..." oninput="acSearch(this.value)" autocomplete="off">
+        <div class="ac-dropdown" id="ac-dd"></div>
+      </div>
+      <div class="selected-klijent" id="sel-k">
+        <span class="sel-name" id="sel-name"></span>
+        <span class="sel-pret" id="sel-pret" style="display:none">pretplatnik</span>
+        <button class="sel-clear" onclick="clearSel()">×</button>
+      </div>
+    </div>
+
+    <div>
+      <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Status rezervacije</label>
+      <div class="status-btns">
+        <button id="sbtn-taken" class="sbtn active-taken" onclick="setStatus('taken')">Zauzeto</button>
+        <button id="sbtn-sub" class="sbtn inactive" onclick="setStatus('sub')">Pretplata</button>
+      </div>
+    </div>
+
     <div id="mmsg"></div>
     <div class="mbtns">
       <button class="bx" onclick="closeM()">Zatvori</button>
@@ -121,114 +219,241 @@ td.sl.free:hover{filter:brightness(.92)}
   </div>
 </div>
 
-<div id="foot">© {{ klub }} {% raw %}{% endraw %}</div>
+<div id="foot">© {{ klub }}</div>
 
 <script>
-const S={{ start }}, E={{ end }};
-const DANI=['nedjelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
-const MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
-let cd=new Date();cd.setHours(0,0,0,0);
-let cu=null, ps=null;
+var S={{ start }}, E={{ end }};
+var DANI=['nedjelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
+var MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
+var cd=new Date();cd.setHours(0,0,0,0);
+cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate());
+var cu=null, ps=null, selKlijent=null, rezStatus='taken', klijentTip='regular';
 
-function fd(d){return `${DANI[d.getDay()]} ${d.getDate()}. ${MES[d.getMonth()]} ${d.getFullYear()}.`}
-function iso(d){return d.toISOString().slice(0,10)}
-function fh(h){return `${String(h).padStart(2,'0')}:00 do ${String(h+1).padStart(2,'0')}:00`}
+function fd(d){return DANI[d.getDay()]+' '+d.getDate()+'. '+MES[d.getMonth()]+' '+d.getFullYear()+'.';}
+function iso(d){var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dd;}
+function fh(h){return String(h).padStart(2,'0')+':00 do '+String(h+1).padStart(2,'0')+':00';}
 
-async function api(url,data,method='GET'){
-  let o={method,credentials:'include'};
+function api(url,data,method,cb){
+  method=method||'GET';
+  var o={method:method,credentials:'include'};
   if(method==='POST'){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(data);}
-  const r=await fetch(url,o);return r.json();
+  fetch(url,o).then(function(r){return r.json();}).then(cb).catch(function(){});
+}
+
+async function apiAsync(url,data,method){
+  method=method||'GET';
+  var o={method:method,credentials:'include'};
+  if(method==='POST'){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(data);}
+  var r=await fetch(url,o);return r.json();
 }
 
 async function checkMe(){
-  const r=await api('/api/me');
+  var r=await apiAsync('/api/me');
   if(r.ok&&r.user)setIn(r.user);
+  else render();
 }
 
 function setIn(u){
   cu=u;
-  document.getElementById('lbar').innerHTML=`
-    <span class="uinfo">✓ Prijavljeni ste kao <strong>${u.name}</strong></span>
-    <button class="btn btn-red" onclick="logout()">Odjava</button>
-    ${u.role==='admin'?'<a href="/admin/" style="margin-left:8px;color:#1a5276;font-weight:bold">⚙ Admin panel</a>':''}`;
+  document.getElementById('lbar').innerHTML=
+    '<span class="uinfo">✓ Prijavljeni ste kao <strong>'+u.name+'</strong></span>'+
+    '<button class="btn btn-red" onclick="logout()">Odjava</button>'+
+    (u.role==='admin'?'<a href="/admin/" style="margin-left:8px;color:#1a5276;font-weight:bold">⚙ Admin panel</a>':'');
   document.getElementById('mylink').innerHTML='<a href="#" onclick="showMy();return false">📋 Moje rezervacije</a>';
+  document.getElementById('klijenti-wrap').style.display='block';
+  loadKlijenti();
   render();
 }
 
 async function login(){
-  const em=document.getElementById('iem')?.value?.trim();
-  const pw=document.getElementById('ipw')?.value;
-  if(!em||!pw){document.getElementById('lerr').textContent='Unesite email i lozinku.';return;}
-  const r=await api('/api/login',{email:em,password:pw},'POST');
+  var em=document.getElementById('iem')&&document.getElementById('iem').value.trim();
+  var pw=document.getElementById('ipw')&&document.getElementById('ipw').value;
+  if(!em||!pw){if(document.getElementById('lerr'))document.getElementById('lerr').textContent='Unesite email i lozinku.';return;}
+  var r=await apiAsync('/api/login',{email:em,password:pw},'POST');
   if(r.ok)setIn(r.user);
-  else document.getElementById('lerr').textContent=r.error||'Greška.';
+  else if(document.getElementById('lerr'))document.getElementById('lerr').textContent=r.error||'Greška.';
 }
 
 async function logout(){
-  await api('/api/logout',{},'POST');
+  await apiAsync('/api/logout',{},'POST');
   cu=null;location.reload();
 }
 
 async function render(){
-  const ds=iso(cd);
+  var ds=iso(cd);
   document.getElementById('dlbl').textContent=fd(cd);
   document.getElementById('load').style.display='block';
   document.getElementById('tb').innerHTML='';
-  const r=await api(`/api/raspored?date=${ds}`);
+  var r=await apiAsync('/api/raspored?date='+ds);
   document.getElementById('load').style.display='none';
   if(!r.ok)return;
-  const cs=r.courts,ids=Object.keys(cs);
-  document.getElementById('th').innerHTML=`
-    <tr class="rdate"><th class="tc">Teren</th><th colspan="${ids.length}">${fd(cd)}</th></tr>
-    <tr class="rcourt"><th class="tc"></th>${ids.map(i=>`<th>${cs[i].name}</th>`).join('')}</tr>`;
-  let body='';
-  for(let h=S;h<E;h++){
-    body+=`<tr><td class="tc">${fh(h)}</td>`;
-    for(const id of ids){
-      const sl=cs[id].slots[h],st=sl.status;
-      const lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Prošlo'}[st]||st;
-      const tt=sl.booked_by?`title="Rezervisao: ${sl.booked_by}"`:'';
-      const cl=st==='free'?`onclick="openM('${id}','${cs[id].name}',${h})"`:''
-      body+=`<td class="sl ${st}" ${cl} ${tt}>${lbl}</td>`;
+  var cs=r.courts,ids=Object.keys(cs);
+  document.getElementById('th').innerHTML=
+    '<tr class="rdate"><th class="tc">Teren</th><th colspan="'+ids.length+'">'+fd(cd)+'</th></tr>'+
+    '<tr class="rcourt"><th class="tc"></th>'+ids.map(function(i){return '<th>'+cs[i].name+'</th>';}).join('')+'</tr>';
+  var body='';
+  for(var h=S;h<E;h++){
+    body+='<tr><td class="tc">'+fh(h)+'</td>';
+    for(var j=0;j<ids.length;j++){
+      var id=ids[j],slot=cs[id].slots[h],st=slot.status;
+      var lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Prošlo'}[st]||st;
+      if(slot.booked_by&&st==='taken')lbl='Zauzeto<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
+      if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
+      var cl=st==='free'&&cu?' onclick="openM(\''+id+'\',\''+cs[id].name+'\','+h+')"':'';
+      body+='<td class="sl '+st+'"'+cl+'>'+lbl+'</td>';
     }
     body+='</tr>';
   }
   document.getElementById('tb').innerHTML=body;
-  document.getElementById('tf').innerHTML=`<tr class="rcourt"><td class="tc">Teren</td>${ids.map(i=>`<td>${cs[i].name}</td>`).join('')}</tr>`;
+  document.getElementById('tf').innerHTML='<tr class="rcourt"><td class="tc">Teren</td>'+ids.map(function(i){return '<td>'+cs[i].name+'</td>';}).join('')+'</tr>';
 }
 
-function chDate(d){cd.setDate(cd.getDate()+d);render();}
-function goToday(){cd=new Date();cd.setHours(0,0,0,0);render();}
+function chDate(d){cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate()+d);render();}
+function goToday(){var t=new Date();cd=new Date(t.getFullYear(),t.getMonth(),t.getDate());render();}
 
-function openM(cid,cname,h){
+// ── Klijenti ──────────────────────────────────────────────────────────────────
+var sviKlijenti=[];
+
+function loadKlijenti(){
+  api('/api/klijenti',null,'GET',function(r){
+    if(r.ok){sviKlijenti=r.klijenti;renderKlijenti();}
+  });
+}
+
+function renderKlijenti(){
+  var q=(document.getElementById('k-search')||{value:''}).value.toLowerCase();
+  var filtered=sviKlijenti.filter(function(k){return k.ime.toLowerCase().includes(q);});
+  var body=document.getElementById('k-body');
+  if(!body)return;
+  if(!filtered.length){body.innerHTML='<tr><td colspan="3" style="text-align:center;padding:16px;color:#888">Nema klijenata.</td></tr>';return;}
+  body.innerHTML=filtered.map(function(k){
+    return '<tr>'+
+      '<td>'+k.ime+'</td>'+
+      '<td><span class="badge '+(k.pretplatnik?'badge-pret':'badge-reg')+'" onclick="promeniTip('+k.id+')" title="Klikni da promijeniš">'+(k.pretplatnik?'pretplatnik':'regularni')+'</span></td>'+
+      '<td><button onclick="brisiK('+k.id+')" class="btn btn-red" style="font-size:11px;padding:2px 8px">Obriši</button></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function setTip(t){
+  klijentTip=t;
+  document.getElementById('btn-reg').className='btn '+(t==='regular'?'btn-blue':'');
+  document.getElementById('btn-reg').style.background=t==='regular'?'':'#e8e8e8';
+  document.getElementById('btn-reg').style.color=t==='regular'?'':'#555';
+  document.getElementById('btn-pret').className='btn';
+  document.getElementById('btn-pret').style.background=t==='pretplatnik'?'#935116':'#e8e8e8';
+  document.getElementById('btn-pret').style.color=t==='pretplatnik'?'#fff':'#555';
+}
+
+function dodajKlijenta(){
+  var ime=(document.getElementById('k-ime')||{value:''}).value.trim();
+  var msg=document.getElementById('k-msg');
+  if(!ime){msg.innerHTML='<p class="msg-err">Unesite ime klijenta.</p>';return;}
+  api('/api/dodaj_klijenta',{ime:ime,pretplatnik:klijentTip==='pretplatnik'},'POST',function(r){
+    if(r.ok){
+      document.getElementById('k-ime').value='';
+      msg.innerHTML='<p class="msg-ok">✓ Klijent dodat!</p>';
+      setTimeout(function(){msg.innerHTML='';},3000);
+      loadKlijenti();
+    } else msg.innerHTML='<p class="msg-err">'+r.error+'</p>';
+  });
+}
+
+function brisiK(id){
+  if(!confirm('Obrisati klijenta?'))return;
+  api('/api/brisi_klijenta',{id:id},'POST',function(r){
+    if(r.ok)loadKlijenti();
+  });
+}
+
+function promeniTip(id){
+  api('/api/promeni_klijenta',{id:id},'POST',function(r){
+    if(r.ok)loadKlijenti();
+  });
+}
+
+// ── Modal rezervacija ─────────────────────────────────────────────────────────
+function openM(courtId,courtName,hour){
   if(!cu){alert('Prijavite se da rezervišete termin.');return;}
-  ps={date:iso(cd),court:cid,hour:h};
-  document.getElementById('minfo').innerHTML=`<strong>Teren:</strong> ${cname}<br><strong>Datum:</strong> ${fd(cd)}<br><strong>Vreme:</strong> ${fh(h)}<br><br>Da li želite da rezervišete ovaj termin?`;
+  ps={date:iso(cd),court:courtId,hour:hour};
+  document.getElementById('minfo').innerHTML=
+    '<strong>Teren:</strong> '+courtName+'<br>'+
+    '<strong>Datum:</strong> '+fd(cd)+'<br>'+
+    '<strong>Vreme:</strong> '+fh(hour);
   document.getElementById('mmsg').innerHTML='';
   document.getElementById('mbtn').style.display='';
+  document.getElementById('ac-input').value='';
+  document.getElementById('ac-dd').style.display='none';
+  document.getElementById('sel-k').style.display='none';
+  selKlijent=null;
+  rezStatus='taken';
+  document.getElementById('sbtn-taken').className='sbtn active-taken';
+  document.getElementById('sbtn-sub').className='sbtn inactive';
   document.getElementById('mov').classList.add('on');
 }
+
 function closeM(){document.getElementById('mov').classList.remove('on');ps=null;}
+
+function setStatus(s){
+  rezStatus=s;
+  document.getElementById('sbtn-taken').className='sbtn '+(s==='taken'?'active-taken':'inactive');
+  document.getElementById('sbtn-sub').className='sbtn '+(s==='sub'?'active-sub':'inactive');
+}
+
+function acSearch(q){
+  var dd=document.getElementById('ac-dd');
+  if(!q){dd.style.display='none';return;}
+  var filtered=sviKlijenti.filter(function(k){return k.ime.toLowerCase().includes(q.toLowerCase());});
+  if(!filtered.length){dd.style.display='none';return;}
+  dd.innerHTML=filtered.map(function(k){
+    return '<div class="ac-item" onclick="selK('+k.id+')">'+
+      '<span>'+k.ime+'</span>'+
+      (k.pretplatnik?'<span class="ac-tag">pretplatnik</span>':'')+
+    '</div>';
+  }).join('');
+  dd.style.display='block';
+}
+
+function selK(id){
+  selKlijent=sviKlijenti.find(function(k){return k.id===id;});
+  document.getElementById('ac-input').value=selKlijent.ime;
+  document.getElementById('ac-dd').style.display='none';
+  document.getElementById('sel-k').style.display='flex';
+  document.getElementById('sel-name').textContent=selKlijent.ime;
+  document.getElementById('sel-pret').style.display=selKlijent.pretplatnik?'inline':'none';
+  if(selKlijent.pretplatnik)setStatus('sub');
+}
+
+function clearSel(){
+  selKlijent=null;
+  document.getElementById('ac-input').value='';
+  document.getElementById('sel-k').style.display='none';
+  setStatus('taken');
+}
 
 async function confirmRez(){
   if(!ps)return;
-  const r=await api('/api/rezervisi',ps,'POST');
-  const m=document.getElementById('mmsg');
-  if(r.ok){m.innerHTML=`<p class="mok">✓ ${r.message}</p>`;document.getElementById('mbtn').style.display='none';render();}
-  else m.innerHTML=`<p class="merr">✗ ${r.error}</p>`;
+  var ime=selKlijent?selKlijent.ime:document.getElementById('ac-input').value.trim();
+  if(!ime){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite ime klijenta.</p>';return;}
+  var r=await apiAsync('/api/rezervisi',{date:ps.date,court:ps.court,hour:ps.hour,status:rezStatus,name:ime},'POST');
+  var m=document.getElementById('mmsg');
+  if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
+  else m.innerHTML='<p class="merr">✗ '+r.error+'</p>';
 }
 
 async function showMy(){
   if(!cu)return;
-  const r=await api('/api/admin/rezervacije');
-  let html='';
+  var r=await apiAsync('/api/admin/rezervacije');
+  var html='';
   if(r.ok&&r.rezervacije.length){
-    const mine=r.rezervacije.filter(x=>x.user_email===cu.email||cu.role==='admin');
+    var mine=r.rezervacije.filter(function(x){return x.user_email===cu.email||cu.role==='admin';});
     if(!mine.length){html='<p style="color:#888">Nemate rezervacija.</p>';}
     else{
       html='<table style="width:100%;border-collapse:collapse"><tr style="background:#dce8f5"><th style="padding:4px 6px;border:1px solid #bcd">Datum</th><th style="padding:4px 6px;border:1px solid #bcd">Teren</th><th style="padding:4px 6px;border:1px solid #bcd">Vreme</th><th style="padding:4px 6px;border:1px solid #bcd">Akcija</th></tr>';
-      for(const b of mine)
-        html+=`<tr><td style="padding:4px 6px;border:1px solid #bcd">${b.date}</td><td style="padding:4px 6px;border:1px solid #bcd">${b.court_name}</td><td style="padding:4px 6px;border:1px solid #bcd">${fh(parseInt(b.hour))}</td><td style="padding:4px 6px;border:1px solid #bcd;text-align:center"><button onclick="otkaziM('${b.date}','${b.court_id}',${parseInt(b.hour)})" style="background:#922b21;color:#fff;border:none;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:11px">Otkaži</button></td></tr>`;
+      for(var i=0;i<mine.length;i++){
+        var b=mine[i];
+        html+='<tr><td style="padding:4px 6px;border:1px solid #bcd">'+b.date+'</td><td style="padding:4px 6px;border:1px solid #bcd">'+b.court_name+'</td><td style="padding:4px 6px;border:1px solid #bcd">'+fh(parseInt(b.hour))+'</td><td style="padding:4px 6px;border:1px solid #bcd;text-align:center"><button onclick="otkaziM(\''+b.date+'\',\''+b.court_id+'\','+parseInt(b.hour)+')" style="background:#922b21;color:#fff;border:none;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:11px">Otkaži</button></td></tr>';
+      }
       html+='</table>';
     }
   }else html='<p style="color:#888">Nemate rezervacija.</p>';
@@ -238,14 +463,20 @@ async function showMy(){
 
 async function otkaziM(date,court,hour){
   if(!confirm('Otkazati ovu rezervaciju?'))return;
-  const r=await api('/api/otkazi',{date,court,hour},'POST');
+  var r=await apiAsync('/api/otkazi',{date:date,court:court,hour:hour},'POST');
   if(r.ok){showMy();render();}else alert(r.error);
 }
 
-document.getElementById('mov').addEventListener('click',e=>{if(e.target===e.currentTarget)closeM();});
-document.getElementById('myov').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('myov').classList.remove('on');});
+document.getElementById('mov').addEventListener('click',function(e){if(e.target===this)closeM();});
+document.getElementById('myov').addEventListener('click',function(e){if(e.target===this)document.getElementById('myov').classList.remove('on');});
+document.addEventListener('click',function(e){
+  var dd=document.getElementById('ac-dd');
+  if(dd&&!dd.contains(e.target)&&e.target.id!=='ac-input')dd.style.display='none';
+});
 
-(async()=>{await checkMe();render();})();
+(async function(){await checkMe();})();
 </script>
 </body>
 </html>
+ENDOFFILE
+echo "done"
