@@ -41,14 +41,12 @@ td.sl.free:hover{filter:brightness(.92)}
 #leg{display:flex;gap:14px;flex-wrap:wrap;padding:6px 14px 12px;font-size:12px;align-items:center}
 .lb{display:inline-block;width:14px;height:14px;border:1px solid #aaa;vertical-align:middle;margin-right:4px;border-radius:2px}
 #load{text-align:center;padding:30px;color:#666;font-style:italic;display:none}
-
-/* Klijenti sekcija */
 #klijenti-wrap{padding:0 6px 20px;display:none}
 .card{background:#fff;border-radius:6px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:14px}
 .card h3{font-size:13px;color:#1a5276;margin-bottom:10px;border-bottom:1px solid #eee;padding-bottom:6px}
 .fr{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px}
 .fr label{font-size:12px;color:#555;display:block;margin-bottom:3px}
-.fr input{border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:200px}
+.fr input{border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:180px}
 .tbl{border-collapse:collapse;width:100%}
 .tbl th{background:#2e86c1;color:#fff;padding:7px 10px;text-align:left;font-size:12px}
 .tbl td{padding:6px 10px;border-bottom:1px solid #e8e8e8;font-size:12px}
@@ -58,13 +56,10 @@ td.sl.free:hover{filter:brightness(.92)}
 .badge-reg{background:#e8e8e8;color:#666}
 .msg-ok{color:#1e8449;font-size:12px;margin-top:6px}
 .msg-err{color:#c0392b;font-size:12px;margin-top:6px}
-
-/* Modal */
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
 .ov.on{display:flex}
 .mod{background:#fff;border-radius:6px;padding:22px 28px;max-width:420px;width:90%;box-shadow:0 4px 24px rgba(0,0,0,.22)}
 .mod h3{margin-bottom:14px;color:#1a5276}
-.mod p{margin-bottom:8px;font-size:13px}
 .minfo{background:#f0f4f8;border-radius:4px;padding:10px 14px;margin-bottom:14px;font-size:13px;line-height:1.8}
 .mbtns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
 .bc{background:#1a5276;color:#fff;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:13px}
@@ -72,26 +67,22 @@ td.sl.free:hover{filter:brightness(.92)}
 .bx{background:#e8e8e8;color:#333;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:13px}
 .mok{color:#1e8449;font-weight:bold;margin-top:8px;font-size:13px}
 .merr{color:#c0392b;font-weight:bold;margin-top:8px;font-size:13px}
-
-/* Autocomplete */
 .ac-wrap{position:relative}
 .ac-wrap input{width:100%;border:1px solid #aac;padding:6px 10px;border-radius:3px;font-size:13px}
 .ac-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #aac;border-radius:3px;margin-top:2px;z-index:200;max-height:200px;overflow-y:auto}
 .ac-item{padding:8px 12px;cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f0f0}
 .ac-item:hover{background:#f0f4f8}
 .ac-tag{font-size:11px;background:#fdebd0;color:#935116;padding:2px 7px;border-radius:10px}
+.ac-tel{font-size:11px;color:#888;margin-left:6px}
 .selected-klijent{display:none;margin-top:6px;align-items:center;gap:6px;flex-wrap:wrap}
 .sel-name{background:#d5e8f7;color:#1a5276;font-size:12px;padding:3px 10px;border-radius:10px;font-weight:bold}
 .sel-pret{background:#fdebd0;color:#935116;font-size:11px;padding:2px 7px;border-radius:10px}
 .sel-clear{background:none;border:none;cursor:pointer;color:#888;font-size:16px;line-height:1}
-
-/* Status dugmad */
 .status-btns{display:flex;gap:8px;margin-top:10px}
 .sbtn{flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;cursor:pointer;font-size:12px;text-align:center;font-weight:bold;transition:all .15s}
 .sbtn.active-taken{background:#fadbd8;color:#922b21;border-color:#e59a9a}
 .sbtn.active-sub{background:#fdebd0;color:#935116;border-color:#e5c990}
 .sbtn.inactive{background:#f5f5f5;color:#888;border-color:#ddd}
-
 #foot{text-align:center;padding:10px;font-size:11px;color:#777;border-top:1px solid #ddd}
 #foot a{color:#1a5276}
 </style>
@@ -109,7 +100,7 @@ td.sl.free:hover{filter:brightness(.92)}
 </div>
 
 <div id="lbar">
-  <span>Prijavite se da rezervišete:</span>
+  <span>Prijavite se:</span>
   <input type="email" id="iem" placeholder="E-Mail" onkeydown="if(event.key==='Enter')login()">
   <input type="password" id="ipw" placeholder="Lozinka" onkeydown="if(event.key==='Enter')login()">
   <button class="btn btn-blue" onclick="login()">Prijava</button>
@@ -139,7 +130,7 @@ td.sl.free:hover{filter:brightness(.92)}
   <span><span class="lb" style="background:#e8e8e8"></span>Prošlo</span>
 </div>
 
-<!-- Klijenti sekcija -->
+<!-- Klijenti sekcija - vidljiva samo staff/admin -->
 <div id="klijenti-wrap">
   <div style="padding:0 6px">
     <div class="card">
@@ -148,6 +139,10 @@ td.sl.free:hover{filter:brightness(.92)}
         <div>
           <label>Ime i prezime</label>
           <input type="text" id="k-ime" placeholder="Npr. Marko Petrović">
+        </div>
+        <div>
+          <label>Broj telefona</label>
+          <input type="text" id="k-tel" placeholder="Npr. 063-123-456">
         </div>
         <div>
           <label>Tip klijenta</label>
@@ -164,10 +159,10 @@ td.sl.free:hover{filter:brightness(.92)}
     <div class="card">
       <h3>👥 Lista klijenata</h3>
       <div style="margin-bottom:10px">
-        <input type="text" id="k-search" placeholder="Pretraži klijente..." oninput="renderKlijenti()" style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:240px">
+        <input type="text" id="k-search" placeholder="Pretraži po imenu ili telefonu..." oninput="renderKlijenti()" style="border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:280px">
       </div>
       <table class="tbl">
-        <thead><tr><th>Ime i prezime</th><th>Tip</th><th>Akcija</th></tr></thead>
+        <thead><tr><th>Ime i prezime</th><th>Telefon</th><th>Tip</th><th>Akcija</th></tr></thead>
         <tbody id="k-body"></tbody>
       </table>
     </div>
@@ -179,11 +174,10 @@ td.sl.free:hover{filter:brightness(.92)}
   <div class="mod">
     <h3>Rezervacija termina</h3>
     <div id="minfo" class="minfo"></div>
-
     <div style="margin-bottom:12px">
       <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Ime klijenta</label>
       <div class="ac-wrap">
-        <input type="text" id="ac-input" placeholder="Počni da kucaš ime..." oninput="acSearch(this.value)" autocomplete="off">
+        <input type="text" id="ac-input" placeholder="Počni da kucaš ime ili telefon..." oninput="acSearch(this.value)" autocomplete="off">
         <div class="ac-dropdown" id="ac-dd"></div>
       </div>
       <div class="selected-klijent" id="sel-k">
@@ -192,7 +186,6 @@ td.sl.free:hover{filter:brightness(.92)}
         <button class="sel-clear" onclick="clearSel()">×</button>
       </div>
     </div>
-
     <div>
       <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Status rezervacije</label>
       <div class="status-btns">
@@ -200,7 +193,6 @@ td.sl.free:hover{filter:brightness(.92)}
         <button id="sbtn-sub" class="sbtn inactive" onclick="setStatus('sub')">Pretplata</button>
       </div>
     </div>
-
     <div id="mmsg"></div>
     <div class="mbtns">
       <button class="bx" onclick="closeM()">Zatvori</button>
@@ -224,7 +216,7 @@ td.sl.free:hover{filter:brightness(.92)}
 var S={{ start }}, E={{ end }};
 var DANI=['nedjelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
 var MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
-var cd=new Date();cd.setHours(0,0,0,0);
+var cd=new Date();
 cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate());
 var cu=null, ps=null, selKlijent=null, rezStatus='taken', klijentTip='regular';
 
@@ -259,8 +251,11 @@ function setIn(u){
     '<button class="btn btn-red" onclick="logout()">Odjava</button>'+
     (u.role==='admin'?'<a href="/admin/" style="margin-left:8px;color:#1a5276;font-weight:bold">⚙ Admin panel</a>':'');
   document.getElementById('mylink').innerHTML='<a href="#" onclick="showMy();return false">📋 Moje rezervacije</a>';
-  document.getElementById('klijenti-wrap').style.display='block';
-  loadKlijenti();
+  // Klijenti sekcija vidljiva samo staff i admin
+  if(u.role==='admin'||u.role==='staff'){
+    document.getElementById('klijenti-wrap').style.display='block';
+    loadKlijenti();
+  }
   render();
 }
 
@@ -298,7 +293,9 @@ async function render(){
       var lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Prošlo'}[st]||st;
       if(slot.booked_by&&st==='taken')lbl='Zauzeto<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
       if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
-      var cl=st==='free'&&cu?' onclick="openM(\''+id+'\',\''+cs[id].name+'\','+h+')"':'';
+      // Klik samo za staff i admin
+      var canClick=st==='free'&&cu&&(cu.role==='admin'||cu.role==='staff');
+      var cl=canClick?' onclick="openM(\''+id+'\',\''+cs[id].name+'\','+h+')"':'';
       body+='<td class="sl '+st+'"'+cl+'>'+lbl+'</td>';
     }
     body+='</tr>';
@@ -321,13 +318,16 @@ function loadKlijenti(){
 
 function renderKlijenti(){
   var q=(document.getElementById('k-search')||{value:''}).value.toLowerCase();
-  var filtered=sviKlijenti.filter(function(k){return k.ime.toLowerCase().includes(q);});
+  var filtered=sviKlijenti.filter(function(k){
+    return k.ime.toLowerCase().includes(q)||(k.telefon||'').toLowerCase().includes(q);
+  });
   var body=document.getElementById('k-body');
   if(!body)return;
-  if(!filtered.length){body.innerHTML='<tr><td colspan="3" style="text-align:center;padding:16px;color:#888">Nema klijenata.</td></tr>';return;}
+  if(!filtered.length){body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:16px;color:#888">Nema klijenata.</td></tr>';return;}
   body.innerHTML=filtered.map(function(k){
     return '<tr>'+
       '<td>'+k.ime+'</td>'+
+      '<td style="color:#555">'+(k.telefon||'-')+'</td>'+
       '<td><span class="badge '+(k.pretplatnik?'badge-pret':'badge-reg')+'" onclick="promeniTip('+k.id+')" title="Klikni da promijeniš">'+(k.pretplatnik?'pretplatnik':'regularni')+'</span></td>'+
       '<td><button onclick="brisiK('+k.id+')" class="btn btn-red" style="font-size:11px;padding:2px 8px">Obriši</button></td>'+
     '</tr>';
@@ -336,21 +336,21 @@ function renderKlijenti(){
 
 function setTip(t){
   klijentTip=t;
-  document.getElementById('btn-reg').className='btn '+(t==='regular'?'btn-blue':'');
-  document.getElementById('btn-reg').style.background=t==='regular'?'':'#e8e8e8';
-  document.getElementById('btn-reg').style.color=t==='regular'?'':'#555';
-  document.getElementById('btn-pret').className='btn';
+  document.getElementById('btn-reg').style.background=t==='regular'?'#1a5276':'#e8e8e8';
+  document.getElementById('btn-reg').style.color=t==='regular'?'#fff':'#555';
   document.getElementById('btn-pret').style.background=t==='pretplatnik'?'#935116':'#e8e8e8';
   document.getElementById('btn-pret').style.color=t==='pretplatnik'?'#fff':'#555';
 }
 
 function dodajKlijenta(){
   var ime=(document.getElementById('k-ime')||{value:''}).value.trim();
+  var tel=(document.getElementById('k-tel')||{value:''}).value.trim();
   var msg=document.getElementById('k-msg');
   if(!ime){msg.innerHTML='<p class="msg-err">Unesite ime klijenta.</p>';return;}
-  api('/api/dodaj_klijenta',{ime:ime,pretplatnik:klijentTip==='pretplatnik'},'POST',function(r){
+  api('/api/dodaj_klijenta',{ime:ime,telefon:tel,pretplatnik:klijentTip==='pretplatnik'},'POST',function(r){
     if(r.ok){
       document.getElementById('k-ime').value='';
+      document.getElementById('k-tel').value='';
       msg.innerHTML='<p class="msg-ok">✓ Klijent dodat!</p>';
       setTimeout(function(){msg.innerHTML='';},3000);
       loadKlijenti();
@@ -402,11 +402,13 @@ function setStatus(s){
 function acSearch(q){
   var dd=document.getElementById('ac-dd');
   if(!q){dd.style.display='none';return;}
-  var filtered=sviKlijenti.filter(function(k){return k.ime.toLowerCase().includes(q.toLowerCase());});
+  var filtered=sviKlijenti.filter(function(k){
+    return k.ime.toLowerCase().includes(q.toLowerCase())||(k.telefon||'').includes(q);
+  });
   if(!filtered.length){dd.style.display='none';return;}
   dd.innerHTML=filtered.map(function(k){
     return '<div class="ac-item" onclick="selK('+k.id+')">'+
-      '<span>'+k.ime+'</span>'+
+      '<span>'+k.ime+(k.telefon?'<span class="ac-tel">'+k.telefon+'</span>':'')+'</span>'+
       (k.pretplatnik?'<span class="ac-tag">pretplatnik</span>':'')+
     '</div>';
   }).join('');
@@ -418,7 +420,7 @@ function selK(id){
   document.getElementById('ac-input').value=selKlijent.ime;
   document.getElementById('ac-dd').style.display='none';
   document.getElementById('sel-k').style.display='flex';
-  document.getElementById('sel-name').textContent=selKlijent.ime;
+  document.getElementById('sel-name').textContent=selKlijent.ime+(selKlijent.telefon?' ('+selKlijent.telefon+')':'');
   document.getElementById('sel-pret').style.display=selKlijent.pretplatnik?'inline':'none';
   if(selKlijent.pretplatnik)setStatus('sub');
 }
@@ -446,7 +448,7 @@ async function showMy(){
   var html='';
   if(r.ok&&r.rezervacije.length){
     var mine=r.rezervacije.filter(function(x){return x.user_email===cu.email||cu.role==='admin';});
-    if(!mine.length){html='<p style="color:#888">Nemate rezervacija.</p>';}
+    if(!mine.length){html='<p style="color:#888">Nema rezervacija.</p>';}
     else{
       html='<table style="width:100%;border-collapse:collapse"><tr style="background:#dce8f5"><th style="padding:4px 6px;border:1px solid #bcd">Datum</th><th style="padding:4px 6px;border:1px solid #bcd">Teren</th><th style="padding:4px 6px;border:1px solid #bcd">Vreme</th><th style="padding:4px 6px;border:1px solid #bcd">Akcija</th></tr>';
       for(var i=0;i<mine.length;i++){
@@ -455,7 +457,7 @@ async function showMy(){
       }
       html+='</table>';
     }
-  }else html='<p style="color:#888">Nemate rezervacija.</p>';
+  }else html='<p style="color:#888">Nema rezervacija.</p>';
   document.getElementById('mylist').innerHTML=html;
   document.getElementById('myov').classList.add('on');
 }
