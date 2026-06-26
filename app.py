@@ -302,7 +302,7 @@ def api_klijenti():
     klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
     q = request.args.get('q','').lower()
     if q:
-        klijenti = [k for k in klijenti if q in k['ime'].lower()]
+        klijenti = [k for k in klijenti if q in k['ime'].lower() or q in k.get('telefon','').lower()]
     return ok({'klijenti': klijenti})
 
 @app.route('/api/dodaj_klijenta', methods=['POST'])
@@ -311,11 +311,12 @@ def api_dodaj_klijenta():
     if not u: return err('Niste prijavljeni.', 401)
     d = request.json or {}
     ime = (d.get('ime') or '').strip()
+    telefon = (d.get('telefon') or '').strip()
     pretplatnik = bool(d.get('pretplatnik', False))
     if not ime: return err('Unesite ime.')
     klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
     new_id = max((k['id'] for k in klijenti), default=0) + 1
-    klijenti.append({'id': new_id, 'ime': ime, 'pretplatnik': pretplatnik})
+    klijenti.append({'id': new_id, 'ime': ime, 'telefon': telefon, 'pretplatnik': pretplatnik})
     write(KLIJENTI_F, klijenti)
     return ok({'message': 'Klijent dodat.'})
 
