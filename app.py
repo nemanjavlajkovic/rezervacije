@@ -78,7 +78,7 @@ def ensure_admin():
         users.append({
             'id': 2, 'email': 'ivanajovanovicc07@gmail.com',
             'password': hp('Ivana07'),
-            'name': 'Ivana Jovanovic', 'role': 'admin'
+            'name': 'Ivana Jovanovic', 'role': 'staff'
         })
         changed = True
     if changed:
