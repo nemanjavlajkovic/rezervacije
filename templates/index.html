@@ -58,7 +58,7 @@ td.sl.free:hover{filter:brightness(.92)}
 .msg-err{color:#c0392b;font-size:12px;margin-top:6px}
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
 .ov.on{display:flex}
-.mod{background:#fff;border-radius:6px;padding:22px 28px;max-width:420px;width:90%;box-shadow:0 4px 24px rgba(0,0,0,.22)}
+.mod{background:#fff;border-radius:6px;padding:22px 28px;max-width:440px;width:90%;box-shadow:0 4px 24px rgba(0,0,0,.22)}
 .mod h3{margin-bottom:14px;color:#1a5276}
 .minfo{background:#f0f4f8;border-radius:4px;padding:10px 14px;margin-bottom:14px;font-size:13px;line-height:1.8}
 .mbtns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
@@ -83,6 +83,9 @@ td.sl.free:hover{filter:brightness(.92)}
 .sbtn.active-taken{background:#fadbd8;color:#922b21;border-color:#e59a9a}
 .sbtn.active-sub{background:#fdebd0;color:#935116;border-color:#e5c990}
 .sbtn.inactive{background:#f5f5f5;color:#888;border-color:#ddd}
+#pretplata-period{display:none;margin-top:12px;background:#fffbf0;border:1px solid #e5c990;border-radius:4px;padding:12px}
+#pretplata-period label{font-size:12px;color:#555;display:block;margin-bottom:3px}
+#pretplata-period input[type=date]{border:1px solid #aac;padding:5px 8px;border-radius:3px;font-size:12px;width:100%}
 #foot{text-align:center;padding:10px;font-size:11px;color:#777;border-top:1px solid #ddd}
 #foot a{color:#1a5276}
 </style>
@@ -130,7 +133,7 @@ td.sl.free:hover{filter:brightness(.92)}
   <span><span class="lb" style="background:#e8e8e8"></span>Prošlo</span>
 </div>
 
-<!-- Klijenti sekcija - vidljiva samo staff/admin -->
+<!-- Klijenti sekcija -->
 <div id="klijenti-wrap">
   <div style="padding:0 6px">
     <div class="card">
@@ -174,6 +177,7 @@ td.sl.free:hover{filter:brightness(.92)}
   <div class="mod">
     <h3>Rezervacija termina</h3>
     <div id="minfo" class="minfo"></div>
+
     <div style="margin-bottom:12px">
       <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Ime klijenta</label>
       <div class="ac-wrap">
@@ -186,6 +190,7 @@ td.sl.free:hover{filter:brightness(.92)}
         <button class="sel-clear" onclick="clearSel()">×</button>
       </div>
     </div>
+
     <div>
       <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Status rezervacije</label>
       <div class="status-btns">
@@ -193,6 +198,24 @@ td.sl.free:hover{filter:brightness(.92)}
         <button id="sbtn-sub" class="sbtn inactive" onclick="setStatus('sub')">Pretplata</button>
       </div>
     </div>
+
+    <!-- Period pretplate - pojavljuje se samo kad je odabrano Pretplata -->
+    <div id="pretplata-period">
+      <p style="font-size:12px;color:#935116;margin-bottom:10px;">
+        📅 Sistem će automatski kreirati rezervacije za svaki isti dan u sedmici u odabranom periodu.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px">
+          <label>Od datuma</label>
+          <input type="date" id="date-od">
+        </div>
+        <div style="flex:1;min-width:120px">
+          <label>Do datuma</label>
+          <input type="date" id="date-do">
+        </div>
+      </div>
+    </div>
+
     <div id="mmsg"></div>
     <div class="mbtns">
       <button class="bx" onclick="closeM()">Zatvori</button>
@@ -214,7 +237,7 @@ td.sl.free:hover{filter:brightness(.92)}
 
 <script>
 var S={{ start }}, E={{ end }};
-var DANI=['nedjelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
+var DANI=['nedjelja','ponedeljak','utorak','sreda','cetvrtak','petak','subota'];
 var MES=['januara','februara','marta','aprila','maja','juna','jula','avgusta','septembra','oktobra','novembra','decembra'];
 var cd=new Date();
 cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate());
@@ -251,7 +274,6 @@ function setIn(u){
     '<button class="btn btn-red" onclick="logout()">Odjava</button>'+
     (u.role==='admin'?'<a href="/admin/" style="margin-left:8px;color:#1a5276;font-weight:bold">⚙ Admin panel</a>':'');
   document.getElementById('mylink').innerHTML='<a href="#" onclick="showMy();return false">📋 Moje rezervacije</a>';
-  // Klijenti sekcija vidljiva samo staff i admin
   if(u.role==='admin'||u.role==='staff'){
     document.getElementById('klijenti-wrap').style.display='block';
     loadKlijenti();
@@ -290,10 +312,9 @@ async function render(){
     body+='<tr><td class="tc">'+fh(h)+'</td>';
     for(var j=0;j<ids.length;j++){
       var id=ids[j],slot=cs[id].slots[h],st=slot.status;
-      var lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Prošlo'}[st]||st;
+      var lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Proslo'}[st]||st;
       if(slot.booked_by&&st==='taken')lbl='Zauzeto<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
       if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
-      // Klik samo za staff i admin
       var canClick=st==='free'&&cu&&(cu.role==='admin'||cu.role==='staff');
       var cl=canClick?' onclick="openM(\''+id+'\',\''+cs[id].name+'\','+h+')"':'';
       body+='<td class="sl '+st+'"'+cl+'>'+lbl+'</td>';
@@ -307,7 +328,6 @@ async function render(){
 function chDate(d){cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate()+d);render();}
 function goToday(){var t=new Date();cd=new Date(t.getFullYear(),t.getMonth(),t.getDate());render();}
 
-// ── Klijenti ──────────────────────────────────────────────────────────────────
 var sviKlijenti=[];
 
 function loadKlijenti(){
@@ -328,8 +348,8 @@ function renderKlijenti(){
     return '<tr>'+
       '<td>'+k.ime+'</td>'+
       '<td style="color:#555">'+(k.telefon||'-')+'</td>'+
-      '<td><span class="badge '+(k.pretplatnik?'badge-pret':'badge-reg')+'" onclick="promeniTip('+k.id+')" title="Klikni da promijeniš">'+(k.pretplatnik?'pretplatnik':'regularni')+'</span></td>'+
-      '<td><button onclick="brisiK('+k.id+')" class="btn btn-red" style="font-size:11px;padding:2px 8px">Obriši</button></td>'+
+      '<td><span class="badge '+(k.pretplatnik?'badge-pret':'badge-reg')+'" onclick="promeniTip('+k.id+')" title="Klikni da promijenis">'+(k.pretplatnik?'pretplatnik':'regularni')+'</span></td>'+
+      '<td><button onclick="brisiK('+k.id+')" class="btn btn-red" style="font-size:11px;padding:2px 8px">Obrisi</button></td>'+
     '</tr>';
   }).join('');
 }
@@ -371,9 +391,8 @@ function promeniTip(id){
   });
 }
 
-// ── Modal rezervacija ─────────────────────────────────────────────────────────
 function openM(courtId,courtName,hour){
-  if(!cu){alert('Prijavite se da rezervišete termin.');return;}
+  if(!cu){alert('Prijavite se da rezervisete termin.');return;}
   ps={date:iso(cd),court:courtId,hour:hour};
   document.getElementById('minfo').innerHTML=
     '<strong>Teren:</strong> '+courtName+'<br>'+
@@ -388,6 +407,12 @@ function openM(courtId,courtName,hour){
   rezStatus='taken';
   document.getElementById('sbtn-taken').className='sbtn active-taken';
   document.getElementById('sbtn-sub').className='sbtn inactive';
+  document.getElementById('pretplata-period').style.display='none';
+  // Postavi default datume
+  var danas=iso(cd);
+  document.getElementById('date-od').value=danas;
+  var za30=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate()+30);
+  document.getElementById('date-do').value=iso(za30);
   document.getElementById('mov').classList.add('on');
 }
 
@@ -397,6 +422,7 @@ function setStatus(s){
   rezStatus=s;
   document.getElementById('sbtn-taken').className='sbtn '+(s==='taken'?'active-taken':'inactive');
   document.getElementById('sbtn-sub').className='sbtn '+(s==='sub'?'active-sub':'inactive');
+  document.getElementById('pretplata-period').style.display=s==='sub'?'block':'none';
 }
 
 function acSearch(q){
@@ -436,6 +462,18 @@ async function confirmRez(){
   if(!ps)return;
   var ime=selKlijent?selKlijent.ime:document.getElementById('ac-input').value.trim();
   if(!ime){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite ime klijenta.</p>';return;}
+
+  if(rezStatus==='sub'){
+    var od=document.getElementById('date-od').value;
+    var doo=document.getElementById('date-do').value;
+    if(!od||!doo){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite period pretplate.</p>';return;}
+    var r=await apiAsync('/api/rezervisi_pretplatu',{date_od:od,date_do:doo,court:ps.court,hour:ps.hour,name:ime},'POST');
+    var m=document.getElementById('mmsg');
+    if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
+    else m.innerHTML='<p class="merr">✗ '+r.error+'</p>';
+    return;
+  }
+
   var r=await apiAsync('/api/rezervisi',{date:ps.date,court:ps.court,hour:ps.hour,status:rezStatus,name:ime},'POST');
   var m=document.getElementById('mmsg');
   if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
@@ -453,7 +491,7 @@ async function showMy(){
       html='<table style="width:100%;border-collapse:collapse"><tr style="background:#dce8f5"><th style="padding:4px 6px;border:1px solid #bcd">Datum</th><th style="padding:4px 6px;border:1px solid #bcd">Teren</th><th style="padding:4px 6px;border:1px solid #bcd">Vreme</th><th style="padding:4px 6px;border:1px solid #bcd">Akcija</th></tr>';
       for(var i=0;i<mine.length;i++){
         var b=mine[i];
-        html+='<tr><td style="padding:4px 6px;border:1px solid #bcd">'+b.date+'</td><td style="padding:4px 6px;border:1px solid #bcd">'+b.court_name+'</td><td style="padding:4px 6px;border:1px solid #bcd">'+fh(parseInt(b.hour))+'</td><td style="padding:4px 6px;border:1px solid #bcd;text-align:center"><button onclick="otkaziM(\''+b.date+'\',\''+b.court_id+'\','+parseInt(b.hour)+')" style="background:#922b21;color:#fff;border:none;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:11px">Otkaži</button></td></tr>';
+        html+='<tr><td style="padding:4px 6px;border:1px solid #bcd">'+b.date+'</td><td style="padding:4px 6px;border:1px solid #bcd">'+b.court_name+'</td><td style="padding:4px 6px;border:1px solid #bcd">'+fh(parseInt(b.hour))+'</td><td style="padding:4px 6px;border:1px solid #bcd;text-align:center"><button onclick="otkaziM(\''+b.date+'\',\''+b.court_id+'\','+parseInt(b.hour)+')" style="background:#922b21;color:#fff;border:none;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:11px">Otkazi</button></td></tr>';
       }
       html+='</table>';
     }
