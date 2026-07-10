@@ -289,7 +289,51 @@ def api_lozinka():
             x['password'] = hp(pw)
     write(USERS_F, users)
     return ok({'message': 'Lozinka promenjena.'})
+    
+@app.route('/api/rezervisi_pretplatu', methods=['POST'])
+def api_rezervisi_pretplatu():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    d = request.json or {}
+    date_od  = d.get('date_od','')
+    date_do  = d.get('date_do','')
+    court    = d.get('court','')
+    hour     = int(d.get('hour', 0))
+    ime      = d.get('name','')
 
+    if court not in TERENI: return err('Neispravan teren.')
+    if hour < START_SAT or hour >= END_SAT: return err('Neispravan sat.')
+    if not date_od or not date_do: return err('Unesite period.')
+    if not ime: return err('Unesite ime klijenta.')
+
+    try:
+        od = datetime.strptime(date_od, '%Y-%m-%d')
+        do = datetime.strptime(date_do, '%Y-%m-%d')
+    except:
+        return err('Neispravan datum.')
+
+    if do < od: return err('Krajnji datum mora biti nakon početnog.')
+
+    bookings = read(BOOKINGS_F)
+    kreirano = 0
+    current = od
+    while current <= do:
+        slot_dt = current.replace(hour=hour, minute=0, second=0)
+        if slot_dt >= datetime.now():
+            key = slot_key(current.strftime('%Y-%m-%d'), court, hour)
+            if key not in bookings:
+                bookings[key] = {
+                    'status': 'sub',
+                    'user_id': u['id'],
+                    'user_name': ime,
+                    'user_email': u['email'],
+                    'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+                kreirano += 1
+        current = current + timedelta(days=7)
+
+    write(BOOKINGS_F, bookings)
+    return ok({'message': f'Kreirano {kreirano} rezervacija za pretplatu!'})
 if __name__ == '__main__':
     app.run(debug=True)
     
