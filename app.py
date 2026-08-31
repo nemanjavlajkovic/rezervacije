@@ -140,22 +140,19 @@ def api_raspored():
             slot_dt = datetime.strptime(f"{date_str} {h:02d}:00", "%Y-%m-%d %H:%M")
             if slot_dt < now:
                 status = 'past'
-                if key in bookings:
-                    b = bookings.get(key, {})
-                    u2 = current_user()
-                    if u2 and b:
-                        booked_by = b.get('user_name')
             elif key in bookings:
                 status = bookings[key]['status']
             else:
                 status = 'free'
             b = bookings.get(key, {})
-            u = current_user()
             booked_by = None
             if b:
-                booked_by = b.get('user_name')
+                u = current_user()
+                if status == 'past':
+                    booked_by = b.get('user_name')
+                elif u and (u['role'] == 'admin' or u['email'] == b.get('user_email','')):
+                    booked_by = b.get('user_name')
             result[cid]['slots'][h] = {'status': status, 'booked_by': booked_by}
-    return ok({'date': date_str, 'courts': result})
 
 @app.route('/api/rezervisi', methods=['POST'])
 def api_rezervisi():
