@@ -315,6 +315,7 @@ async function render(){
       var lbl={free:'Slobodno',taken:'Zauzeto',sub:'Pretplata',past:'Proslo'}[st]||st;
       if(slot.booked_by&&st==='taken')lbl='Zauzeto<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
       if(slot.booked_by&&st==='sub')lbl='Pretplata<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
+      if(slot.booked_by&&st==='past')lbl='Proslo<br><small style="font-weight:normal;font-size:10px">'+slot.booked_by+'</small>';
       var canClick=st==='free'&&cu&&(cu.role==='admin'||cu.role==='staff');
       var cl=canClick?' onclick="openM(\''+id+'\',\''+cs[id].name+'\','+h+')"':'';
       body+='<td class="sl '+st+'"'+cl+'>'+lbl+'</td>';
