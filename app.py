@@ -138,7 +138,7 @@ def api_raspored():
         for h in range(START_SAT, END_SAT):
             key = slot_key(date_str, cid, h)
             slot_dt = datetime.strptime(f"{date_str} {h:02d}:00", "%Y-%m-%d %H:%M")
-                        if slot_dt < now:
+            if slot_dt < now:
                 status = 'past'
                 if key in bookings:
                     b = bookings.get(key, {})
