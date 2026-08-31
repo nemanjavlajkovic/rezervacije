@@ -149,7 +149,7 @@ def api_raspored():
                 status = bookings[key]['status']
             else:
                 status = 'free'
-                        b = bookings.get(key, {})
+                    b = bookings.get(key, {})
             u = current_user()
             booked_by = None
             if b:
