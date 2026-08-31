@@ -149,12 +149,11 @@ def api_raspored():
                 status = bookings[key]['status']
             else:
                 status = 'free'
-            b = bookings.get(key, {})
+                        b = bookings.get(key, {})
             u = current_user()
             booked_by = None
-            if u and b:
-                if u['role'] == 'admin' or u['email'] == b.get('user_email',''):
-                    booked_by = b.get('user_name')
+            if b:
+                booked_by = b.get('user_name')
             result[cid]['slots'][h] = {'status': status, 'booked_by': booked_by}
     return ok({'date': date_str, 'courts': result})
 
