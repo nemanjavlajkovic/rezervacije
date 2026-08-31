@@ -230,14 +230,12 @@ def api_admin_set():
     if status == 'free':
         bookings.pop(key, None)
     else:
-            name = d.get('name', 'Admin')
-            bookings[key] = {
-                'status': status, 'user_id': 1,
-                'user_name': name, 'user_email': 'admin@klub.rs',
-                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }
-    write(BOOKINGS_F, bookings)
-    return ok()
+        name = d.get('name', 'Admin')
+        bookings[key] = {
+            'status': status, 'user_id': 1,
+            'user_name': name, 'user_email': 'admin@klub.rs',
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
 
 @app.route('/api/admin/korisnici')
 def api_korisnici():
