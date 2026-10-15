@@ -113,7 +113,8 @@ td.sl.free:hover{filter:brightness(.92)}
 <div id="dnav">
   <span class="arr" onclick="chDate(-1)">&#9664;</span>
   <button class="btn-today" onclick="goToday()">Danas</button>
-  <span id="dlbl"></span>
+ <span id="dlbl" onclick="document.getElementById('dp').showPicker?document.getElementById('dp').showPicker():document.getElementById('dp').click()" style="cursor:pointer;text-decoration:underline dotted;" title="Klikni za kalendar"></span>
+ <input type="date" id="dp" style="position:absolute;opacity:0;width:0;height:0" onchange="goToDate(this.value)">
   <span class="arr" onclick="chDate(1)">&#9654;</span>
 </div>
 
@@ -328,7 +329,7 @@ async function render(){
 
 function chDate(d){cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate()+d);render();}
 function goToday(){var t=new Date();cd=new Date(t.getFullYear(),t.getMonth(),t.getDate());render();}
-
+function goToDate(v){if(v){var p=v.split('-');cd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));render();}}
 var sviKlijenti=[];
 
 function loadKlijenti(){
