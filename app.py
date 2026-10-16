@@ -290,7 +290,11 @@ def api_korisnici():
     u = current_user()
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     users = read(USERS_F)
-    safe = [{'id':x['id'],'email':x['email'],'name':x['name'],'role':x['role']} for x in users]
+    safe = [{'id':x['id'],'email':x['email'],'name':x['name'],'role':x['role'],
+             'alias':x.get('alias',''),'oslovljavanje':x.get('oslovljavanje','-'),
+             'ulica':x.get('ulica',''),'ptt':x.get('ptt',''),'grad':x.get('grad',''),
+             'telefon':x.get('telefon',''),'rodjadan':x.get('rodjadan',''),
+             'beleske':x.get('beleske',''),'created_at':x.get('created_at','')} for x in users]
     return ok({'korisnici': safe})
 
 @app.route('/api/admin/dodaj_korisnika', methods=['POST'])
@@ -308,7 +312,8 @@ def api_dodaj():
     if any(x['email'].lower()==email.lower() for x in users):
         return err('Email već postoji.')
     new_id = max((x['id'] for x in users), default=0) + 1
-    users.append({'id':new_id,'email':email,'password':hp(pw),'name':name,'role':role})
+    users.append({'id':new_id,'email':email,'password':hp(pw),'name':name,'role':role,
+                  'telefon':d.get('telefon',''),'beleske':d.get('beleske','')})
     write(USERS_F, users)
     return ok({'message': 'Korisnik dodat.'})
 
@@ -321,6 +326,25 @@ def api_brisi():
     users = [x for x in read(USERS_F) if x['id'] != tid]
     write(USERS_F, users)
     return ok()
+
+@app.route('/api/admin/uredi_korisnika', methods=['POST'])
+def api_uredi_korisnika():
+    u = current_user()
+    if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
+    d = request.json or {}
+    tid = int(d.get('id', 0))
+    users = read(USERS_F)
+    for x in users:
+        if x['id'] == tid:
+            if 'name'  in d: x['name']  = d['name']
+            if 'email' in d: x['email'] = d['email']
+            if 'role'  in d and d['role'] in ('user','admin','staff'): x['role'] = d['role']
+            if d.get('password'): x['password'] = hp(d['password'])
+            for fld in ('alias','oslovljavanje','ulica','ptt','grad','telefon','rodjadan','beleske'):
+                if fld in d: x[fld] = d[fld]
+            write(USERS_F, users)
+            return ok({'message': 'Korisnik sačuvan.'})
+    return err('Korisnik nije pronađen.')
 
 @app.route('/api/admin/promeni_lozinku', methods=['POST'])
 def api_lozinka():
