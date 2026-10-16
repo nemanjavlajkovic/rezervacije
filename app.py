@@ -10,6 +10,7 @@ DATA_DIR   = os.path.join(os.path.dirname(__file__), 'data')
 USERS_F    = os.path.join(DATA_DIR, 'users.json')
 BOOKINGS_F = os.path.join(DATA_DIR, 'bookings.json')
 KLIJENTI_F = os.path.join(DATA_DIR, 'klijenti.json')
+DOGADJAJI_F   = os.path.join(DATA_DIR, 'dogadjaji.json')
 
 KLUB_IME  = 'Byford Country Club'
 TELEFON   = '063-3-6666-4'
@@ -120,20 +121,6 @@ def admin_korisnici():
     if not u or u['role'] != 'admin':
         return redirect('/')
     return render_template('admin_korisnici.html')
-
-@app.route('/admin/statistika')
-
-@app.route('/admin/rezervacije')
-def admin_rezervacije_page():
-    u = current_user()
-    if not u or u['role'] != 'admin':
-        return redirect('/')
-    return render_template('admin_rezervacije.html')
-def admin_statistika():
-    u = current_user()
-    if not u or u['role'] != 'admin':
-        return redirect('/')
-    return render_template('admin_statistika.html')
 
 # ── API ───────────────────────────────────────────────────────────────────────
 
@@ -491,6 +478,73 @@ def api_promeni_klijenta():
             k['pretplatnik'] = not k['pretplatnik']
     write(KLIJENTI_F, klijenti)
     return ok()
+
+
+
+# ── Događaji ──────────────────────────────────────────────────────────────────
+
+@app.route('/admin/dogadjaji')
+def admin_dogadjaji_page():
+    u = current_user()
+    if not u or u['role'] != 'admin': return redirect('/')
+    return render_template('admin_dogadjaji.html')
+
+@app.route('/api/admin/dogadjaji')
+def api_admin_dogadjaji():
+    u = current_user()
+    if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
+    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
+    return ok({'dogadjaji': dogadjaji})
+
+@app.route('/api/admin/dodaj_dogadjaj', methods=['POST'])
+def api_dodaj_dogadjaj():
+    u = current_user()
+    if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
+    d = request.json or {}
+    naziv = (d.get('naziv') or '').strip()
+    datum = (d.get('datum') or '').strip()
+    if not naziv or not datum: return err('Naziv i datum su obavezni.')
+    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
+    new_id = max((x['id'] for x in dogadjaji), default=0) + 1
+    dogadjaji.append({
+        'id': new_id,
+        'naziv': naziv,
+        'datum': datum,
+        'vreme': d.get('vreme', '10:00'),
+        'lokacija': d.get('lokacija', ''),
+        'max_ucenika': d.get('max_ucenika') or None,
+        'opis': d.get('opis', ''),
+        'status': 'aktivan',
+        'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    })
+    write(DOGADJAJI_F, dogadjaji)
+    return ok({'message': 'Događaj kreiran.'})
+
+@app.route('/api/admin/uredi_dogadjaj', methods=['POST'])
+def api_uredi_dogadjaj():
+    u = current_user()
+    if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
+    d = request.json or {}
+    tid = int(d.get('id', 0))
+    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
+    for x in dogadjaji:
+        if x['id'] == tid:
+            for fld in ('naziv', 'datum', 'vreme', 'lokacija', 'opis', 'status'):
+                if fld in d: x[fld] = d[fld]
+            if 'max_ucenika' in d: x['max_ucenika'] = d['max_ucenika'] or None
+            write(DOGADJAJI_F, dogadjaji)
+            return ok({'message': 'Događaj sačuvan.'})
+    return err('Događaj nije pronađen.')
+
+@app.route('/api/admin/brisi_dogadjaj', methods=['POST'])
+def api_brisi_dogadjaj():
+    u = current_user()
+    if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
+    tid = int((request.json or {}).get('id', 0))
+    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
+    dogadjaji = [x for x in dogadjaji if x['id'] != tid]
+    write(DOGADJAJI_F, dogadjaji)
+    return ok({'message': 'Događaj obrisan.'})
 
 if __name__ == '__main__':
     app.run(debug=True)
