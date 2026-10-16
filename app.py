@@ -122,6 +122,13 @@ def admin_korisnici():
         return redirect('/')
     return render_template('admin_korisnici.html')
 
+@app.route('/admin/rezervacije')
+def admin_rezervacije_page():
+    u = current_user()
+    if not u or u['role'] not in ('admin', 'staff'):
+        return redirect('/')
+    return render_template('admin_rezervacije.html')
+
 # ── API ───────────────────────────────────────────────────────────────────────
 
 @app.route('/api/me')
@@ -480,6 +487,38 @@ def api_promeni_klijenta():
     return ok()
 
 
+
+
+# ── User pages ────────────────────────────────────────────────────────────────
+
+@app.route('/user/bookings')
+def user_bookings():
+    u = current_user()
+    if not u: return redirect('/')
+    return render_template('user_bookings.html')
+
+@app.route('/api/moje_rezervacije')
+def api_moje_rezervacije():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    bookings = read(BOOKINGS_F)
+    lst = []
+    for key, val in bookings.items():
+        parts = key.split('|')
+        if len(parts) != 3: continue
+        dt, cid, hour = parts
+        if val.get('user_id') != u['id']:
+            continue
+        lst.append({
+            'key': key, 'date': dt, 'court_id': cid,
+            'court_name': TERENI.get(cid, cid),
+            'hour': hour,
+            'status': val.get('status', 'taken'),
+            'payment_status': val.get('payment_status', 'na_cekanju'),
+            'created_at': val.get('created_at', ''),
+        })
+    lst.sort(key=lambda x: x['date'] + x['hour'])
+    return ok({'rezervacije': lst})
 
 # ── Događaji ──────────────────────────────────────────────────────────────────
 
