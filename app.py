@@ -197,7 +197,7 @@ def api_otkazi():
     write(BOOKINGS_F, bookings)
     return ok({'message': 'Rezervacija otkazana.'})
 
-    @app.route('/api/edituj_rezervaciju', methods=['POST'])
+@app.route('/api/edituj_rezervaciju', methods=['POST'])
 def api_edituj_rezervaciju():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
