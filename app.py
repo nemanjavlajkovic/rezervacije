@@ -152,7 +152,7 @@ def api_raspored():
                     booked_by = b.get('user_name')
                 elif u and (u['role'] == 'admin' or u['email'] == b.get('user_email','')):
                     booked_by = b.get('user_name')
-            result[cid]['slots'][h] = {'status': status, 'booked_by': booked_by}
+            result[cid]['slots'][h] = {'status': status, 'booked_by': booked_by, 'payment_status': b.get('payment_status', 'na_cekanju')}
     return ok({'date': date_str, 'courts': result})
 @app.route('/api/rezervisi', methods=['POST'])
 def api_rezervisi():
