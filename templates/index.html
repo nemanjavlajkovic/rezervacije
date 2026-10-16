@@ -69,6 +69,7 @@ td.sl.sub{background:#3d3520;color:#ca8a04;font-weight:bold}
 td.sl.sub.clickable{cursor:pointer}
 td.sl.sub.clickable:hover{filter:brightness(1.15)}
 td.sl.past{background:#161b2a;color:#374151;font-style:italic;font-size:11px}
+td.sl.past-taken{background:#1e1a35;color:#7c6faa;font-size:11px;font-weight:bold}
 /* payment status colors */
 td.sl.ps-na_cekanju{background:#37415a;color:#fbbf24;font-weight:bold}
 td.sl.ps-placeno{background:#14532d;color:#4ade80;font-weight:bold}
@@ -401,8 +402,8 @@ async function logout(){
   cu=null;location.reload();
 }
 
-function slotColorClass(st,pst){
-  if(st==='past') return 'past';
+function slotColorClass(st,pst,booked_by){
+  if(st==='past') return booked_by ? 'past-taken' : 'past';
   if(st==='free') return 'free';
   if(pst==='placeno') return 'ps-placeno';
   if(pst==='nedolazak') return 'ps-nedolazak';
@@ -435,14 +436,17 @@ async function render(){
     for(var j=0;j<ids.length;j++){
       var cid=ids[j],slot=cs[cid].slots[h],st=slot.status;
       var pst=slot.payment_status||'na_cekanju';
-      var cls=slotColorClass(st,pst);
+      var cls=slotColorClass(st,pst,slot.booked_by);
       var isStaff=cu&&(cu.role==='admin'||cu.role==='staff');
       var canFree=st==='free'&&isStaff;
       var canEdit=(st==='taken'||st==='sub')&&isStaff;
       var clickable=canFree||canEdit;
       var lbl='';
       if(st==='free') lbl='Slobodno';
-      else if(st==='past'){lbl='Prošlo';if(slot.booked_by)lbl+='<br><small style="font-size:10px;opacity:.7">'+slot.booked_by+'</small>';}
+      else if(st==='past'){
+        if(slot.booked_by) lbl='<span style="font-size:10px;opacity:.6">✓</span> '+slot.booked_by;
+        else lbl='Prošlo';
+      }
       else{
         var pLabel={na_cekanju:'Zauzeto',placeno:'Plaćeno',nedolazak:'Nedolazak',otkazano:'Otkazano'}[pst]||'Zauzeto';
         if(st==='sub')pLabel='Pretplata';
