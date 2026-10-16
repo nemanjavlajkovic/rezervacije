@@ -73,20 +73,24 @@ def ensure_admin():
     users = read(USERS_F)
     emails = [u['email'].lower() for u in users]
     changed = False
-    if 'admin@klub.rs' not in emails:
-        users.append({
-            'id': 1, 'email': 'admin@klub.rs',
-            'password': hp('password'),
-            'name': 'Administrator', 'role': 'admin'
-        })
-        changed = True
-    if 'ivanajovanovicc07@gmail.com' not in emails:
-        users.append({
-            'id': 2, 'email': 'ivanajovanovicc07@gmail.com',
-            'password': hp('Ivana07'),
-            'name': 'Ivana Jovanovic', 'role': 'admin'
-        })
-        changed = True
+
+    seed_users = [
+        {'id': 1, 'email': 'admin@klub.rs',                    'password': hp('password'),  'name': 'Administrator',    'role': 'admin'},
+        {'id': 2, 'email': 'ivanajovanovicc07@gmail.com',       'password': hp('Ivana07'),   'name': 'Ivana Jovanovic',  'role': 'admin'},
+        {'id': 3, 'email': 'nemanjavlajkovic000@gmail.com',     'password': hp('Nemanja00'), 'name': 'Nemanja Vlajkovic','role': 'admin'},
+    ]
+
+    for su in seed_users:
+        if su['email'].lower() not in emails:
+            users.append(su)
+            changed = True
+        else:
+            # ensure role is admin for seed users
+            for u in users:
+                if u['email'].lower() == su['email'].lower() and u['role'] != 'admin':
+                    u['role'] = 'admin'
+                    changed = True
+
     if changed:
         write(USERS_F, users)
 
