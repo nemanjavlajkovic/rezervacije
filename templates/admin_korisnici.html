@@ -9,10 +9,8 @@
 body{font-family:Arial,Helvetica,sans-serif;font-size:13px;background:#111827;color:#e5e7eb;min-height:100vh;display:flex;flex-direction:column}
 a{color:inherit;text-decoration:none}
 
-/* HEADER - identican glavnoj strani */
+/* HEADER */
 #hdr{background:#1a1f2e;border-bottom:1px solid #2d3548;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-#hdr-logo{display:flex;align-items:center;gap:12px;min-width:200px}
-#hdr-logo img{width:52px;height:52px;border-radius:50%}
 #hdr-logo .logo-text .name{font-size:15px;font-weight:bold;color:#fff}
 #hdr-logo .logo-text .sub{font-size:12px;color:#9ca3af}
 #hdr-divider{width:1px;height:40px;background:#2d3548;flex-shrink:0}
@@ -24,57 +22,81 @@ a{color:inherit;text-decoration:none}
 .hdr-link .val{font-size:13px;color:#fff;font-weight:500}
 
 /* MAIN LAYOUT */
-#main{flex:1;display:flex;padding:30px 20px;gap:20px;max-width:1100px;margin:0 auto;width:100%;align-items:flex-start}
+#main{flex:1;display:flex;padding:30px 20px;gap:20px;max-width:1200px;margin:0 auto;width:100%;align-items:flex-start}
 
 /* LEFT SIDEBAR */
-#side-left{width:160px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;padding-top:4px}
-.side-back{display:flex;align-items:center;gap:8px;background:#1e2536;border:1px solid #2d3548;border-radius:50%;width:48px;height:48px;justify-content:center;font-size:20px;cursor:pointer;margin-bottom:4px;text-decoration:none;color:#e5e7eb}
+#side-left{width:140px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px}
+.side-back{display:flex;align-items:center;justify-content:center;background:#1e2536;border:1px solid #2d3548;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;text-decoration:none;color:#e5e7eb}
 .side-back:hover{background:#2d3548}
 .side-back-lbl{font-size:12px;color:#9ca3af;text-align:center}
 .side-back-sub{font-size:11px;color:#6b7280;text-align:center}
 
 /* CENTER BOX */
-#box{flex:1;min-width:0;max-width:680px;background:#fff;border-radius:4px;color:#222;overflow:hidden}
-#box-title{padding:20px 24px 12px;border-bottom:1px solid #e8e8e8}
-#box-title h1{font-size:18px;font-weight:bold;color:#111;margin-bottom:4px}
-#box-title p{font-size:13px;color:#555}
-#box-search{padding:16px 24px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#box{flex:1;min-width:0;background:#fff;border-radius:4px;color:#222;overflow:hidden}
+
+/* SEARCH BAR */
+#box-search{padding:16px 24px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 #box-search label{font-size:13px;color:#333;white-space:nowrap}
-#box-search input{border:1px solid #ccc;padding:5px 10px;border-radius:3px;font-size:13px;width:220px;color:#222}
+#box-search input{border:1px solid #ccc;padding:5px 10px;border-radius:3px;font-size:13px;width:260px;color:#222}
 .btn-search{background:#fff;border:1px solid #aaa;padding:5px 14px;border-radius:3px;font-size:13px;cursor:pointer;color:#333}
 .btn-search:hover{background:#f5f5f5}
-.link-adv{font-size:13px;color:#1a6fc4;margin-left:4px;cursor:pointer}
-.link-adv:hover{text-decoration:underline}
-#box-results{padding:0 24px;min-height:60px}
-#result-list{width:100%}
-#result-list th{background:#f0f0f0;padding:7px 10px;text-align:left;font-size:12px;color:#444;border-bottom:1px solid #ddd}
-#result-list td{padding:7px 10px;font-size:13px;color:#333;border-bottom:1px solid #f0f0f0}
-#result-list tr:hover td{background:#f9f9f9}
+
+/* USER LIST TABLE */
+#list-section{padding:0}
+#result-list{width:100%;border-collapse:collapse}
+#result-list th{background:#f0f0f0;padding:7px 12px;text-align:left;font-size:12px;color:#444;border-bottom:1px solid #ddd;font-weight:normal}
+#result-list td{padding:7px 12px;font-size:13px;color:#333;border-bottom:1px solid #f0f0f0}
+#result-list tr:hover td{background:#f9f9f9;cursor:pointer}
+#result-list tr.selected td{background:#e8f0fe}
 .badge-role{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold}
 .badge-admin{background:#dbeafe;color:#1d4ed8}
 .badge-user{background:#dcfce7;color:#166534}
 .badge-staff{background:#fef3c7;color:#92400e}
-.btn-sm-action{border:none;background:none;font-size:12px;cursor:pointer;padding:2px 6px;border-radius:3px;color:#1a6fc4}
-.btn-sm-action:hover{background:#e8f0fe}
-.btn-sm-del{color:#c0392b}
-.btn-sm-del:hover{background:#fdecea}
-#box-new{padding:14px 24px;border-top:1px solid #e8e8e8;display:flex;align-items:center;gap:6px}
-#box-new a{color:#1a6fc4;font-size:13px;display:flex;align-items:center;gap:4px}
-#box-new a:hover{text-decoration:underline}
-.msg-box{padding:8px 14px;border-radius:3px;font-size:13px;margin:10px 24px}
-.msg-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
-.msg-err{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+.no-results{padding:20px 24px;color:#888;font-size:13px}
 
-/* NOVI KORISNIK FORMA (sakrivena po defaultu) */
+/* EDIT FORM */
+#edit-section{display:none;border-top:2px solid #e0e0e0;padding:0}
+#edit-header{padding:14px 24px;border-bottom:1px solid #e0e0e0;background:#fafafa;display:flex;align-items:center;justify-content:space-between}
+#edit-header h2{font-size:15px;font-weight:bold;color:#222}
+.btn-close-edit{background:none;border:none;font-size:18px;cursor:pointer;color:#888;line-height:1}
+.btn-close-edit:hover{color:#333}
+#edit-body{padding:20px 24px;display:flex;gap:24px;flex-wrap:wrap}
+.edit-panel{flex:1;min-width:240px}
+.panel-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.panel-num{width:32px;height:32px;border-radius:50%;background:#8aa8c4;color:#fff;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.panel-title{font-size:14px;color:#1a6fc4;font-weight:bold}
+.fld{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.fld label{width:130px;flex-shrink:0;font-size:13px;color:#555;text-align:right}
+.fld input,.fld select,.fld textarea{flex:1;border:1px solid #ccc;padding:5px 8px;border-radius:3px;font-size:13px;color:#222;background:#fff}
+.fld textarea{height:70px;resize:vertical}
+.fld-note{font-size:11px;color:#888;margin-left:138px;margin-bottom:8px}
+.fld-ro{flex:1;font-size:13px;color:#444;padding:5px 0}
+#edit-footer{padding:12px 24px;border-top:1px solid #e0e0e0;background:#fafafa;display:flex;justify-content:center;gap:10px}
+.btn-save{background:#1a5276;color:#fff;border:none;padding:7px 28px;border-radius:3px;font-size:13px;cursor:pointer}
+.btn-save:hover{background:#154360}
+.btn-cancel-edit{background:#fff;color:#555;border:1px solid #ccc;padding:7px 18px;border-radius:3px;font-size:13px;cursor:pointer}
+.btn-cancel-edit:hover{background:#f5f5f5}
+
+/* NEW USER FORM */
 #form-novi{display:none;padding:16px 24px;border-top:1px solid #e8e8e8;background:#fafafa}
 #form-novi h3{font-size:14px;color:#333;margin-bottom:12px}
 .form-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .form-row .fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:160px}
 .form-row label{font-size:12px;color:#555}
 .form-row input,.form-row select{border:1px solid #ccc;padding:6px 10px;border-radius:3px;font-size:13px;color:#222;background:#fff}
-.btn-dodaj{background:#1a5276;color:#fff;border:none;padding:7px 18px;border-radius:3px;font-size:13px;cursor:pointer;margin-top:4px}
+.btn-dodaj{background:#1a5276;color:#fff;border:none;padding:7px 18px;border-radius:3px;font-size:13px;cursor:pointer}
 .btn-dodaj:hover{background:#154360}
-.btn-otkazi{background:#fff;color:#555;border:1px solid #ccc;padding:7px 14px;border-radius:3px;font-size:13px;cursor:pointer;margin-top:4px;margin-left:6px}
+.btn-otkazi{background:#fff;color:#555;border:1px solid #ccc;padding:7px 14px;border-radius:3px;font-size:13px;cursor:pointer;margin-left:6px}
+
+/* BOX BOTTOM */
+#box-bottom{padding:12px 24px;border-top:1px solid #e8e8e8}
+#box-bottom a{color:#1a6fc4;font-size:13px}
+#box-bottom a:hover{text-decoration:underline}
+
+/* MESSAGES */
+.msg-box{padding:8px 14px;border-radius:3px;font-size:13px;margin:8px 24px}
+.msg-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+.msg-err{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
 
 /* RIGHT SIDEBAR */
 #side-right{width:180px;flex-shrink:0;padding-top:4px}
@@ -85,17 +107,8 @@ a{color:inherit;text-decoration:none}
 #side-right ul li a{font-size:13px;color:#60a5fa}
 #side-right ul li a:hover{text-decoration:underline}
 
-/* MODAL LOZINKA */
-.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:center;justify-content:center}
-.ov.on{display:flex}
-.mod{background:#fff;border-radius:4px;padding:24px;max-width:360px;width:92%;color:#222;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.mod h3{font-size:15px;margin-bottom:14px;color:#111}
-.mod input{width:100%;border:1px solid #ccc;padding:7px 10px;border-radius:3px;font-size:13px;margin-bottom:14px;color:#222}
-.mod-btns{display:flex;gap:8px;justify-content:flex-end}
-
 /* FOOTER */
 #foot{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-align:center;font-size:11px;color:#6b7280}
-#foot a{color:#60a5fa}
 </style>
 </head>
 <body>
@@ -133,11 +146,14 @@ a{color:inherit;text-decoration:none}
 
   <!-- CENTER: Box -->
   <div id="box">
-    <div id="box-title">
-      <h1>Administracija korisnika</h1>
-      <p>Ovde možete da kreirate, uređujete ili brišete korisnike svog sistema.</p>
+
+    <!-- Administracija korisnika title -->
+    <div style="padding:20px 24px 14px;border-bottom:1px solid #e0e0e0">
+      <h1 style="font-size:18px;font-weight:bold;color:#111;margin-bottom:4px">Administracija korisnika</h1>
+      <p style="font-size:13px;color:#555">Ovde možete da kreirate, uređujete ili brišete korisnike svog sistema.</p>
     </div>
 
+    <!-- Search -->
     <div id="box-search">
       <label>Ime ili broj:</label>
       <input type="text" id="search-input" placeholder="" oninput="filterUsers()" onkeydown="if(event.key==='Enter')filterUsers()">
@@ -146,23 +162,90 @@ a{color:inherit;text-decoration:none}
 
     <div id="msg-global"></div>
 
-    <div id="box-results">
-      <table id="result-list" style="width:100%;border-collapse:collapse;display:none">
+    <!-- User list -->
+    <div id="list-section">
+      <table id="result-list" style="display:none">
         <thead>
           <tr>
-            <th>ID</th>
+            <th style="width:40px">ID</th>
             <th>Ime i prezime</th>
             <th>Email</th>
             <th>Rola</th>
-            <th>Akcije</th>
+            <th style="width:80px">Akcije</th>
           </tr>
         </thead>
         <tbody id="user-tbody"></tbody>
       </table>
-      <div id="no-results" style="padding:20px 0;color:#888;font-size:13px;display:none">Nema korisnika.</div>
+      <div id="no-results" class="no-results" style="display:none">Nema korisnika.</div>
     </div>
 
-    <!-- FORMA ZA NOVOG KORISNIKA -->
+    <!-- Edit section (shows when user clicked) -->
+    <div id="edit-section">
+      <div id="edit-header">
+        <h2 id="edit-title">Uredi korisnika</h2>
+        <button class="btn-close-edit" onclick="closeEdit()">✕</button>
+      </div>
+      <div id="edit-body">
+        <!-- Panel 1: Podaci o računu -->
+        <div class="edit-panel">
+          <div class="panel-hdr">
+            <div class="panel-num">1</div>
+            <div class="panel-title">Podaci o računu</div>
+          </div>
+          <div class="fld"><label>Alias</label><input type="text" id="e-alias" placeholder="Proizvoljno ime ili identifikator"></div>
+          <div class="fld-note">Proizvoljno ime ili identifikator za ovog korisnika</div>
+          <div class="fld"><label>Status</label>
+            <select id="e-status">
+              <option value="user">Rezervisano mesto</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+          <div class="fld"><label>E-Mail Adresa</label><input type="email" id="e-email" placeholder="email@primer.rs"></div>
+          <div class="fld"><label>Nova lozinka</label><input type="password" id="e-pw" placeholder="(ostavi prazno da ne menjaš)"></div>
+          <div class="fld"><label>Poslednja aktivnost</label><span class="fld-ro" id="e-last-active">-</span></div>
+          <div class="fld"><label>Poslednja IP</label><span class="fld-ro" id="e-last-ip">-</span></div>
+          <div class="fld"><label>Stvoreno</label><span class="fld-ro" id="e-created">-</span></div>
+        </div>
+        <!-- Panel 2: Lični podaci -->
+        <div class="edit-panel">
+          <div class="panel-hdr">
+            <div class="panel-num">2</div>
+            <div class="panel-title">Lični podaci</div>
+          </div>
+          <div class="fld"><label>Oslavljanje</label>
+            <select id="e-oslovljavanje">
+              <option value="-">-</option>
+              <option value="g">G.</option>
+              <option value="gda">Gđa.</option>
+            </select>
+          </div>
+          <div class="fld"><label>Ime &amp; prezime</label>
+            <div style="display:flex;gap:6px;flex:1">
+              <input type="text" id="e-ime" placeholder="Ime" style="flex:1">
+              <input type="text" id="e-prezime" placeholder="Prezime" style="flex:1">
+            </div>
+          </div>
+          <div class="fld"><label>Ulica &amp; broj</label><input type="text" id="e-ulica" placeholder=""></div>
+          <div class="fld"><label>Poštanski broj &amp; Grad</label>
+            <div style="display:flex;gap:6px;flex:1">
+              <input type="text" id="e-ptt" placeholder="" style="width:80px;flex:none">
+              <input type="text" id="e-grad" placeholder="" style="flex:1">
+            </div>
+          </div>
+          <div class="fld"><label>Broj telefona</label><input type="text" id="e-tel" placeholder=""></div>
+          <div class="fld"><label>Rođendan</label><input type="date" id="e-rodjadan"></div>
+          <div class="fld" style="align-items:flex-start"><label style="padding-top:4px">Beleške</label><textarea id="e-beleske" placeholder="Vidljive samo administraciji"></textarea></div>
+          <div class="fld-note">One su vidljive samo za administraciju</div>
+        </div>
+      </div>
+      <div id="msg-edit" style="margin:0 24px 6px"></div>
+      <div id="edit-footer">
+        <button class="btn-cancel-edit" onclick="closeEdit()">Otkaži</button>
+        <button class="btn-save" onclick="saveEdit()">Spremi</button>
+      </div>
+    </div>
+
+    <!-- Novi korisnik forma -->
     <div id="form-novi">
       <h3>➕ Novi korisnik</h3>
       <div class="form-row">
@@ -171,20 +254,26 @@ a{color:inherit;text-decoration:none}
       </div>
       <div class="form-row">
         <div class="fg"><label>Lozinka</label><input type="password" id="np" placeholder="Lozinka"></div>
-        <div class="fg"><label>Rola</label>
+        <div class="fg"><label>Status</label>
           <select id="nr">
-            <option value="user">Korisnik</option>
+            <option value="user">Rezervisano mesto</option>
             <option value="admin">Administrator</option>
-            <option value="staff">Osoblje</option>
           </select>
         </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Broj telefona</label><input type="text" id="n-tel" placeholder=""></div>
+        <div class="fg"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg" style="flex:1"><label>Beleške</label><textarea id="n-beleske" placeholder="Vidljive samo administraciji" style="border:1px solid #ccc;padding:6px 10px;border-radius:3px;font-size:13px;color:#222;background:#fff;resize:vertical;height:60px;width:100%"></textarea></div>
       </div>
       <div id="msg-add"></div>
       <button class="btn-dodaj" onclick="addUser()">Dodaj korisnika</button>
       <button class="btn-otkazi" onclick="toggleNovi()">Otkaži</button>
     </div>
 
-    <div id="box-new">
+    <div id="box-bottom">
       <a href="javascript:void(0)" onclick="toggleNovi()">➕ Novi korisnik</a>
     </div>
   </div>
@@ -206,23 +295,9 @@ a{color:inherit;text-decoration:none}
   &copy; 2026 Byford Country Club
 </div>
 
-<!-- MODAL: PROMENI LOZINKU -->
-<div class="ov" id="modal-loz">
-  <div class="mod">
-    <h3>Promeni lozinku</h3>
-    <p id="modal-loz-name" style="font-size:13px;color:#555;margin-bottom:12px"></p>
-    <input type="password" id="modal-loz-pw" placeholder="Nova lozinka...">
-    <div id="msg-loz" style="margin-bottom:10px;font-size:13px"></div>
-    <div class="mod-btns">
-      <button class="btn-otkazi" onclick="closeModal()">Otkaži</button>
-      <button class="btn-dodaj" onclick="submitLozinka()">Sačuvaj</button>
-    </div>
-  </div>
-</div>
-
 <script>
 var allUsers = [];
-var editId = null;
+var editingId = null;
 
 function api(url, data, method, cb) {
   var o = {method: method||'GET', credentials: 'include'};
@@ -258,29 +333,109 @@ function renderUsers(list) {
   var tbl = document.getElementById('result-list');
   var tbody = document.getElementById('user-tbody');
   var noRes = document.getElementById('no-results');
-  if (!list.length) {
-    tbl.style.display = 'none';
-    noRes.style.display = 'block';
-    return;
-  }
+  if (!list.length) { tbl.style.display='none'; noRes.style.display='block'; return; }
   tbl.style.display = 'table';
   noRes.style.display = 'none';
-  var roleLabel = {admin:'Administrator', user:'Korisnik', staff:'Osoblje'};
+  var roleLabel = {admin:'Administrator', user:'Rezervisano mesto', staff:'Osoblje'};
   var roleBadge = {admin:'badge-admin', user:'badge-user', staff:'badge-staff'};
   var h = '';
   for (var i = 0; i < list.length; i++) {
     var u = list[i];
-    h += '<tr>';
-    h += '<td style="color:#999;width:40px">' + u.id + '</td>';
+    var sel = editingId === u.id ? ' selected' : '';
+    h += '<tr class="' + sel + '" onclick="openEdit(' + u.id + ')">';
+    h += '<td style="color:#999">' + u.id + '</td>';
     h += '<td><strong>' + esc(u.name) + '</strong></td>';
     h += '<td style="color:#555">' + esc(u.email) + '</td>';
     h += '<td><span class="badge-role ' + (roleBadge[u.role]||'badge-user') + '">' + (roleLabel[u.role]||u.role) + '</span></td>';
-    h += '<td>';
-    h += '<button class="btn-sm-action" onclick="openLozinka(' + u.id + ',\'' + escQ(u.name) + '\')">Lozinka</button>';
-    h += '<button class="btn-sm-action btn-sm-del" onclick="deleteUser(' + u.id + ',\'' + escQ(u.name) + '\')">Obriši</button>';
-    h += '</td></tr>';
+    h += '<td><button class="btn-sm-del" onclick="event.stopPropagation();deleteUser(' + u.id + ',\'' + escQ(u.name) + '\')" style="border:none;background:none;font-size:12px;cursor:pointer;padding:2px 6px;border-radius:3px;color:#c0392b">Obriši</button></td>';
+    h += '</tr>';
   }
   tbody.innerHTML = h;
+}
+
+function openEdit(id) {
+  var u = allUsers.find(function(x){return x.id===id;});
+  if (!u) return;
+  editingId = id;
+
+  // highlight row
+  var rows = document.querySelectorAll('#result-list tr');
+  rows.forEach(function(r){r.classList.remove('selected');});
+  var tbody = document.getElementById('user-tbody');
+  var trs = tbody.querySelectorAll('tr');
+  for (var i=0;i<trs.length;i++){
+    if (parseInt(trs[i].cells[0].textContent)===id) trs[i].classList.add('selected');
+  }
+
+  document.getElementById('edit-title').textContent = 'Uredi: ' + u.name;
+
+  // split name into ime/prezime
+  var parts = (u.name||'').split(' ');
+  document.getElementById('e-ime').value = parts[0]||'';
+  document.getElementById('e-prezime').value = parts.slice(1).join(' ')||'';
+
+  document.getElementById('e-alias').value = u.alias||'';
+  document.getElementById('e-status').value = u.role === 'admin' ? 'admin' : 'user';
+  document.getElementById('e-email').value = u.email||'';
+  document.getElementById('e-pw').value = '';
+  document.getElementById('e-last-active').textContent = u.last_active||'-';
+  document.getElementById('e-last-ip').textContent = u.last_ip||'-';
+  document.getElementById('e-created').textContent = u.created_at||'-';
+  document.getElementById('e-oslovljavanje').value = u.oslovljavanje||'-';
+  document.getElementById('e-ulica').value = u.ulica||'';
+  document.getElementById('e-ptt').value = u.ptt||'';
+  document.getElementById('e-grad').value = u.grad||'';
+  document.getElementById('e-tel').value = u.telefon||'';
+  document.getElementById('e-rodjadan').value = u.rodjadan||'';
+  document.getElementById('e-beleske').value = u.beleske||'';
+
+  document.getElementById('edit-section').style.display = 'block';
+  document.getElementById('edit-section').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function closeEdit() {
+  editingId = null;
+  document.getElementById('edit-section').style.display = 'none';
+  var rows = document.querySelectorAll('#result-list tr');
+  rows.forEach(function(r){r.classList.remove('selected');});
+}
+
+function saveEdit() {
+  if (!editingId) return;
+  var ime = document.getElementById('e-ime').value.trim();
+  var prezime = document.getElementById('e-prezime').value.trim();
+  var name = (ime + ' ' + prezime).trim();
+  var email = document.getElementById('e-email').value.trim();
+  var role = document.getElementById('e-status').value;
+  var pw = document.getElementById('e-pw').value;
+  var payload = {
+    id: editingId, name: name, email: email, role: role,
+    alias: document.getElementById('e-alias').value.trim(),
+    oslovljavanje: document.getElementById('e-oslovljavanje').value,
+    ulica: document.getElementById('e-ulica').value.trim(),
+    ptt: document.getElementById('e-ptt').value.trim(),
+    grad: document.getElementById('e-grad').value.trim(),
+    telefon: document.getElementById('e-tel').value.trim(),
+    rodjadan: document.getElementById('e-rodjadan').value,
+    beleske: document.getElementById('e-beleske').value.trim()
+  };
+  if (pw) payload.password = pw;
+
+  api('/api/admin/uredi_korisnika', payload, 'POST', function(r) {
+    if (r.ok) {
+      showMsg('msg-global', 'Korisnik sačuvan!', true);
+      closeEdit();
+      loadUsers();
+    } else showMsg('msg-edit', r.error||'Greška.', false);
+  });
+}
+
+function deleteUser(id, name) {
+  if (!confirm('Obrisati korisnika "' + name + '"?')) return;
+  api('/api/admin/brisi_korisnika', {id:id}, 'POST', function(r) {
+    if (r.ok) { showMsg('msg-global','Korisnik obrisan.',true); closeEdit(); loadUsers(); }
+    else showMsg('msg-global', r.error||'Greška.', false);
+  });
 }
 
 function toggleNovi() {
@@ -294,48 +449,21 @@ function addUser() {
   var pw    = document.getElementById('np').value;
   var role  = document.getElementById('nr').value;
   if (!name||!email||!pw) { showMsg('msg-add','Sva polja su obavezna.',false); return; }
-  api('/api/admin/dodaj_korisnika', {name:name,email:email,password:pw,role:role}, 'POST', function(r) {
+  var tel = document.getElementById('n-tel').value.trim();
+  var beleske = document.getElementById('n-beleske').value.trim();
+  api('/api/admin/dodaj_korisnika', {name:name,email:email,password:pw,role:role,telefon:tel,beleske:beleske}, 'POST', function(r) {
     if (r.ok) {
       showMsg('msg-add','Korisnik uspješno dodat!',true);
       document.getElementById('nn').value='';
       document.getElementById('ne').value='';
       document.getElementById('np').value='';
+      document.getElementById('n-tel').value='';
+      document.getElementById('n-beleske').value='';
       document.getElementById('form-novi').style.display='none';
       loadUsers();
     } else showMsg('msg-add', r.error||'Greška.', false);
   });
 }
-
-function deleteUser(id, name) {
-  if (!confirm('Obrisati korisnika "' + name + '"?')) return;
-  api('/api/admin/brisi_korisnika', {id:id}, 'POST', function(r) {
-    if (r.ok) { showMsg('msg-global','Korisnik obrisan.',true); loadUsers(); }
-    else showMsg('msg-global', r.error||'Greška.', false);
-  });
-}
-
-function openLozinka(id, name) {
-  editId = id;
-  document.getElementById('modal-loz-name').textContent = 'Korisnik: ' + name;
-  document.getElementById('modal-loz-pw').value = '';
-  document.getElementById('msg-loz').textContent = '';
-  document.getElementById('modal-loz').classList.add('on');
-}
-
-function submitLozinka() {
-  var pw = document.getElementById('modal-loz-pw').value;
-  if (!pw) { document.getElementById('msg-loz').textContent='Unesite lozinku.'; return; }
-  api('/api/admin/promeni_lozinku', {id:editId, password:pw}, 'POST', function(r) {
-    if (r.ok) { closeModal(); showMsg('msg-global','Lozinka promijenjena!',true); }
-    else { document.getElementById('msg-loz').textContent = r.error||'Greška.'; }
-  });
-}
-
-function closeModal() {
-  document.getElementById('modal-loz').classList.remove('on');
-}
-
-document.getElementById('modal-loz').addEventListener('click', function(e){ if(e.target===this)closeModal(); });
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escQ(s){ return String(s).replace(/'/g,"\\'"); }
