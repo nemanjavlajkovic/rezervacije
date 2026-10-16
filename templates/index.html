@@ -151,6 +151,31 @@ td.sl.ps-otkazano{background:#450a0a;color:#f87171;font-weight:bold}
 .btn-del{background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;padding:7px 14px;border-radius:4px;cursor:pointer;font-size:12px}
 .btn-del:hover{background:#991b1b}
 
+/* RCC-style modal */
+.rcc-mod{background:#fff;color:#111;border-radius:6px;padding:0;max-width:680px;width:95%;position:relative;max-height:90vh;overflow-y:auto}
+.rcc-close{position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;z-index:10;line-height:1}
+.rcc-close:hover{color:#111}
+.rcc-body{display:flex;gap:0;padding:24px 24px 0}
+.rcc-col-left{flex:1.1;padding-right:20px;border-right:1px solid #e5e7eb}
+.rcc-col-right{flex:1;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.rcc-field{margin-bottom:12px}
+.rcc-lbl{display:block;font-size:12px;color:#374151;font-weight:600;margin-bottom:4px}
+.rcc-input{width:100%;border:1px solid #d1d5db;border-radius:4px;padding:7px 10px;font-size:13px;color:#111;background:#fff;outline:none}
+.rcc-input:focus{border-color:#6366f1}
+select.rcc-input{cursor:pointer}
+.rcc-row2{display:flex;gap:10px}
+.rcc-row2 .rcc-field{flex:1}
+.rcc-footer{display:flex;align-items:center;gap:14px;padding:16px 24px;border-top:1px solid #e5e7eb;margin-top:12px}
+.rcc-btn-spremi{background:#4f46e5;color:#fff;border:none;border-radius:4px;padding:9px 28px;font-size:13px;font-weight:600;cursor:pointer}
+.rcc-btn-spremi:hover{background:#4338ca}
+.rcc-btn-dogadjaj{color:#4f46e5;font-size:13px;text-decoration:none;font-weight:500}
+.rcc-btn-dogadjaj:hover{text-decoration:underline}
+.rcc-mod .ac-wrap input{background:#fff;border:1px solid #d1d5db;color:#111;padding:7px 10px;border-radius:4px;font-size:13px;width:100%}
+.rcc-mod .ac-wrap input::placeholder{color:#9ca3af}
+.rcc-mod .ac-dropdown{background:#fff;border:1px solid #d1d5db;color:#111}
+.rcc-mod .ac-item{color:#111;border-bottom:1px solid #f3f4f6}
+.rcc-mod .ac-item:hover{background:#f9fafb}
+
 .card{background:#1e2536;border:1px solid #2d3548;border-radius:6px;padding:16px;margin-bottom:14px}
 .card h3{font-size:13px;color:#93c5fd;margin-bottom:10px;border-bottom:1px solid #2d3548;padding-bottom:6px}
 .fr{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px}
@@ -241,39 +266,89 @@ td.sl.ps-otkazano{background:#450a0a;color:#f87171;font-weight:bold}
 
 <!-- MODAL nova rezervacija -->
 <div class="ov" id="mov">
-  <div class="mod">
-    <h3>Rezervacija termina</h3>
-    <div id="minfo" class="minfo"></div>
-    <div style="margin-bottom:12px">
-      <label>Ime klijenta</label>
-      <div class="ac-wrap">
-        <input type="text" id="ac-input" placeholder="Počni da kucaš ime ili telefon..." oninput="acSearch(this.value)" autocomplete="off">
-        <div class="ac-dropdown" id="ac-dd"></div>
+  <div class="mod rcc-mod">
+    <button class="rcc-close" onclick="closeM()">×</button>
+    <div class="rcc-body">
+      <!-- Leva kolona -->
+      <div class="rcc-col-left">
+        <div class="rcc-field">
+          <label class="rcc-lbl">Rezervisano za</label>
+          <div class="ac-wrap">
+            <input type="text" id="ac-input" placeholder="Počni da kucaš ime ili telefon..." oninput="acSearch(this.value)" autocomplete="off">
+            <div class="ac-dropdown" id="ac-dd"></div>
+          </div>
+          <div class="selected-klijent" id="sel-k">
+            <span class="sel-name" id="sel-name"></span>
+            <span class="sel-pret" id="sel-pret" style="display:none">pretplatnik</span>
+            <button class="sel-clear" onclick="clearSel()">×</button>
+          </div>
+        </div>
+        <div class="rcc-row2">
+          <div class="rcc-field">
+            <label class="rcc-lbl">Vreme (Početak)</label>
+            <input type="time" id="m-vreme-od" class="rcc-input">
+          </div>
+          <div class="rcc-field">
+            <label class="rcc-lbl">Vreme (Kraj)</label>
+            <input type="time" id="m-vreme-do" class="rcc-input">
+          </div>
+        </div>
+        <div class="rcc-row2">
+          <div class="rcc-field">
+            <label class="rcc-lbl">Datum (Početak)</label>
+            <input type="date" id="m-datum-od" class="rcc-input">
+          </div>
+          <div class="rcc-field">
+            <label class="rcc-lbl">Datum (Kraj)</label>
+            <input type="date" id="m-datum-do" class="rcc-input" readonly style="background:#f3f4f6;color:#9ca3af">
+          </div>
+        </div>
+        <div class="rcc-field">
+          <label class="rcc-lbl">Ponoviti</label>
+          <select id="m-ponovi" class="rcc-input" onchange="updatePonoviUI()">
+            <option value="jednom">Samo jednom</option>
+            <option value="nedeljno">Nedeljno (pretplata)</option>
+          </select>
+        </div>
+        <div id="pretplata-period" style="display:none;background:#fefce8;border:1px solid #fde68a;border-radius:4px;padding:10px;margin-top:4px">
+          <p style="font-size:12px;color:#92400e;margin-bottom:8px">📅 Kreira rezervacije za svaki isti dan u sedmici u odabranom periodu.</p>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1"><label class="rcc-lbl">Od datuma</label><input type="date" id="date-od" class="rcc-input"></div>
+            <div style="flex:1"><label class="rcc-lbl">Do datuma</label><input type="date" id="date-do" class="rcc-input"></div>
+          </div>
+        </div>
       </div>
-      <div class="selected-klijent" id="sel-k">
-        <span class="sel-name" id="sel-name"></span>
-        <span class="sel-pret" id="sel-pret" style="display:none">pretplatnik</span>
-        <button class="sel-clear" onclick="clearSel()">×</button>
+      <!-- Desna kolona -->
+      <div class="rcc-col-right">
+        <div class="rcc-field">
+          <label class="rcc-lbl">Teren</label>
+          <select id="m-teren" class="rcc-input"></select>
+        </div>
+        <div class="rcc-field">
+          <label class="rcc-lbl">Status naplate</label>
+          <select id="m-status-naplate" class="rcc-input">
+            <option value="na_cekanju">Na čekanju</option>
+            <option value="placeno">Plaćeno</option>
+            <option value="nedolazak">Nedolazak</option>
+            <option value="otkazano">Otkazano</option>
+          </select>
+        </div>
+        <div class="rcc-field">
+          <label class="rcc-lbl">Broj igrača</label>
+          <input type="number" id="m-igraci" class="rcc-input" value="1" min="1" max="20">
+        </div>
+        <div class="rcc-field" style="flex:1;display:flex;flex-direction:column">
+          <label class="rcc-lbl">Beleške</label>
+          <textarea id="m-beleske" class="rcc-input" rows="4" style="resize:vertical;flex:1"></textarea>
+          <span style="font-size:11px;color:#9ca3af;margin-top:3px">One su vidljive samo za administraciju</span>
+        </div>
       </div>
     </div>
-    <div>
-      <label>Status rezervacije</label>
-      <div class="status-btns">
-        <button id="sbtn-taken" class="sbtn active-taken" onclick="setStatus('taken')">Zauzeto</button>
-        <button id="sbtn-sub" class="sbtn" onclick="setStatus('sub')">Pretplata</button>
-      </div>
-    </div>
-    <div id="pretplata-period">
-      <p style="font-size:12px;color:#ca8a04;margin-bottom:10px">📅 Sistem će automatski kreirati rezervacije za svaki isti dan u sedmici u odabranom periodu.</p>
-      <div style="display:flex;gap:10px">
-        <div style="flex:1"><label>Od datuma</label><input type="date" id="date-od"></div>
-        <div style="flex:1"><label>Do datuma</label><input type="date" id="date-do"></div>
-      </div>
-    </div>
-    <div id="mmsg"></div>
-    <div class="mbtns">
-      <button class="bx" onclick="closeM()">Zatvori</button>
-      <button class="bc" id="mbtn" onclick="confirmRez()">Rezerviši</button>
+    <div id="mmsg" style="padding:0 20px"></div>
+    <div class="rcc-footer">
+      <button class="rcc-btn-spremi" id="mbtn" onclick="confirmRez()">Spremi</button>
+      <span style="color:#6b7280;font-size:13px">ili</span>
+      <a href="/admin/dogadjaji" class="rcc-btn-dogadjaj">📅 Novi događaj</a>
     </div>
   </div>
 </div>
@@ -493,28 +568,43 @@ function pickDate(val){if(!val)return;var p=val.split('-');cd=new Date(parseInt(
 
 function openM(courtId,courtName,hour){
   if(!cu){alert('Prijavite se da rezervišete termin.');return;}
+  if(cu.role!=='admin'&&cu.role!=='staff'){alert('Samo administrator može da postavlja termine.');return;}
   ps={date:iso(cd),court:courtId,hour:hour};
-  document.getElementById('minfo').innerHTML='<strong>Teren:</strong> '+courtName+'<br><strong>Datum:</strong> '+fdShort(cd)+'<br><strong>Vreme:</strong> '+fhLine(hour);
   document.getElementById('mmsg').innerHTML='';
   document.getElementById('mbtn').style.display='';
   document.getElementById('ac-input').value='';
   document.getElementById('ac-dd').style.display='none';
   document.getElementById('sel-k').style.display='none';
   selKlijent=null;rezStatus='taken';
-  document.getElementById('sbtn-taken').className='sbtn active-taken';
-  document.getElementById('sbtn-sub').className='sbtn';
-  document.getElementById('pretplata-period').style.display='none';
+  // Popuni polja
+  var h2=('0'+hour).slice(-2);
+  document.getElementById('m-vreme-od').value=h2+':00';
+  document.getElementById('m-vreme-do').value=('0'+(hour+1)).slice(-2)+':00';
   var danas=iso(cd);
+  document.getElementById('m-datum-od').value=danas;
+  document.getElementById('m-datum-do').value=danas;
   document.getElementById('date-od').value=danas;
   var za30=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate()+30);
   document.getElementById('date-do').value=iso(za30);
+  document.getElementById('m-ponovi').value='jednom';
+  document.getElementById('pretplata-period').style.display='none';
+  document.getElementById('m-status-naplate').value='na_cekanju';
+  document.getElementById('m-igraci').value='1';
+  document.getElementById('m-beleske').value='';
+  // Popuni teren dropdown
+  var ts=document.getElementById('m-teren');ts.innerHTML='';
+  for(var tid in TERENI_MAP){var o=document.createElement('option');o.value=tid;o.textContent=TERENI_MAP[tid];if(tid===courtId)o.selected=true;ts.appendChild(o);}
   document.getElementById('mov').classList.add('on');
 }
 function closeM(){document.getElementById('mov').classList.remove('on');ps=null;}
+function updatePonoviUI(){
+  var v=document.getElementById('m-ponovi').value;
+  rezStatus=v==='nedeljno'?'sub':'taken';
+  document.getElementById('pretplata-period').style.display=v==='nedeljno'?'block':'none';
+}
 function setStatus(s){
   rezStatus=s;
-  document.getElementById('sbtn-taken').className='sbtn'+(s==='taken'?' active-taken':'');
-  document.getElementById('sbtn-sub').className='sbtn'+(s==='sub'?' active-sub':'');
+  document.getElementById('m-ponovi').value=s==='sub'?'nedeljno':'jednom';
   document.getElementById('pretplata-period').style.display=s==='sub'?'block':'none';
 }
 
@@ -598,16 +688,20 @@ async function confirmRez(){
   if(!ps)return;
   var ime=selKlijent?selKlijent.ime:document.getElementById('ac-input').value.trim();
   if(!ime){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite ime klijenta.</p>';return;}
+  var teren=document.getElementById('m-teren').value||ps.court;
+  var statusNaplate=document.getElementById('m-status-naplate').value;
+  var beleske=document.getElementById('m-beleske').value.trim();
+  var igraci=parseInt(document.getElementById('m-igraci').value)||1;
   if(rezStatus==='sub'){
     var od=document.getElementById('date-od').value,doo=document.getElementById('date-do').value;
     if(!od||!doo){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite period pretplate.</p>';return;}
-    var r=await apiAsync('/api/rezervisi_pretplatu',{date_od:od,date_do:doo,court:ps.court,hour:ps.hour,name:ime},'POST');
+    var r=await apiAsync('/api/rezervisi_pretplatu',{date_od:od,date_do:doo,court:teren,hour:ps.hour,name:ime,payment_status:statusNaplate,beleske:beleske,igraci:igraci},'POST');
     var m=document.getElementById('mmsg');
     if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
     else m.innerHTML='<p class="merr">✗ '+r.error+'</p>';
     return;
   }
-  var r=await apiAsync('/api/rezervisi',{date:ps.date,court:ps.court,hour:ps.hour,status:rezStatus,name:ime,payment_status:'na_cekanju'},'POST');
+  var r=await apiAsync('/api/rezervisi',{date:ps.date,court:teren,hour:ps.hour,status:rezStatus,name:ime,payment_status:statusNaplate,beleske:beleske,igraci:igraci},'POST');
   var m=document.getElementById('mmsg');
   if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
   else m.innerHTML='<p class="merr">✗ '+r.error+'</p>';
