@@ -422,6 +422,7 @@ function setIn(u){
   if(u.role==='admin'||u.role==='staff'){
     document.getElementById('klijenti-wrap').style.display='block';
     loadKlijenti();
+    loadKorisnici();
   }
   render();
 }
@@ -524,8 +525,12 @@ function goToday(){var t=new Date();cd=new Date(t.getFullYear(),t.getMonth(),t.g
 function pickDate(val){if(!val)return;var p=val.split('-');cd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));render();}
 
 var sviKlijenti=[];
+var sviKorisnici=[];
 function loadKlijenti(){
   api('/api/klijenti',null,'GET',function(r){if(r.ok){sviKlijenti=r.klijenti;renderKlijenti();}});
+}
+function loadKorisnici(){
+  api('/api/admin/korisnici',null,'GET',function(r){if(r.ok)sviKorisnici=r.korisnici;});
 }
 function renderKlijenti(){
   var q=(document.getElementById('k-search')||{value:''}).value.toLowerCase();
@@ -625,10 +630,29 @@ async function obrisiRezervaciju(){
 function acSearch(q){
   var dd=document.getElementById('ac-dd');
   if(!q){dd.style.display='none';return;}
-  var f=sviKlijenti.filter(function(k){return k.ime.toLowerCase().includes(q.toLowerCase())||(k.telefon||'').includes(q);});
-  if(!f.length){dd.style.display='none';return;}
-  dd.innerHTML=f.map(function(k){return '<div class="ac-item" onclick="selK('+k.id+')"><span>'+k.ime+(k.telefon?'<span class="ac-tel">'+k.telefon+'</span>':'')+'</span>'+(k.pretplatnik?'<span class="ac-tag">pretplatnik</span>':'')+'</div>';}).join('');
+  var ql=q.toLowerCase();
+  var fk=sviKlijenti.filter(function(k){return k.ime.toLowerCase().includes(ql)||(k.telefon||'').includes(q);});
+  // korisnici koji imaju alias ili ime koje odgovara
+  var fu=sviKorisnici.filter(function(u){
+    return (u.alias||'').toLowerCase().includes(ql)||u.name.toLowerCase().includes(ql)||(u.telefon||'').includes(q);
+  });
+  var html='';
+  fk.forEach(function(k){
+    html+='<div class="ac-item" onclick="selK('+k.id+')"><span>'+k.ime+(k.telefon?'<span class="ac-tel">'+k.telefon+'</span>':'')+'</span>'+(k.pretplatnik?'<span class="ac-tag">pretplatnik</span>':'')+'</div>';
+  });
+  fu.forEach(function(u){
+    var display=u.alias?u.alias+' <span class="ac-tel">('+u.name+')</span>':u.name;
+    html+='<div class="ac-item" onclick="selKorisnik(\''+escQ(u.alias||u.name)+'\')"><span>'+display+'</span><span class="ac-tag" style="background:#dbeafe;color:#1d4ed8">korisnik</span></div>';
+  });
+  if(!html){dd.style.display='none';return;}
+  dd.innerHTML=html;
   dd.style.display='block';
+}
+function selKorisnik(ime){
+  document.getElementById('ac-input').value=ime;
+  document.getElementById('ac-dd').style.display='none';
+  selKlijent=null;
+  document.getElementById('sel-k').style.display='none';
 }
 function selK(id){
   selKlijent=sviKlijenti.find(function(k){return k.id===id;});
