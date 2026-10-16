@@ -502,7 +502,7 @@ def api_dodaj_dogadjaj():
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     d = request.json or {}
     naziv = (d.get('naziv') or '').strip()
-    datum = (d.get('datum') or '').strip()
+    datum = (d.get('datum_od') or d.get('datum') or '').strip()
     if not naziv or not datum: return err('Naziv i datum su obavezni.')
     dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
     new_id = max((x['id'] for x in dogadjaji), default=0) + 1
