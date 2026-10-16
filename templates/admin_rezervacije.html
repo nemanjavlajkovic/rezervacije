@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="sr-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administracija rezervacija – Byford Country Club</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;font-size:13px;background:#111827;color:#e5e7eb;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+
+#hdr{background:#1a1f2e;border-bottom:1px solid #2d3548;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+#hdr-logo .logo-text .name{font-size:15px;font-weight:bold;color:#fff}
+#hdr-logo .logo-text .sub{font-size:12px;color:#9ca3af}
+#hdr-divider{width:1px;height:40px;background:#2d3548;flex-shrink:0}
+#hdr-links{display:flex;align-items:center;flex:1;flex-wrap:wrap}
+.hdr-link{display:flex;align-items:center;gap:8px;padding:6px 18px;border-right:1px solid #2d3548;color:#d1d5db;font-size:12px;white-space:nowrap}
+.hdr-link:last-child{border-right:none}
+.hdr-link .icon{font-size:18px;color:#9ca3af}
+.hdr-link .lbl{font-size:11px;color:#9ca3af}
+.hdr-link .val{font-size:13px;color:#fff;font-weight:500}
+
+#main{flex:1;display:flex;padding:30px 20px;gap:20px;max-width:1200px;margin:0 auto;width:100%;align-items:flex-start}
+
+#side-left{width:140px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px}
+.side-back{display:flex;align-items:center;justify-content:center;background:#1e2536;border:1px solid #2d3548;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;text-decoration:none;color:#e5e7eb}
+.side-back:hover{background:#2d3548}
+.side-back-lbl{font-size:12px;color:#9ca3af;text-align:center}
+.side-back-sub{font-size:11px;color:#6b7280;text-align:center}
+
+#center{flex:1;min-width:0}
+
+#side-right{width:180px;flex-shrink:0}
+.related-box{background:#1e2536;border:1px solid #2d3548;border-radius:6px;padding:14px}
+.related-box h4{font-size:12px;color:#9ca3af;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.related-box a{display:block;font-size:12px;color:#60a5fa;padding:3px 0}
+.related-box a:hover{color:#93c5fd}
+.related-box a::before{content:'• ';color:#374151}
+
+/* WHITE BOX */
+.white-box{background:#fff;color:#111;border-radius:8px;padding:24px 28px;margin-bottom:20px}
+.white-box h2{font-size:20px;font-weight:700;color:#111;margin-bottom:4px}
+.white-box .desc{font-size:13px;color:#6b7280;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e5e7eb}
+
+/* FILTER ROW */
+.filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filter-row label{font-size:12px;color:#374151;font-weight:600}
+.filter-row input[type=date],.filter-row input[type=text]{border:1px solid #d1d5db;border-radius:4px;padding:6px 10px;font-size:12px;color:#111;background:#fff}
+.filter-row input[type=date]{width:140px}
+.filter-row input[type=text]{width:200px}
+.btn-filter{background:#374151;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;cursor:pointer}
+.btn-filter:hover{background:#1f2937}
+.btn-info{background:none;border:1px solid #d1d5db;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;color:#6b7280}
+
+/* TABLE */
+.rez-table{width:100%;border-collapse:collapse;font-size:12px}
+.rez-table th{background:#f9fafb;padding:9px 12px;text-align:left;font-weight:600;color:#374151;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+.rez-table td{padding:9px 12px;border-bottom:1px solid #f3f4f6;color:#111;vertical-align:middle}
+.rez-table tr:hover td{background:#f9fafb;cursor:pointer}
+.rez-table tr.selected td{background:#eff6ff}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-taken{background:#dbeafe;color:#1d4ed8}
+.badge-sub{background:#fef9c3;color:#854d0e}
+.badge-placeno{background:#dcfce7;color:#166534}
+.badge-na_cekanju{background:#f3f4f6;color:#374151}
+.badge-nedolazak{background:#fee2e2;color:#991b1b}
+.badge-otkazano{background:#fee2e2;color:#991b1b}
+
+/* NOVA REZ */
+.nova-row{padding:14px 0 4px;border-top:1px solid #e5e7eb;margin-top:8px}
+.btn-nova{background:none;border:none;color:#2563eb;font-size:13px;font-weight:600;cursor:pointer;padding:0}
+.btn-nova:hover{text-decoration:underline}
+.btn-nova::before{content:'+ '}
+
+/* EDIT SECTION */
+#edit-section{display:none;background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:20px;margin-top:16px}
+#edit-section h3{font-size:14px;font-weight:700;color:#111;margin-bottom:16px}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
+.fld input,.fld select{border:1px solid #d1d5db;border-radius:4px;padding:7px 10px;font-size:13px;color:#111;background:#fff}
+.edit-actions{display:flex;gap:8px;margin-top:16px}
+.btn-save{background:#2563eb;color:#fff;border:none;border-radius:4px;padding:8px 20px;font-size:13px;cursor:pointer;font-weight:600}
+.btn-save:hover{background:#1d4ed8}
+.btn-del{background:#dc2626;color:#fff;border:none;border-radius:4px;padding:8px 16px;font-size:13px;cursor:pointer}
+.btn-del:hover{background:#b91c1c}
+.btn-cancel{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:4px;padding:8px 16px;font-size:13px;cursor:pointer}
+
+/* NOVA FORMA */
+#nova-section{display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:20px;margin-top:16px}
+#nova-section h3{font-size:14px;font-weight:700;color:#111;margin-bottom:16px}
+
+.msg{padding:8px 12px;border-radius:4px;font-size:12px;margin-bottom:12px;display:none}
+.msg-ok{background:#dcfce7;color:#166534}
+.msg-err{background:#fee2e2;color:#991b1b}
+
+.empty{text-align:center;color:#9ca3af;padding:24px;font-size:13px}
+
+footer{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-align:center;font-size:11px;color:#6b7280;margin-top:auto}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-logo">
+    <div class="logo-text">
+      <div class="name">Byford Country Club</div>
+      <div class="sub">Rezervacije termina</div>
+    </div>
+  </div>
+  <div id="hdr-divider"></div>
+  <div id="hdr-links">
+    <div class="hdr-link">
+      <span class="icon">📞</span>
+      <div><div class="lbl">Rezervišite ili otkažite telefonom</div><div class="val">063-3-6666-4</div></div>
+    </div>
+    <div class="hdr-link">
+      <span class="icon">ℹ️</span>
+      <div><div class="lbl">Informacije</div><div class="val">byfordcountryclub.com</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="side-left">
+    <a href="/" class="side-back">&#9664;</a>
+    <div class="side-back-lbl">Nazad na:</div>
+    <div class="side-back-sub">Početna</div>
+  </div>
+
+  <div id="center">
+    <div class="white-box">
+      <h2>Administracija rezervacija</h2>
+      <div class="desc">Ovde možete kreirati, uređivati ili brisati rezervacije svog sistema.</div>
+
+      <div id="msg" class="msg"></div>
+
+      <!-- FILTER -->
+      <div class="filter-row">
+        <label>Datum:</label>
+        <input type="date" id="f-od" />
+        <span style="color:#6b7280">do</span>
+        <input type="date" id="f-do" />
+        <label>Filter:</label>
+        <input type="text" id="f-text" placeholder="Ime, email, teren..." />
+        <button class="btn-filter" onclick="filterRez()">Pretraga</button>
+      </div>
+
+      <!-- TABLE -->
+      <div id="rez-wrap">
+        <div class="empty">Učitavanje...</div>
+      </div>
+
+      <!-- EDIT SECTION -->
+      <div id="edit-section">
+        <h3>Uredi rezervaciju</h3>
+        <div class="edit-grid">
+          <div class="fld"><label>Ime klijenta</label><input type="text" id="e-ime" /></div>
+          <div class="fld"><label>Datum</label><input type="date" id="e-date" /></div>
+          <div class="fld">
+            <label>Teren</label>
+            <select id="e-court">
+              <option value="p1">Padel 1</option>
+              <option value="p2">Padel 2</option>
+              <option value="t1">Teren 1</option>
+              <option value="t2">Teren 2</option>
+              <option value="t3">Teren 3 (balon)</option>
+              <option value="t4">Teren 4 (balon)</option>
+              <option value="t5">Teren 5 (hala)</option>
+              <option value="t6">Teren 6 (hala)</option>
+              <option value="t7">Teren 7</option>
+              <option value="t8">Teren 8</option>
+              <option value="t9">Teren 9</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Sat</label>
+            <select id="e-hour"></select>
+          </div>
+          <div class="fld">
+            <label>Status plaćanja</label>
+            <select id="e-payment">
+              <option value="na_cekanju">Na čekanju</option>
+              <option value="placeno">Plaćeno</option>
+              <option value="nedolazak">Nedolazak</option>
+              <option value="otkazano">Otkazano</option>
+            </select>
+          </div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-save" onclick="saveEdit()">Sačuvaj</button>
+          <button class="btn-del" onclick="deleteRez()">Obriši</button>
+          <button class="btn-cancel" onclick="closeEdit()">Otkaži</button>
+        </div>
+      </div>
+
+      <!-- NOVA REZERVACIJA -->
+      <div id="nova-section">
+        <h3>Nova rezervacija</h3>
+        <div class="edit-grid">
+          <div class="fld"><label>Ime klijenta</label><input type="text" id="n-ime" placeholder="Ime i prezime" /></div>
+          <div class="fld"><label>Datum</label><input type="date" id="n-date" /></div>
+          <div class="fld">
+            <label>Teren</label>
+            <select id="n-court">
+              <option value="p1">Padel 1</option>
+              <option value="p2">Padel 2</option>
+              <option value="t1">Teren 1</option>
+              <option value="t2">Teren 2</option>
+              <option value="t3">Teren 3 (balon)</option>
+              <option value="t4">Teren 4 (balon)</option>
+              <option value="t5">Teren 5 (hala)</option>
+              <option value="t6">Teren 6 (hala)</option>
+              <option value="t7">Teren 7</option>
+              <option value="t8">Teren 8</option>
+              <option value="t9">Teren 9</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Sat</label>
+            <select id="n-hour"></select>
+          </div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-save" onclick="saveNova()">Kreiraj</button>
+          <button class="btn-cancel" onclick="closeNova()">Otkaži</button>
+        </div>
+      </div>
+
+      <div class="nova-row">
+        <button class="btn-nova" onclick="openNova()">Nova rezervacija</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="side-right">
+    <div class="related-box">
+      <h4>Povezane stranice</h4>
+      <a href="/admin/korisnici">Administracija korisnika</a>
+      <a href="/admin/statistika">Statistika</a>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 Byford Country Club</footer>
+
+<script>
+var allRez = [];
+var editingKey = null;
+
+// Populate hour selects
+function fillHours(selId) {
+  var sel = document.getElementById(selId);
+  sel.innerHTML = '';
+  for(var h = 7; h < 23; h++) {
+    var opt = document.createElement('option');
+    opt.value = h;
+    opt.text = h + ':00 – ' + (h+1) + ':00';
+    sel.appendChild(opt);
+  }
+}
+fillHours('e-hour');
+fillHours('n-hour');
+
+// Set default dates
+var today = new Date();
+var todayStr = today.toISOString().slice(0,10);
+var in2days = new Date(today); in2days.setDate(today.getDate()+2);
+var in2Str = in2days.toISOString().slice(0,10);
+document.getElementById('f-od').value = todayStr;
+document.getElementById('f-do').value = in2Str;
+document.getElementById('n-date').value = todayStr;
+
+function api(url, data, method, cb) {
+  fetch(url, {
+    method: method||'GET',
+    credentials: 'same-origin',
+    headers: data ? {'Content-Type':'application/json'} : {},
+    body: data ? JSON.stringify(data) : undefined
+  }).then(function(r){return r.json();}).then(cb).catch(function(){cb({ok:false,error:'Greška'});});
+}
+
+function showMsg(txt, isErr) {
+  var el = document.getElementById('msg');
+  el.className = 'msg ' + (isErr ? 'msg-err' : 'msg-ok');
+  el.textContent = txt;
+  el.style.display = 'block';
+  setTimeout(function(){el.style.display='none';}, 3000);
+}
+
+function statusBadge(s) {
+  var labels = {taken:'Rezervisano', sub:'Pretplata'};
+  return '<span class="badge badge-'+s+'">'+(labels[s]||s)+'</span>';
+}
+function payBadge(s) {
+  var labels = {placeno:'Plaćeno', na_cekanju:'Na čekanju', nedolazak:'Nedolazak', otkazano:'Otkazano'};
+  return '<span class="badge badge-'+s+'">'+(labels[s]||s)+'</span>';
+}
+
+function loadRez() {
+  api('/api/admin/rezervacije', null, 'GET', function(r) {
+    if(r.ok) { allRez = r.rezervacije; renderTable(allRez); }
+    else document.getElementById('rez-wrap').innerHTML = '<div class="empty">Greška pri učitavanju.</div>';
+  });
+}
+
+function filterRez() {
+  var od = document.getElementById('f-od').value;
+  var do_ = document.getElementById('f-do').value;
+  var q = document.getElementById('f-text').value.toLowerCase();
+  var f = allRez.filter(function(r) {
+    var dateOk = (!od || r.date >= od) && (!do_ || r.date <= do_);
+    var textOk = !q || r.user_name.toLowerCase().includes(q) || r.user_email.toLowerCase().includes(q) || r.court_name.toLowerCase().includes(q);
+    return dateOk && textOk;
+  });
+  renderTable(f);
+}
+
+function renderTable(rez) {
+  var wrap = document.getElementById('rez-wrap');
+  if(!rez.length) { wrap.innerHTML = '<div class="empty">Nema rezervacija za odabrane kriterijume.</div>'; return; }
+  var html = '<table class="rez-table"><thead><tr><th>Datum</th><th>Sat</th><th>Teren</th><th>Klijent</th><th>Tip</th><th>Plaćanje</th></tr></thead><tbody>';
+  rez.forEach(function(r) {
+    html += '<tr onclick="openEdit(\''+escQ(r.key)+'\')">';
+    html += '<td>'+r.date+'</td>';
+    html += '<td>'+r.hour+':00</td>';
+    html += '<td>'+r.court_name+'</td>';
+    html += '<td>'+r.user_name+'<br><span style="color:#9ca3af;font-size:11px">'+r.user_email+'</span></td>';
+    html += '<td>'+statusBadge(r.status)+'</td>';
+    html += '<td>'+payBadge(r.payment_status||'na_cekanju')+'</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function escQ(s) { return (s||'').replace(/'/g,"\\'"); }
+
+function openEdit(key) {
+  var r = allRez.find(function(x){return x.key===key;});
+  if(!r) return;
+  editingKey = key;
+  document.getElementById('e-ime').value = r.user_name;
+  document.getElementById('e-date').value = r.date;
+  document.getElementById('e-court').value = r.court_id;
+  document.getElementById('e-hour').value = parseInt(r.hour);
+  document.getElementById('e-payment').value = r.payment_status || 'na_cekanju';
+  document.getElementById('nova-section').style.display = 'none';
+  document.getElementById('edit-section').style.display = 'block';
+  document.getElementById('edit-section').scrollIntoView({behavior:'smooth'});
+}
+
+function closeEdit() {
+  document.getElementById('edit-section').style.display = 'none';
+  editingKey = null;
+}
+
+function saveEdit() {
+  if(!editingKey) return;
+  var d = {
+    old_key: editingKey,
+    new_date: document.getElementById('e-date').value,
+    new_court: document.getElementById('e-court').value,
+    new_hour: parseInt(document.getElementById('e-hour').value),
+    payment_status: document.getElementById('e-payment').value
+  };
+  api('/api/edituj_rezervaciju', d, 'POST', function(r) {
+    if(r.ok) { showMsg('Rezervacija ažurirana!'); closeEdit(); loadRez(); }
+    else showMsg(r.error || 'Greška', true);
+  });
+}
+
+function deleteRez() {
+  if(!editingKey || !confirm('Obrisati ovu rezervaciju?')) return;
+  var parts = editingKey.split('|');
+  api('/api/otkazi', {date:parts[0], court:parts[1], hour:parseInt(parts[2])}, 'POST', function(r) {
+    if(r.ok) { showMsg('Rezervacija obrisana.'); closeEdit(); loadRez(); }
+    else showMsg(r.error || 'Greška', true);
+  });
+}
+
+function openNova() {
+  document.getElementById('edit-section').style.display = 'none';
+  document.getElementById('nova-section').style.display = 'block';
+  document.getElementById('nova-section').scrollIntoView({behavior:'smooth'});
+}
+
+function closeNova() {
+  document.getElementById('nova-section').style.display = 'none';
+}
+
+function saveNova() {
+  var ime = document.getElementById('n-ime').value.trim();
+  var date = document.getElementById('n-date').value;
+  var court = document.getElementById('n-court').value;
+  var hour = parseInt(document.getElementById('n-hour').value);
+  if(!ime || !date) { showMsg('Unesite ime i datum.', true); return; }
+  api('/api/rezervisi', {name:ime, date:date, court:court, hour:hour, status:'taken'}, 'POST', function(r) {
+    if(r.ok) { showMsg('Rezervacija kreirana!'); closeNova(); loadRez(); }
+    else showMsg(r.error || 'Greška', true);
+  });
+}
+
+loadRez();
+</script>
+</body>
+</html>
