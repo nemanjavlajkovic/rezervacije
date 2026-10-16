@@ -509,11 +509,14 @@ def api_dodaj_dogadjaj():
     dogadjaji.append({
         'id': new_id,
         'naziv': naziv,
-        'datum': datum,
-        'vreme': d.get('vreme', '10:00'),
-        'lokacija': d.get('lokacija', ''),
-        'max_ucenika': d.get('max_ucenika') or None,
         'opis': d.get('opis', ''),
+        'datum_od': datum,
+        'vreme_od': d.get('vreme_od', d.get('vreme', '10:00')),
+        'datum_do': d.get('datum_do', datum),
+        'vreme_do': d.get('vreme_do', ''),
+        'teren': d.get('teren', d.get('lokacija', '')),
+        'kapacitet': d.get('kapacitet') or d.get('max_ucenika') or 0,
+        'beleske': d.get('beleske', ''),
         'status': 'aktivan',
         'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     })
@@ -529,9 +532,9 @@ def api_uredi_dogadjaj():
     dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
     for x in dogadjaji:
         if x['id'] == tid:
-            for fld in ('naziv', 'datum', 'vreme', 'lokacija', 'opis', 'status'):
+            for fld in ('naziv', 'opis', 'datum_od', 'vreme_od', 'datum_do', 'vreme_do', 'teren', 'status', 'beleske'):
                 if fld in d: x[fld] = d[fld]
-            if 'max_ucenika' in d: x['max_ucenika'] = d['max_ucenika'] or None
+            if 'kapacitet' in d: x['kapacitet'] = d['kapacitet'] or 0
             write(DOGADJAJI_F, dogadjaji)
             return ok({'message': 'Događaj sačuvan.'})
     return err('Događaj nije pronađen.')
