@@ -121,6 +121,13 @@ def admin_korisnici():
         return redirect('/')
     return render_template('admin_korisnici.html')
 
+@app.route('/admin/statistika')
+def admin_statistika():
+    u = current_user()
+    if not u or u['role'] != 'admin':
+        return redirect('/')
+    return render_template('admin_statistika.html')
+
 # ── API ───────────────────────────────────────────────────────────────────────
 
 @app.route('/api/me')
