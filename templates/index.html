@@ -50,6 +50,16 @@ a{color:inherit;text-decoration:none}
 .btn-nav:hover{background:#3d4560;color:#fff}
 .btn-admin{color:#60a5fa;font-size:12px;margin-left:4px}
 
+/* ADMIN DROPDOWN */
+.adm-wrap{position:relative;display:inline-block}
+.adm-dd{display:none;position:absolute;top:calc(100% + 4px);right:0;background:#1e2536;border:1px solid #3d4560;border-radius:4px;min-width:200px;z-index:300;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.adm-dd.open{display:block}
+.adm-dd a,.adm-dd button{display:block;width:100%;text-align:left;padding:9px 16px;font-size:12px;color:#d1d5db;background:none;border:none;border-bottom:1px solid #2d3548;cursor:pointer;text-decoration:none;white-space:nowrap}
+.adm-dd a:last-child,.adm-dd button:last-child{border-bottom:none}
+.adm-dd a:hover,.adm-dd button:hover{background:#2d3548;color:#fff}
+.adm-sep{height:1px;background:#3d4560;margin:2px 0}
+.adm-hdr{padding:5px 16px 3px;font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px}
+
 /* TABLE */
 #twrap{overflow-x:auto;padding:16px 20px}
 table.sc{border-collapse:collapse;width:100%;min-width:800px}
@@ -405,7 +415,7 @@ function setIn(u){
   cu=u;
   document.getElementById('login-area').innerHTML=
     '<span class="uinfo">✓ '+u.name+'</span> '+
-    (u.role==='admin'||u.role==='staff' ? '<a href="/admin/" class="btn-nav">⚙ Administracija</a>' : '')+
+    (u.role==='admin'||u.role==='staff' ? '<div class="adm-wrap" id="adm-wrap"><button class="btn-nav" onclick="toggleAdmMenu(event)">⚙ Administracija ▾</button><div class="adm-dd" id="adm-dd"><a href="/admin/#korisnici" onclick="closeAdmMenu()">👥 Korisnici</a><a href="/admin/#stat-korisnici" onclick="closeAdmMenu()" style="padding-left:30px;font-size:11px;color:#9ca3af">📊 Statistika</a><div class="adm-sep"></div><a href="/admin/#rezervacije" onclick="closeAdmMenu()">📋 Rezervacije</a><a href="/admin/#stat-rezervacije" onclick="closeAdmMenu()" style="padding-left:30px;font-size:11px;color:#9ca3af">📊 Statistika</a><div class="adm-sep"></div><a href="/admin/#dogadjaji" onclick="closeAdmMenu()">🎉 Događaji</a><a href="/admin/#stat-dogadjaji" onclick="closeAdmMenu()" style="padding-left:30px;font-size:11px;color:#9ca3af">📊 Statistika</a><div class="adm-sep"></div><a href="/admin/#menadzer" onclick="closeAdmMenu()">📁 Menadžer datoteka</a><a href="/admin/#konfiguracija" onclick="closeAdmMenu()">⚙ Konfiguracija</a></div></div>' : '')+
     '<button class="btn-nav" onclick="showMy()">📋 Moji termini</button>'+
     '<button class="btn-nav" onclick="showNalog()">👤 Moj nalog</button>'+
     '<button class="btn-odjava" onclick="logout()">⏻ Odjava</button>';
@@ -429,6 +439,20 @@ async function logout(){
   await apiAsync('/api/logout',{},'POST');
   cu=null;location.reload();
 }
+
+function toggleAdmMenu(e){
+  e.stopPropagation();
+  var dd=document.getElementById('adm-dd');
+  if(dd)dd.classList.toggle('open');
+}
+function closeAdmMenu(){
+  var dd=document.getElementById('adm-dd');
+  if(dd)dd.classList.remove('open');
+}
+document.addEventListener('click',function(e){
+  var wrap=document.getElementById('adm-wrap');
+  if(wrap&&!wrap.contains(e.target))closeAdmMenu();
+});
 
 function slotColorClass(st,pst,booked_by){
   if(st==='past') return booked_by ? 'past-taken' : 'past';
