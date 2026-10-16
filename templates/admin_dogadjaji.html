@@ -63,20 +63,37 @@ a{color:inherit;text-decoration:none}
 .btn-nova:hover{text-decoration:underline}
 .btn-nova::before{content:'+ '}
 
-#edit-section{display:none;background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:20px;margin-top:16px}
-#edit-section h3{font-size:14px;font-weight:700;color:#111;margin-bottom:16px}
-#nova-section{display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:20px;margin-top:16px}
-#nova-section h3{font-size:14px;font-weight:700;color:#111;margin-bottom:16px}
+/* FORM SECTIONS */
+#edit-section,#nova-section{display:none;background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:24px 28px;margin-top:16px}
+#nova-section{background:#f0fdf4;border-color:#bbf7d0}
+#edit-section h3,#nova-section h3{font-size:15px;font-weight:700;color:#111;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #e5e7eb}
 
-.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.edit-grid-full{grid-column:1/-1}
-.fld{display:flex;flex-direction:column;gap:4px}
-.fld label{font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
-.fld input,.fld select,.fld textarea{border:1px solid #d1d5db;border-radius:4px;padding:7px 10px;font-size:13px;color:#111;background:#fff}
-.fld textarea{resize:vertical;min-height:70px}
+/* FORM LAYOUT - label left, input right like the screenshot */
+.form-row{display:flex;align-items:flex-start;gap:0;margin-bottom:14px}
+.form-row .flabel{width:160px;flex-shrink:0;font-size:13px;color:#374151;font-weight:500;padding-top:8px;text-align:right;padding-right:16px}
+.form-row .finput{flex:1}
+.form-row .finput input,
+.form-row .finput select,
+.form-row .finput textarea{width:100%;border:1px solid #d1d5db;border-radius:4px;padding:7px 10px;font-size:13px;color:#111;background:#fff}
+.form-row .finput textarea{resize:vertical;min-height:120px}
+.form-row .finput .hint{font-size:11px;color:#9ca3af;margin-top:3px}
+.form-row .finput input[type=date]{width:160px}
+.form-row .finput input[type=time]{width:120px}
 
-.edit-actions{display:flex;gap:8px;margin-top:16px}
-.btn-save{background:#2563eb;color:#fff;border:none;border-radius:4px;padding:8px 20px;font-size:13px;cursor:pointer;font-weight:600}
+/* Two date/time fields side by side */
+.date-pair{display:flex;gap:10px;align-items:center}
+.date-pair span{font-size:12px;color:#6b7280}
+
+/* Rich text toolbar */
+.rte-toolbar{display:flex;gap:2px;padding:5px 6px;background:#f3f4f6;border:1px solid #d1d5db;border-bottom:none;border-radius:4px 4px 0 0;flex-wrap:wrap}
+.rte-btn{background:#fff;border:1px solid #d1d5db;border-radius:3px;padding:3px 7px;font-size:12px;cursor:pointer;color:#374151}
+.rte-btn:hover{background:#e5e7eb}
+.rte-sep{width:1px;background:#d1d5db;margin:2px 3px}
+.rte-area{border:1px solid #d1d5db;border-radius:0 0 4px 4px;min-height:130px;padding:8px 10px;font-size:13px;color:#111;background:#fff;outline:none;line-height:1.5}
+.rte-area:focus{border-color:#3b82f6}
+
+.edit-actions{display:flex;gap:8px;margin-top:20px;padding-left:176px}
+.btn-save{background:#2563eb;color:#fff;border:none;border-radius:4px;padding:8px 24px;font-size:13px;cursor:pointer;font-weight:600}
 .btn-save:hover{background:#1d4ed8}
 .btn-del{background:#dc2626;color:#fff;border:none;border-radius:4px;padding:8px 16px;font-size:13px;cursor:pointer}
 .btn-del:hover{background:#b91c1c}
@@ -141,24 +158,77 @@ footer{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-al
       <!-- EDIT -->
       <div id="edit-section">
         <h3>Uredi događaj</h3>
-        <div class="edit-grid">
-          <div class="fld"><label>Naziv događaja</label><input type="text" id="e-naziv" /></div>
-          <div class="fld"><label>Datum</label><input type="date" id="e-datum" /></div>
-          <div class="fld"><label>Vreme početka</label><input type="time" id="e-vreme" /></div>
-          <div class="fld"><label>Lokacija / teren</label><input type="text" id="e-lokacija" placeholder="npr. Teren 1" /></div>
-          <div class="fld"><label>Maksimalan broj učesnika</label><input type="number" id="e-max" min="1" /></div>
-          <div class="fld">
-            <label>Status</label>
-            <select id="e-status">
+        <div class="form-row">
+          <div class="flabel">Ime</div>
+          <div class="finput"><input type="text" id="e-naziv" /></div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Opis</div>
+          <div class="finput">
+            <div class="rte-toolbar">
+              <button class="rte-btn" onclick="rteCmd('e-rte','bold')" title="Bold"><b>B</b></button>
+              <button class="rte-btn" onclick="rteCmd('e-rte','italic')" title="Italic"><i>I</i></button>
+              <div class="rte-sep"></div>
+              <button class="rte-btn" onclick="rteCmd('e-rte','justifyLeft')">⬅</button>
+              <button class="rte-btn" onclick="rteCmd('e-rte','justifyCenter')">≡</button>
+              <button class="rte-btn" onclick="rteCmd('e-rte','justifyRight')">➡</button>
+              <div class="rte-sep"></div>
+              <button class="rte-btn" onclick="rteCmd('e-rte','insertUnorderedList')">•</button>
+              <button class="rte-btn" onclick="rteCmd('e-rte','insertOrderedList')">1.</button>
+            </div>
+            <div class="rte-area" id="e-rte" contenteditable="true"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Datum (Početak)</div>
+          <div class="finput">
+            <div class="date-pair">
+              <input type="date" id="e-datum-od" />
+              <span>Vreme (Početak)</span>
+              <input type="time" id="e-vreme-od" />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Datum (Kraj)</div>
+          <div class="finput">
+            <div class="date-pair">
+              <input type="date" id="e-datum-do" />
+              <span>Vreme (Kraj)</span>
+              <input type="time" id="e-vreme-do" />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Teren</div>
+          <div class="finput"><select id="e-teren"><option value="">-- Odaberite teren --</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Kapacitet</div>
+          <div class="finput">
+            <input type="number" id="e-max" min="0" style="width:100px" />
+            <div class="hint">Koliko ljudi može da učestvuje?</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Status</div>
+          <div class="finput">
+            <select id="e-status" style="width:180px">
               <option value="aktivan">Aktivan</option>
               <option value="zavrsen">Završen</option>
               <option value="otkazan">Otkazan</option>
             </select>
           </div>
-          <div class="fld edit-grid-full"><label>Opis</label><textarea id="e-opis"></textarea></div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Beleške</div>
+          <div class="finput">
+            <textarea id="e-beleske" style="min-height:70px"></textarea>
+            <div class="hint">One su vidljive samo za administraciju</div>
+          </div>
         </div>
         <div class="edit-actions">
-          <button class="btn-save" onclick="saveEdit()">Sačuvaj</button>
+          <button class="btn-save" onclick="saveEdit()">Spremi</button>
           <button class="btn-del" onclick="deleteEvent()">Obriši</button>
           <button class="btn-cancel" onclick="closeEdit()">Otkaži</button>
         </div>
@@ -167,16 +237,67 @@ footer{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-al
       <!-- NOVA -->
       <div id="nova-section">
         <h3>Novi događaj</h3>
-        <div class="edit-grid">
-          <div class="fld"><label>Naziv događaja</label><input type="text" id="n-naziv" placeholder="npr. Turnir u tenisu" /></div>
-          <div class="fld"><label>Datum</label><input type="date" id="n-datum" /></div>
-          <div class="fld"><label>Vreme početka</label><input type="time" id="n-vreme" value="10:00" /></div>
-          <div class="fld"><label>Lokacija / teren</label><input type="text" id="n-lokacija" placeholder="npr. Teren 1" /></div>
-          <div class="fld"><label>Maksimalan broj učesnika</label><input type="number" id="n-max" min="1" value="20" /></div>
-          <div class="fld edit-grid-full"><label>Opis</label><textarea id="n-opis" placeholder="Kratak opis događaja..."></textarea></div>
+        <div class="form-row">
+          <div class="flabel">Ime</div>
+          <div class="finput"><input type="text" id="n-naziv" placeholder="npr. Turnir u tenisu" /></div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Opis</div>
+          <div class="finput">
+            <div class="rte-toolbar">
+              <button class="rte-btn" onclick="rteCmd('n-rte','bold')" title="Bold"><b>B</b></button>
+              <button class="rte-btn" onclick="rteCmd('n-rte','italic')" title="Italic"><i>I</i></button>
+              <div class="rte-sep"></div>
+              <button class="rte-btn" onclick="rteCmd('n-rte','justifyLeft')">⬅</button>
+              <button class="rte-btn" onclick="rteCmd('n-rte','justifyCenter')">≡</button>
+              <button class="rte-btn" onclick="rteCmd('n-rte','justifyRight')">➡</button>
+              <div class="rte-sep"></div>
+              <button class="rte-btn" onclick="rteCmd('n-rte','insertUnorderedList')">•</button>
+              <button class="rte-btn" onclick="rteCmd('n-rte','insertOrderedList')">1.</button>
+            </div>
+            <div class="rte-area" id="n-rte" contenteditable="true"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Datum (Početak)</div>
+          <div class="finput">
+            <div class="date-pair">
+              <input type="date" id="n-datum-od" />
+              <span>Vreme (Početak)</span>
+              <input type="time" id="n-vreme-od" value="10:00" />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Datum (Kraj)</div>
+          <div class="finput">
+            <div class="date-pair">
+              <input type="date" id="n-datum-do" />
+              <span>Vreme (Kraj)</span>
+              <input type="time" id="n-vreme-do" value="12:00" />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Teren</div>
+          <div class="finput"><select id="n-teren"><option value="">-- Odaberite teren --</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Kapacitet</div>
+          <div class="finput">
+            <input type="number" id="n-max" min="0" value="0" style="width:100px" />
+            <div class="hint">Koliko ljudi može da učestvuje?</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="flabel">Beleške</div>
+          <div class="finput">
+            <textarea id="n-beleske" style="min-height:70px"></textarea>
+            <div class="hint">One su vidljive samo za administraciju</div>
+          </div>
         </div>
         <div class="edit-actions">
-          <button class="btn-save" onclick="saveNova()">Kreiraj</button>
+          <button class="btn-save" onclick="saveNova()">Spremi</button>
           <button class="btn-cancel" onclick="closeNova()">Otkaži</button>
         </div>
       </div>
@@ -203,11 +324,34 @@ footer{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-al
 var allEvents = [];
 var editingId = null;
 
+// Tereni - loaded from server config, fallback to defaults
+var TERENI = {
+  'p1':'Padel 1','p2':'Padel 2',
+  't1':'1','t2':'2','t3':'3 (balon)','t4':'4 (balon)',
+  't5':'5 (hala)','t6':'6 (hala)','t7':'7','t8':'8','t9':'9'
+};
+
+function populateTerenSelects() {
+  ['e-teren','n-teren'].forEach(function(sid) {
+    var sel = document.getElementById(sid);
+    sel.innerHTML = '<option value="">-- Odaberite teren --</option>';
+    Object.keys(TERENI).forEach(function(k) {
+      sel.innerHTML += '<option value="'+k+'">'+TERENI[k]+'</option>';
+    });
+  });
+}
+
 var today = new Date().toISOString().slice(0,10);
 var in30 = new Date(); in30.setDate(in30.getDate()+30);
 document.getElementById('f-od').value = today;
 document.getElementById('f-do').value = in30.toISOString().slice(0,10);
-document.getElementById('n-datum').value = today;
+
+populateTerenSelects();
+
+function rteCmd(id, cmd) {
+  document.getElementById(id).focus();
+  document.execCommand(cmd, false, null);
+}
 
 function api(url, data, method, cb) {
   fetch(url, {
@@ -242,7 +386,8 @@ function filterDog() {
   var od = document.getElementById('f-od').value;
   var do_ = document.getElementById('f-do').value;
   var f = allEvents.filter(function(d) {
-    return (!od || d.datum >= od) && (!do_ || d.datum <= do_);
+    var datum = d.datum_od || d.datum || '';
+    return (!od || datum >= od) && (!do_ || datum <= do_);
   });
   renderTable(f);
 }
@@ -250,14 +395,18 @@ function filterDog() {
 function renderTable(evts) {
   var wrap = document.getElementById('dog-wrap');
   if(!evts.length) { wrap.innerHTML = '<div class="empty">Nema događaja za odabrani period.</div>'; return; }
-  var html = '<table class="dog-table"><thead><tr><th>Datum</th><th>Vreme</th><th>Naziv</th><th>Lokacija</th><th>Učesnici</th><th>Status</th></tr></thead><tbody>';
+  var html = '<table class="dog-table"><thead><tr><th>Datum</th><th>Vreme</th><th>Naziv</th><th>Teren</th><th>Kapacitet</th><th>Status</th></tr></thead><tbody>';
   evts.forEach(function(d) {
+    var datum = d.datum_od || d.datum || '';
+    var vreme = d.vreme_od || d.vreme || '';
+    var teren = d.teren ? (TERENI[d.teren]||d.teren) : (d.lokacija||'-');
+    var opis = d.opis ? d.opis.replace(/<[^>]+>/g,'') : '';
     html += '<tr onclick="openEdit('+d.id+')">';
-    html += '<td>'+d.datum+'</td>';
-    html += '<td>'+d.vreme+'</td>';
-    html += '<td><b>'+d.naziv+'</b>'+(d.opis?'<br><span style="color:#9ca3af;font-size:11px">'+d.opis.slice(0,60)+'...</span>':'')+'</td>';
-    html += '<td>'+(d.lokacija||'-')+'</td>';
-    html += '<td>'+(d.max_ucenika||'∞')+'</td>';
+    html += '<td>'+datum+'</td>';
+    html += '<td>'+vreme+'</td>';
+    html += '<td><b>'+d.naziv+'</b>'+(opis?'<br><span style="color:#9ca3af;font-size:11px">'+opis.slice(0,60)+'</span>':'')+'</td>';
+    html += '<td>'+teren+'</td>';
+    html += '<td>'+(d.kapacitet||d.max_ucenika||'∞')+'</td>';
     html += '<td>'+statusBadge(d.status||'aktivan')+'</td>';
     html += '</tr>';
   });
@@ -270,12 +419,15 @@ function openEdit(id) {
   if(!d) return;
   editingId = id;
   document.getElementById('e-naziv').value = d.naziv||'';
-  document.getElementById('e-datum').value = d.datum||'';
-  document.getElementById('e-vreme').value = d.vreme||'';
-  document.getElementById('e-lokacija').value = d.lokacija||'';
-  document.getElementById('e-max').value = d.max_ucenika||'';
+  document.getElementById('e-rte').innerHTML = d.opis||'';
+  document.getElementById('e-datum-od').value = d.datum_od||d.datum||'';
+  document.getElementById('e-vreme-od').value = d.vreme_od||d.vreme||'';
+  document.getElementById('e-datum-do').value = d.datum_do||d.datum||'';
+  document.getElementById('e-vreme-do').value = d.vreme_do||'';
+  document.getElementById('e-teren').value = d.teren||d.lokacija||'';
+  document.getElementById('e-max').value = d.kapacitet||d.max_ucenika||'';
   document.getElementById('e-status').value = d.status||'aktivan';
-  document.getElementById('e-opis').value = d.opis||'';
+  document.getElementById('e-beleske').value = d.beleske||'';
   document.getElementById('nova-section').style.display = 'none';
   document.getElementById('edit-section').style.display = 'block';
   document.getElementById('edit-section').scrollIntoView({behavior:'smooth'});
@@ -291,12 +443,15 @@ function saveEdit() {
   var d = {
     id: editingId,
     naziv: document.getElementById('e-naziv').value,
-    datum: document.getElementById('e-datum').value,
-    vreme: document.getElementById('e-vreme').value,
-    lokacija: document.getElementById('e-lokacija').value,
-    max_ucenika: parseInt(document.getElementById('e-max').value)||null,
+    opis: document.getElementById('e-rte').innerHTML,
+    datum_od: document.getElementById('e-datum-od').value,
+    vreme_od: document.getElementById('e-vreme-od').value,
+    datum_do: document.getElementById('e-datum-do').value,
+    vreme_do: document.getElementById('e-vreme-do').value,
+    teren: document.getElementById('e-teren').value,
+    kapacitet: parseInt(document.getElementById('e-max').value)||0,
     status: document.getElementById('e-status').value,
-    opis: document.getElementById('e-opis').value
+    beleske: document.getElementById('e-beleske').value
   };
   api('/api/admin/uredi_dogadjaj', d, 'POST', function(r) {
     if(r.ok) { showMsg('Događaj sačuvan!'); closeEdit(); loadEvents(); }
@@ -314,6 +469,16 @@ function deleteEvent() {
 
 function openNova() {
   document.getElementById('edit-section').style.display = 'none';
+  // reset form
+  document.getElementById('n-naziv').value = '';
+  document.getElementById('n-rte').innerHTML = '';
+  document.getElementById('n-datum-od').value = today;
+  document.getElementById('n-datum-do').value = today;
+  document.getElementById('n-vreme-od').value = '10:00';
+  document.getElementById('n-vreme-do').value = '12:00';
+  document.getElementById('n-teren').value = '';
+  document.getElementById('n-max').value = '0';
+  document.getElementById('n-beleske').value = '';
   document.getElementById('nova-section').style.display = 'block';
   document.getElementById('nova-section').scrollIntoView({behavior:'smooth'});
 }
@@ -324,15 +489,18 @@ function closeNova() {
 
 function saveNova() {
   var naziv = document.getElementById('n-naziv').value.trim();
-  var datum = document.getElementById('n-datum').value;
-  if(!naziv || !datum) { showMsg('Unesite naziv i datum.', true); return; }
+  var datum_od = document.getElementById('n-datum-od').value;
+  if(!naziv || !datum_od) { showMsg('Unesite ime i datum početka.', true); return; }
   var d = {
     naziv: naziv,
-    datum: datum,
-    vreme: document.getElementById('n-vreme').value,
-    lokacija: document.getElementById('n-lokacija').value,
-    max_ucenika: parseInt(document.getElementById('n-max').value)||null,
-    opis: document.getElementById('n-opis').value
+    opis: document.getElementById('n-rte').innerHTML,
+    datum_od: datum_od,
+    vreme_od: document.getElementById('n-vreme-od').value,
+    datum_do: document.getElementById('n-datum-do').value,
+    vreme_do: document.getElementById('n-vreme-do').value,
+    teren: document.getElementById('n-teren').value,
+    kapacitet: parseInt(document.getElementById('n-max').value)||0,
+    beleske: document.getElementById('n-beleske').value
   };
   api('/api/admin/dodaj_dogadjaj', d, 'POST', function(r) {
     if(r.ok) { showMsg('Događaj kreiran!'); closeNova(); loadEvents(); }
