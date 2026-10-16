@@ -200,7 +200,10 @@ td.sl.ps-otkazano{background:#450a0a;color:#f87171;font-weight:bold}
   <div id="nav-left">
     <button class="nav-arr" onclick="chDate(-1)">&#9664;</button>
     <button class="nav-today" onclick="goToday()">Danas</button>
-    <div id="nav-date"><span class="cal-icon">📅</span><span id="dlbl"></span></div>
+    <div id="nav-date" onclick="document.getElementById('cal-picker').showPicker()" style="cursor:pointer" title="Izaberi datum">
+      <span class="cal-icon">📅</span><span id="dlbl"></span>
+      <input type="date" id="cal-picker" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" onchange="pickDate(this.value)">
+    </div>
     <button class="nav-arr" onclick="chDate(1)">&#9654;</button>
   </div>
   <div id="nav-right">
@@ -469,6 +472,7 @@ async function render(){
 
 function chDate(d){cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate()+d);render();}
 function goToday(){var t=new Date();cd=new Date(t.getFullYear(),t.getMonth(),t.getDate());render();}
+function pickDate(val){if(!val)return;var p=val.split('-');cd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));render();}
 
 var sviKlijenti=[];
 function loadKlijenti(){
