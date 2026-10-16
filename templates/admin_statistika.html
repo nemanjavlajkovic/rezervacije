@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="sr-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistika – Byford Country Club</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;font-size:13px;background:#111827;color:#e5e7eb;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+
+/* HEADER */
+#hdr{background:#1a1f2e;border-bottom:1px solid #2d3548;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+#hdr-logo .logo-text .name{font-size:15px;font-weight:bold;color:#fff}
+#hdr-logo .logo-text .sub{font-size:12px;color:#9ca3af}
+#hdr-divider{width:1px;height:40px;background:#2d3548;flex-shrink:0}
+#hdr-links{display:flex;align-items:center;flex:1;flex-wrap:wrap}
+.hdr-link{display:flex;align-items:center;gap:8px;padding:6px 18px;border-right:1px solid #2d3548;color:#d1d5db;font-size:12px;white-space:nowrap}
+.hdr-link:last-child{border-right:none}
+.hdr-link .icon{font-size:18px;color:#9ca3af}
+.hdr-link .lbl{font-size:11px;color:#9ca3af}
+.hdr-link .val{font-size:13px;color:#fff;font-weight:500}
+
+/* MAIN LAYOUT */
+#main{flex:1;display:flex;padding:30px 20px;gap:20px;max-width:1200px;margin:0 auto;width:100%;align-items:flex-start}
+
+/* LEFT SIDEBAR */
+#side-left{width:140px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px}
+.side-back{display:flex;align-items:center;justify-content:center;background:#1e2536;border:1px solid #2d3548;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;text-decoration:none;color:#e5e7eb}
+.side-back:hover{background:#2d3548}
+.side-back-lbl{font-size:12px;color:#9ca3af;text-align:center}
+.side-back-sub{font-size:11px;color:#6b7280;text-align:center}
+
+/* CENTER */
+#center{flex:1;min-width:0}
+
+/* RIGHT SIDEBAR */
+#side-right{width:180px;flex-shrink:0}
+.related-box{background:#1e2536;border:1px solid #2d3548;border-radius:6px;padding:14px}
+.related-box h4{font-size:12px;color:#9ca3af;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.related-box a{display:block;font-size:12px;color:#60a5fa;padding:3px 0}
+.related-box a:hover{color:#93c5fd}
+.related-box a::before{content:'• ';color:#374151}
+
+/* WHITE BOX */
+.white-box{background:#fff;color:#111;border-radius:8px;padding:28px 32px;margin-bottom:20px}
+.white-box h2{font-size:20px;font-weight:700;color:#111;margin-bottom:6px}
+.white-box .desc{font-size:13px;color:#6b7280;margin-bottom:24px}
+
+/* STATS TABLE */
+.stat-table{width:100%;border-collapse:collapse;margin-bottom:0}
+.stat-table td{padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px}
+.stat-table tr:last-child td{border-bottom:none;font-weight:700;background:#f9fafb}
+.stat-table .indent{padding-left:24px;color:#374151}
+.stat-table .num{text-align:right;font-weight:600;color:#2563eb;cursor:pointer}
+.stat-table .num:hover{text-decoration:underline}
+.stat-table .num-plain{text-align:right;font-weight:700;color:#111}
+.stat-table tr.section-hdr td{background:#f3f4f6;font-weight:700;font-size:12px;color:#374151;text-transform:uppercase;letter-spacing:0.4px;padding:10px 12px}
+
+/* TWO COLUMNS */
+.two-cols{display:flex;gap:20px}
+.two-cols .white-box{flex:1}
+
+/* LOADING */
+.loading{color:#9ca3af;font-size:13px;padding:20px 0;text-align:center}
+
+footer{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-align:center;font-size:11px;color:#6b7280;margin-top:auto}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-logo">
+    <div class="logo-text">
+      <div class="name">Byford Country Club</div>
+      <div class="sub">Rezervacije termina</div>
+    </div>
+  </div>
+  <div id="hdr-divider"></div>
+  <div id="hdr-links">
+    <div class="hdr-link">
+      <span class="icon">📞</span>
+      <div><div class="lbl">Rezervišite ili otkažite telefonom</div><div class="val">063-3-6666-4</div></div>
+    </div>
+    <div class="hdr-link">
+      <span class="icon">ℹ️</span>
+      <div><div class="lbl">Informacije</div><div class="val">byfordcountryclub.com</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT -->
+  <div id="side-left">
+    <a href="/" class="side-back">&#9664;</a>
+    <div class="side-back-lbl">Nazad na:</div>
+    <div class="side-back-sub">Početna</div>
+  </div>
+
+  <!-- CENTER -->
+  <div id="center">
+
+    <!-- Statistika korisnika -->
+    <div class="white-box">
+      <h2>Statistika korisnika</h2>
+      <div class="desc">Pregled svih registrovanih korisnika sistema.</div>
+      <div id="stat-korisnici"><div class="loading">Učitavanje...</div></div>
+    </div>
+
+    <!-- Statistika rezervacija -->
+    <div class="white-box">
+      <h2>Statistika rezervacija</h2>
+      <div class="desc">Pregled svih rezervacija u sistemu.</div>
+      <div id="stat-rezervacije"><div class="loading">Učitavanje...</div></div>
+    </div>
+
+    <!-- Statistika događaja -->
+    <div class="white-box">
+      <h2>Statistika događaja</h2>
+      <div class="desc">Pregled svih događaja organizovanih u klubu.</div>
+      <table class="stat-table">
+        <tr><td><b>Ukupno događaja</b></td><td class="num-plain">0</td></tr>
+        <tr class="section-hdr"><td colspan="2">Po statusu</td></tr>
+        <tr><td class="indent">| Aktivni</td><td class="num-plain">0</td></tr>
+        <tr><td class="indent">| Završeni</td><td class="num-plain">0</td></tr>
+        <tr><td class="indent">| Otkazani</td><td class="num-plain">0</td></tr>
+        <tr class="section-hdr"><td colspan="2">Učesnici</td></tr>
+        <tr><td class="indent">| Ukupno prijavljenih</td><td class="num-plain">0</td></tr>
+      </table>
+      <div style="margin-top:12px;font-size:12px;color:#9ca3af;font-style:italic">Modul za događaje još nije aktivan. Statistika će se automatski popuniti kada se doda.</div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div id="side-right">
+    <div class="related-box">
+      <h4>Povezane stranice</h4>
+      <a href="/admin/korisnici">Administracija korisnika</a>
+      <a href="/admin/rezervacije">Administracija rezervacija</a>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 Byford Country Club</footer>
+
+<script>
+function api(url, cb) {
+  fetch(url, {credentials:'same-origin'})
+    .then(function(r){return r.json();})
+    .then(cb)
+    .catch(function(){cb({ok:false});});
+}
+
+function buildKorisniciTable(korisnici) {
+  var total = korisnici.length;
+  var admins = korisnici.filter(function(k){return k.role==='admin';}).length;
+  var staff  = korisnici.filter(function(k){return k.role==='staff';}).length;
+  var users  = korisnici.filter(function(k){return k.role==='user';}).length;
+
+  var html = '<table class="stat-table">';
+  html += '<tr><td><b>Ukupno korisnika</b></td><td class="num-plain">'+total+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Po ulozi</td></tr>';
+  html += '<tr><td class="indent">| Administrator</td><td class="num" onclick="window.location=\'/admin/korisnici\'">' + admins + '</td></tr>';
+  html += '<tr><td class="indent">| Rezervisano mesto</td><td class="num" onclick="window.location=\'/admin/korisnici\'">' + users + '</td></tr>';
+  if(staff > 0) {
+    html += '<tr><td class="indent">| Zaposleni</td><td class="num" onclick="window.location=\'/admin/korisnici\'">' + staff + '</td></tr>';
+  }
+  html += '</table>';
+  document.getElementById('stat-korisnici').innerHTML = html;
+}
+
+function buildRezervacijeTable(rezervacije) {
+  var total = rezervacije.length;
+  var taken = rezervacije.filter(function(r){return r.status==='taken';}).length;
+  var sub   = rezervacije.filter(function(r){return r.status==='sub';}).length;
+
+  // by payment status
+  var placeno    = rezervacije.filter(function(r){return r.payment_status==='placeno';}).length;
+  var na_cekanju = rezervacije.filter(function(r){return r.payment_status==='na_cekanju'||!r.payment_status;}).length;
+  var nedolazak  = rezervacije.filter(function(r){return r.payment_status==='nedolazak';}).length;
+  var otkazano   = rezervacije.filter(function(r){return r.payment_status==='otkazano';}).length;
+
+  // today
+  var today = new Date().toISOString().slice(0,10);
+  var danasnje = rezervacije.filter(function(r){return r.date===today;}).length;
+
+  var html = '<table class="stat-table">';
+  html += '<tr><td><b>Ukupno rezervacija</b></td><td class="num-plain">'+total+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Po tipu</td></tr>';
+  html += '<tr><td class="indent">| Rezervisano</td><td class="num-plain">'+taken+'</td></tr>';
+  html += '<tr><td class="indent">| Pretplata</td><td class="num-plain">'+sub+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Po statusu plaćanja</td></tr>';
+  html += '<tr><td class="indent">| Plaćeno</td><td class="num-plain">'+placeno+'</td></tr>';
+  html += '<tr><td class="indent">| Na čekanju</td><td class="num-plain">'+na_cekanju+'</td></tr>';
+  html += '<tr><td class="indent">| Nedolazak</td><td class="num-plain">'+nedolazak+'</td></tr>';
+  html += '<tr><td class="indent">| Otkazano</td><td class="num-plain">'+otkazano+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Danas ('+today+')</td></tr>';
+  html += '<tr><td class="indent">| Danas rezervisano</td><td class="num-plain">'+danasnje+'</td></tr>';
+  html += '</table>';
+  document.getElementById('stat-rezervacije').innerHTML = html;
+}
+
+// Load data
+api('/api/admin/korisnici', function(r) {
+  if(r.ok) buildKorisniciTable(r.korisnici);
+  else document.getElementById('stat-korisnici').innerHTML = '<div class="loading">Greška pri učitavanju.</div>';
+});
+
+api('/api/admin/rezervacije', function(r) {
+  if(r.ok) buildRezervacijeTable(r.rezervacije);
+  else document.getElementById('stat-rezervacije').innerHTML = '<div class="loading">Greška pri učitavanju.</div>';
+});
+</script>
+</body>
+</html>
