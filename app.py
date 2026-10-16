@@ -197,6 +197,40 @@ def api_otkazi():
     write(BOOKINGS_F, bookings)
     return ok({'message': 'Rezervacija otkazana.'})
 
+    @app.route('/api/edituj_rezervaciju', methods=['POST'])
+def api_edituj_rezervaciju():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    d = request.json or {}
+    old_key = d.get('old_key','')
+    new_date = d.get('new_date','')
+    new_court = d.get('new_court','')
+    new_hour = int(d.get('new_hour', 0))
+    payment_status = d.get('payment_status', 'na_cekanju')
+
+    valid_statuses = ['na_cekanju', 'placeno', 'nedolazak', 'otkazano']
+    if payment_status not in valid_statuses:
+        return err('Neispravan status plaćanja.')
+
+    bookings = read(BOOKINGS_F)
+    if old_key not in bookings:
+        return err('Rezervacija nije pronađena.')
+
+    old_booking = bookings[old_key].copy()
+
+    # Obrisi staru
+    del bookings[old_key]
+
+    # Napravi novu
+    new_key = slot_key(new_date, new_court, new_hour)
+    if new_key != old_key and new_key in bookings:
+        return err('Novi termin je već zauzet.')
+
+    old_booking['payment_status'] = payment_status
+    bookings[new_key] = old_booking
+    write(BOOKINGS_F, bookings)
+    return ok({'message': 'Rezervacija ažurirana!'})
+
 @app.route('/api/admin/rezervacije')
 def api_admin_rez():
     u = current_user()
