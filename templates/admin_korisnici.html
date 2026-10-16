@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Administracija korisnika – Byford Country Club</title>
+<title>Statistika – Byford Country Club</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,Helvetica,sans-serif;font-size:13px;background:#111827;color:#e5e7eb;min-height:100vh;display:flex;flex-direction:column}
@@ -31,89 +31,44 @@ a{color:inherit;text-decoration:none}
 .side-back-lbl{font-size:12px;color:#9ca3af;text-align:center}
 .side-back-sub{font-size:11px;color:#6b7280;text-align:center}
 
-/* CENTER BOX */
-#box{flex:1;min-width:0;background:#fff;border-radius:4px;color:#222;overflow:hidden}
-
-/* SEARCH BAR */
-#box-search{padding:16px 24px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#box-search label{font-size:13px;color:#333;white-space:nowrap}
-#box-search input{border:1px solid #ccc;padding:5px 10px;border-radius:3px;font-size:13px;width:260px;color:#222}
-.btn-search{background:#fff;border:1px solid #aaa;padding:5px 14px;border-radius:3px;font-size:13px;cursor:pointer;color:#333}
-.btn-search:hover{background:#f5f5f5}
-
-/* USER LIST TABLE */
-#list-section{padding:0}
-#result-list{width:100%;border-collapse:collapse}
-#result-list th{background:#f0f0f0;padding:7px 12px;text-align:left;font-size:12px;color:#444;border-bottom:1px solid #ddd;font-weight:normal}
-#result-list td{padding:7px 12px;font-size:13px;color:#333;border-bottom:1px solid #f0f0f0}
-#result-list tr:hover td{background:#f9f9f9;cursor:pointer}
-#result-list tr.selected td{background:#e8f0fe}
-.badge-role{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold}
-.badge-admin{background:#dbeafe;color:#1d4ed8}
-.badge-user{background:#dcfce7;color:#166534}
-.badge-staff{background:#fef3c7;color:#92400e}
-.no-results{padding:20px 24px;color:#888;font-size:13px}
-
-/* EDIT FORM */
-#edit-section{display:none;border-top:2px solid #e0e0e0;padding:0}
-#edit-header{padding:14px 24px;border-bottom:1px solid #e0e0e0;background:#fafafa;display:flex;align-items:center;justify-content:space-between}
-#edit-header h2{font-size:15px;font-weight:bold;color:#222}
-.btn-close-edit{background:none;border:none;font-size:18px;cursor:pointer;color:#888;line-height:1}
-.btn-close-edit:hover{color:#333}
-#edit-body{padding:20px 24px;display:flex;gap:24px;flex-wrap:wrap}
-.edit-panel{flex:1;min-width:240px}
-.panel-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.panel-num{width:32px;height:32px;border-radius:50%;background:#8aa8c4;color:#fff;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.panel-title{font-size:14px;color:#1a6fc4;font-weight:bold}
-.fld{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
-.fld label{width:130px;flex-shrink:0;font-size:13px;color:#555;text-align:right}
-.fld input,.fld select,.fld textarea{flex:1;border:1px solid #ccc;padding:5px 8px;border-radius:3px;font-size:13px;color:#222;background:#fff}
-.fld textarea{height:70px;resize:vertical}
-.fld-note{font-size:11px;color:#888;margin-left:138px;margin-bottom:8px}
-.fld-ro{flex:1;font-size:13px;color:#444;padding:5px 0}
-#edit-footer{padding:12px 24px;border-top:1px solid #e0e0e0;background:#fafafa;display:flex;justify-content:center;gap:10px}
-.btn-save{background:#1a5276;color:#fff;border:none;padding:7px 28px;border-radius:3px;font-size:13px;cursor:pointer}
-.btn-save:hover{background:#154360}
-.btn-cancel-edit{background:#fff;color:#555;border:1px solid #ccc;padding:7px 18px;border-radius:3px;font-size:13px;cursor:pointer}
-.btn-cancel-edit:hover{background:#f5f5f5}
-
-/* NEW USER FORM */
-#form-novi{display:none;padding:16px 24px;border-top:1px solid #e8e8e8;background:#fafafa}
-#form-novi h3{font-size:14px;color:#333;margin-bottom:12px}
-.form-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-.form-row .fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:160px}
-.form-row label{font-size:12px;color:#555}
-.form-row input,.form-row select{border:1px solid #ccc;padding:6px 10px;border-radius:3px;font-size:13px;color:#222;background:#fff}
-.btn-dodaj{background:#1a5276;color:#fff;border:none;padding:7px 18px;border-radius:3px;font-size:13px;cursor:pointer}
-.btn-dodaj:hover{background:#154360}
-.btn-otkazi{background:#fff;color:#555;border:1px solid #ccc;padding:7px 14px;border-radius:3px;font-size:13px;cursor:pointer;margin-left:6px}
-
-/* BOX BOTTOM */
-#box-bottom{padding:12px 24px;border-top:1px solid #e8e8e8}
-#box-bottom a{color:#1a6fc4;font-size:13px}
-#box-bottom a:hover{text-decoration:underline}
-
-/* MESSAGES */
-.msg-box{padding:8px 14px;border-radius:3px;font-size:13px;margin:8px 24px}
-.msg-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
-.msg-err{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+/* CENTER */
+#center{flex:1;min-width:0}
 
 /* RIGHT SIDEBAR */
-#side-right{width:180px;flex-shrink:0;padding-top:4px}
-#side-right h4{font-size:13px;font-weight:bold;color:#e5e7eb;margin-bottom:10px}
-#side-right ul{list-style:none;padding:0}
-#side-right ul li{margin-bottom:6px}
-#side-right ul li::before{content:"• ";color:#6b7280}
-#side-right ul li a{font-size:13px;color:#60a5fa}
-#side-right ul li a:hover{text-decoration:underline}
+#side-right{width:180px;flex-shrink:0}
+.related-box{background:#1e2536;border:1px solid #2d3548;border-radius:6px;padding:14px}
+.related-box h4{font-size:12px;color:#9ca3af;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.related-box a{display:block;font-size:12px;color:#60a5fa;padding:3px 0}
+.related-box a:hover{color:#93c5fd}
+.related-box a::before{content:'• ';color:#374151}
 
-/* FOOTER */
-#foot{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-align:center;font-size:11px;color:#6b7280}
+/* WHITE BOX */
+.white-box{background:#fff;color:#111;border-radius:8px;padding:28px 32px;margin-bottom:20px}
+.white-box h2{font-size:20px;font-weight:700;color:#111;margin-bottom:6px}
+.white-box .desc{font-size:13px;color:#6b7280;margin-bottom:24px}
+
+/* STATS TABLE */
+.stat-table{width:100%;border-collapse:collapse;margin-bottom:0}
+.stat-table td{padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px}
+.stat-table tr:last-child td{border-bottom:none;font-weight:700;background:#f9fafb}
+.stat-table .indent{padding-left:24px;color:#374151}
+.stat-table .num{text-align:right;font-weight:600;color:#2563eb;cursor:pointer}
+.stat-table .num:hover{text-decoration:underline}
+.stat-table .num-plain{text-align:right;font-weight:700;color:#111}
+.stat-table tr.section-hdr td{background:#f3f4f6;font-weight:700;font-size:12px;color:#374151;text-transform:uppercase;letter-spacing:0.4px;padding:10px 12px}
+
+/* TWO COLUMNS */
+.two-cols{display:flex;gap:20px}
+.two-cols .white-box{flex:1}
+
+/* LOADING */
+.loading{color:#9ca3af;font-size:13px;padding:20px 0;text-align:center}
+
+footer{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-align:center;font-size:11px;color:#6b7280;margin-top:auto}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div id="hdr">
   <div id="hdr-logo">
     <div class="logo-text">
@@ -125,350 +80,137 @@ a{color:inherit;text-decoration:none}
   <div id="hdr-links">
     <div class="hdr-link">
       <span class="icon">📞</span>
-      <div><div class="lbl">Rezerviši ili otkaži telefonom</div><div class="val">063-3-6666-4</div></div>
+      <div><div class="lbl">Rezervišite ili otkažite telefonom</div><div class="val">063-3-6666-4</div></div>
     </div>
     <div class="hdr-link">
-      <span class="icon">ℹ</span>
-      <div><div class="lbl">Informacije</div><div class="val"><a href="https://byfordcountryclub.com/" target="_blank" style="color:#fff">byfordcountryclub.com</a></div></div>
+      <span class="icon">ℹ️</span>
+      <div><div class="lbl">Informacije</div><div class="val">byfordcountryclub.com</div></div>
     </div>
   </div>
 </div>
 
-<!-- MAIN -->
 <div id="main">
-
-  <!-- LEFT: Nazad -->
+  <!-- LEFT -->
   <div id="side-left">
     <a href="/" class="side-back">&#9664;</a>
     <div class="side-back-lbl">Nazad na:</div>
     <div class="side-back-sub">Početna</div>
   </div>
 
-  <!-- CENTER: Box -->
-  <div id="box">
+  <!-- CENTER -->
+  <div id="center">
 
-    <!-- Administracija korisnika title -->
-    <div style="padding:20px 24px 14px;border-bottom:1px solid #e0e0e0">
-      <h1 style="font-size:18px;font-weight:bold;color:#111;margin-bottom:4px">Administracija korisnika</h1>
-      <p style="font-size:13px;color:#555">Ovde možete da kreirate, uređujete ili brišete korisnike svog sistema.</p>
+    <!-- Statistika korisnika -->
+    <div class="white-box">
+      <h2>Statistika korisnika</h2>
+      <div class="desc">Pregled svih registrovanih korisnika sistema.</div>
+      <div id="stat-korisnici"><div class="loading">Učitavanje...</div></div>
     </div>
 
-    <!-- Search -->
-    <div id="box-search">
-      <label>Ime ili broj:</label>
-      <input type="text" id="search-input" placeholder="" oninput="filterUsers()" onkeydown="if(event.key==='Enter')filterUsers()">
-      <button class="btn-search" onclick="filterUsers()">Pretraga</button>
+    <!-- Statistika rezervacija -->
+    <div class="white-box">
+      <h2>Statistika rezervacija</h2>
+      <div class="desc">Pregled svih rezervacija u sistemu.</div>
+      <div id="stat-rezervacije"><div class="loading">Učitavanje...</div></div>
     </div>
 
-    <div id="msg-global"></div>
-
-    <!-- User list -->
-    <div id="list-section">
-      <table id="result-list" style="display:none">
-        <thead>
-          <tr>
-            <th style="width:40px">ID</th>
-            <th>Ime i prezime</th>
-            <th>Email</th>
-            <th>Rola</th>
-            <th style="width:80px">Akcije</th>
-          </tr>
-        </thead>
-        <tbody id="user-tbody"></tbody>
+    <!-- Statistika događaja -->
+    <div class="white-box">
+      <h2>Statistika događaja</h2>
+      <div class="desc">Pregled svih događaja organizovanih u klubu.</div>
+      <table class="stat-table">
+        <tr><td><b>Ukupno događaja</b></td><td class="num-plain">0</td></tr>
+        <tr class="section-hdr"><td colspan="2">Po statusu</td></tr>
+        <tr><td class="indent">| Aktivni</td><td class="num-plain">0</td></tr>
+        <tr><td class="indent">| Završeni</td><td class="num-plain">0</td></tr>
+        <tr><td class="indent">| Otkazani</td><td class="num-plain">0</td></tr>
+        <tr class="section-hdr"><td colspan="2">Učesnici</td></tr>
+        <tr><td class="indent">| Ukupno prijavljenih</td><td class="num-plain">0</td></tr>
       </table>
-      <div id="no-results" class="no-results" style="display:none">Nema korisnika.</div>
+      <div style="margin-top:12px;font-size:12px;color:#9ca3af;font-style:italic">Modul za događaje još nije aktivan. Statistika će se automatski popuniti kada se doda.</div>
     </div>
 
-    <!-- Edit section (shows when user clicked) -->
-    <div id="edit-section">
-      <div id="edit-header">
-        <h2 id="edit-title">Uredi korisnika</h2>
-        <button class="btn-close-edit" onclick="closeEdit()">✕</button>
-      </div>
-      <div id="edit-body">
-        <!-- Panel 1: Podaci o računu -->
-        <div class="edit-panel">
-          <div class="panel-hdr">
-            <div class="panel-num">1</div>
-            <div class="panel-title">Podaci o računu</div>
-          </div>
-          <div class="fld"><label>Alias</label><input type="text" id="e-alias" placeholder="Proizvoljno ime ili identifikator"></div>
-          <div class="fld-note">Proizvoljno ime ili identifikator za ovog korisnika</div>
-          <div class="fld"><label>Status</label>
-            <select id="e-status">
-              <option value="user">Rezervisano mesto</option>
-              <option value="admin">Administrator</option>
-            </select>
-          </div>
-          <div class="fld"><label>E-Mail Adresa</label><input type="email" id="e-email" placeholder="email@primer.rs"></div>
-          <div class="fld"><label>Nova lozinka</label><input type="password" id="e-pw" placeholder="(ostavi prazno da ne menjaš)"></div>
-          <div class="fld"><label>Poslednja aktivnost</label><span class="fld-ro" id="e-last-active">-</span></div>
-          <div class="fld"><label>Poslednja IP</label><span class="fld-ro" id="e-last-ip">-</span></div>
-          <div class="fld"><label>Stvoreno</label><span class="fld-ro" id="e-created">-</span></div>
-        </div>
-        <!-- Panel 2: Lični podaci -->
-        <div class="edit-panel">
-          <div class="panel-hdr">
-            <div class="panel-num">2</div>
-            <div class="panel-title">Lični podaci</div>
-          </div>
-          <div class="fld"><label>Oslavljanje</label>
-            <select id="e-oslovljavanje">
-              <option value="-">-</option>
-              <option value="g">G.</option>
-              <option value="gda">Gđa.</option>
-            </select>
-          </div>
-          <div class="fld"><label>Ime &amp; prezime</label>
-            <div style="display:flex;gap:6px;flex:1">
-              <input type="text" id="e-ime" placeholder="Ime" style="flex:1">
-              <input type="text" id="e-prezime" placeholder="Prezime" style="flex:1">
-            </div>
-          </div>
-          <div class="fld"><label>Ulica &amp; broj</label><input type="text" id="e-ulica" placeholder=""></div>
-          <div class="fld"><label>Poštanski broj &amp; Grad</label>
-            <div style="display:flex;gap:6px;flex:1">
-              <input type="text" id="e-ptt" placeholder="" style="width:80px;flex:none">
-              <input type="text" id="e-grad" placeholder="" style="flex:1">
-            </div>
-          </div>
-          <div class="fld"><label>Broj telefona</label><input type="text" id="e-tel" placeholder=""></div>
-          <div class="fld"><label>Rođendan</label><input type="date" id="e-rodjadan"></div>
-          <div class="fld" style="align-items:flex-start"><label style="padding-top:4px">Beleške</label><textarea id="e-beleske" placeholder="Vidljive samo administraciji"></textarea></div>
-          <div class="fld-note">One su vidljive samo za administraciju</div>
-        </div>
-      </div>
-      <div id="msg-edit" style="margin:0 24px 6px"></div>
-      <div id="edit-footer">
-        <button class="btn-cancel-edit" onclick="closeEdit()">Otkaži</button>
-        <button class="btn-save" onclick="saveEdit()">Spremi</button>
-      </div>
-    </div>
-
-    <!-- Novi korisnik forma -->
-    <div id="form-novi">
-      <h3>➕ Novi korisnik</h3>
-      <div class="form-row">
-        <div class="fg"><label>Ime i prezime</label><input type="text" id="nn" placeholder="Ime Prezime"></div>
-        <div class="fg"><label>Email</label><input type="email" id="ne" placeholder="email@primer.rs"></div>
-      </div>
-      <div class="form-row">
-        <div class="fg"><label>Lozinka</label><input type="password" id="np" placeholder="Lozinka"></div>
-        <div class="fg"><label>Status</label>
-          <select id="nr">
-            <option value="user">Rezervisano mesto</option>
-            <option value="admin">Administrator</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="fg"><label>Broj telefona</label><input type="text" id="n-tel" placeholder=""></div>
-        <div class="fg"></div>
-      </div>
-      <div class="form-row">
-        <div class="fg" style="flex:1"><label>Beleške</label><textarea id="n-beleske" placeholder="Vidljive samo administraciji" style="border:1px solid #ccc;padding:6px 10px;border-radius:3px;font-size:13px;color:#222;background:#fff;resize:vertical;height:60px;width:100%"></textarea></div>
-      </div>
-      <div id="msg-add"></div>
-      <button class="btn-dodaj" onclick="addUser()">Dodaj korisnika</button>
-      <button class="btn-otkazi" onclick="toggleNovi()">Otkaži</button>
-    </div>
-
-    <div id="box-bottom">
-      <a href="javascript:void(0)" onclick="toggleNovi()">➕ Novi korisnik</a>
-    </div>
   </div>
 
-  <!-- RIGHT: Povezane stranice -->
+  <!-- RIGHT -->
   <div id="side-right">
-    <h4>Povezane stranice:</h4>
-    <ul>
-      <li><a href="/admin/rezervacije">Administracija rezervacija</a></li>
-      <li><a href="/admin/dogadjaji">Organizacija događaja</a></li>
-      <li><a href="/admin/konfiguracija">Konfiguracija</a></li>
-    </ul>
+    <div class="related-box">
+      <h4>Povezane stranice</h4>
+      <a href="/admin/korisnici">Administracija korisnika</a>
+      <a href="/admin/rezervacije">Administracija rezervacija</a>
+    </div>
   </div>
-
 </div>
 
-<!-- FOOTER -->
-<div id="foot">
-  &copy; 2026 Byford Country Club
-</div>
+<footer>© 2026 Byford Country Club</footer>
 
 <script>
-var allUsers = [];
-var editingId = null;
-
-function api(url, data, method, cb) {
-  var o = {method: method||'GET', credentials: 'include'};
-  if (method==='POST') { o.headers={'Content-Type':'application/json'}; o.body=JSON.stringify(data); }
-  fetch(url, o).then(function(r){return r.json();}).then(cb).catch(function(){cb({ok:false,error:'Greška.'});});
+function api(url, cb) {
+  fetch(url, {credentials:'same-origin'})
+    .then(function(r){return r.json();})
+    .then(cb)
+    .catch(function(){cb({ok:false});});
 }
 
-function showMsg(id, msg, ok) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  el.className = ok ? 'msg-box msg-ok' : 'msg-box msg-err';
-  el.textContent = msg;
-  setTimeout(function(){ el.className=''; el.textContent=''; }, 4000);
-}
+function buildKorisniciTable(korisnici) {
+  var total = korisnici.length;
+  var admins = korisnici.filter(function(k){return k.role==='admin';}).length;
+  var staff  = korisnici.filter(function(k){return k.role==='staff';}).length;
+  var users  = korisnici.filter(function(k){return k.role==='user';}).length;
 
-function loadUsers() {
-  api('/api/admin/korisnici', null, 'GET', function(r) {
-    if (!r.ok) { showMsg('msg-global', r.error||'Greška pri učitavanju.', false); return; }
-    allUsers = r.korisnici;
-    renderUsers(allUsers);
-  });
-}
-
-function filterUsers() {
-  var q = document.getElementById('search-input').value.toLowerCase();
-  if (!q) { renderUsers(allUsers); return; }
-  renderUsers(allUsers.filter(function(u){
-    return u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || String(u.id).includes(q);
-  }));
-}
-
-function renderUsers(list) {
-  var tbl = document.getElementById('result-list');
-  var tbody = document.getElementById('user-tbody');
-  var noRes = document.getElementById('no-results');
-  if (!list.length) { tbl.style.display='none'; noRes.style.display='block'; return; }
-  tbl.style.display = 'table';
-  noRes.style.display = 'none';
-  var roleLabel = {admin:'Administrator', user:'Rezervisano mesto', staff:'Osoblje'};
-  var roleBadge = {admin:'badge-admin', user:'badge-user', staff:'badge-staff'};
-  var h = '';
-  for (var i = 0; i < list.length; i++) {
-    var u = list[i];
-    var sel = editingId === u.id ? ' selected' : '';
-    h += '<tr class="' + sel + '" onclick="openEdit(' + u.id + ')">';
-    h += '<td style="color:#999">' + u.id + '</td>';
-    h += '<td><strong>' + esc(u.name) + '</strong></td>';
-    h += '<td style="color:#555">' + esc(u.email) + '</td>';
-    h += '<td><span class="badge-role ' + (roleBadge[u.role]||'badge-user') + '">' + (roleLabel[u.role]||u.role) + '</span></td>';
-    h += '<td><button class="btn-sm-del" onclick="event.stopPropagation();deleteUser(' + u.id + ',\'' + escQ(u.name) + '\')" style="border:none;background:none;font-size:12px;cursor:pointer;padding:2px 6px;border-radius:3px;color:#c0392b">Obriši</button></td>';
-    h += '</tr>';
+  var html = '<table class="stat-table">';
+  html += '<tr><td><b>Ukupno korisnika</b></td><td class="num-plain">'+total+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Po ulozi</td></tr>';
+  html += '<tr><td class="indent">| Administrator</td><td class="num" onclick="window.location=\'/admin/korisnici\'">' + admins + '</td></tr>';
+  html += '<tr><td class="indent">| Rezervisano mesto</td><td class="num" onclick="window.location=\'/admin/korisnici\'">' + users + '</td></tr>';
+  if(staff > 0) {
+    html += '<tr><td class="indent">| Zaposleni</td><td class="num" onclick="window.location=\'/admin/korisnici\'">' + staff + '</td></tr>';
   }
-  tbody.innerHTML = h;
+  html += '</table>';
+  document.getElementById('stat-korisnici').innerHTML = html;
 }
 
-function openEdit(id) {
-  var u = allUsers.find(function(x){return x.id===id;});
-  if (!u) return;
-  editingId = id;
+function buildRezervacijeTable(rezervacije) {
+  var total = rezervacije.length;
+  var taken = rezervacije.filter(function(r){return r.status==='taken';}).length;
+  var sub   = rezervacije.filter(function(r){return r.status==='sub';}).length;
 
-  // highlight row
-  var rows = document.querySelectorAll('#result-list tr');
-  rows.forEach(function(r){r.classList.remove('selected');});
-  var tbody = document.getElementById('user-tbody');
-  var trs = tbody.querySelectorAll('tr');
-  for (var i=0;i<trs.length;i++){
-    if (parseInt(trs[i].cells[0].textContent)===id) trs[i].classList.add('selected');
-  }
+  // by payment status
+  var placeno    = rezervacije.filter(function(r){return r.payment_status==='placeno';}).length;
+  var na_cekanju = rezervacije.filter(function(r){return r.payment_status==='na_cekanju'||!r.payment_status;}).length;
+  var nedolazak  = rezervacije.filter(function(r){return r.payment_status==='nedolazak';}).length;
+  var otkazano   = rezervacije.filter(function(r){return r.payment_status==='otkazano';}).length;
 
-  document.getElementById('edit-title').textContent = 'Uredi: ' + u.name;
+  // today
+  var today = new Date().toISOString().slice(0,10);
+  var danasnje = rezervacije.filter(function(r){return r.date===today;}).length;
 
-  // split name into ime/prezime
-  var parts = (u.name||'').split(' ');
-  document.getElementById('e-ime').value = parts[0]||'';
-  document.getElementById('e-prezime').value = parts.slice(1).join(' ')||'';
-
-  document.getElementById('e-alias').value = u.alias||'';
-  document.getElementById('e-status').value = u.role === 'admin' ? 'admin' : 'user';
-  document.getElementById('e-email').value = u.email||'';
-  document.getElementById('e-pw').value = '';
-  document.getElementById('e-last-active').textContent = u.last_active||'-';
-  document.getElementById('e-last-ip').textContent = u.last_ip||'-';
-  document.getElementById('e-created').textContent = u.created_at||'-';
-  document.getElementById('e-oslovljavanje').value = u.oslovljavanje||'-';
-  document.getElementById('e-ulica').value = u.ulica||'';
-  document.getElementById('e-ptt').value = u.ptt||'';
-  document.getElementById('e-grad').value = u.grad||'';
-  document.getElementById('e-tel').value = u.telefon||'';
-  document.getElementById('e-rodjadan').value = u.rodjadan||'';
-  document.getElementById('e-beleske').value = u.beleske||'';
-
-  document.getElementById('edit-section').style.display = 'block';
-  document.getElementById('edit-section').scrollIntoView({behavior:'smooth', block:'nearest'});
+  var html = '<table class="stat-table">';
+  html += '<tr><td><b>Ukupno rezervacija</b></td><td class="num-plain">'+total+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Po tipu</td></tr>';
+  html += '<tr><td class="indent">| Rezervisano</td><td class="num-plain">'+taken+'</td></tr>';
+  html += '<tr><td class="indent">| Pretplata</td><td class="num-plain">'+sub+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Po statusu plaćanja</td></tr>';
+  html += '<tr><td class="indent">| Plaćeno</td><td class="num-plain">'+placeno+'</td></tr>';
+  html += '<tr><td class="indent">| Na čekanju</td><td class="num-plain">'+na_cekanju+'</td></tr>';
+  html += '<tr><td class="indent">| Nedolazak</td><td class="num-plain">'+nedolazak+'</td></tr>';
+  html += '<tr><td class="indent">| Otkazano</td><td class="num-plain">'+otkazano+'</td></tr>';
+  html += '<tr class="section-hdr"><td colspan="2">Danas ('+today+')</td></tr>';
+  html += '<tr><td class="indent">| Danas rezervisano</td><td class="num-plain">'+danasnje+'</td></tr>';
+  html += '</table>';
+  document.getElementById('stat-rezervacije').innerHTML = html;
 }
 
-function closeEdit() {
-  editingId = null;
-  document.getElementById('edit-section').style.display = 'none';
-  var rows = document.querySelectorAll('#result-list tr');
-  rows.forEach(function(r){r.classList.remove('selected');});
-}
+// Load data
+api('/api/admin/korisnici', function(r) {
+  if(r.ok) buildKorisniciTable(r.korisnici);
+  else document.getElementById('stat-korisnici').innerHTML = '<div class="loading">Greška pri učitavanju.</div>';
+});
 
-function saveEdit() {
-  if (!editingId) return;
-  var ime = document.getElementById('e-ime').value.trim();
-  var prezime = document.getElementById('e-prezime').value.trim();
-  var name = (ime + ' ' + prezime).trim();
-  var email = document.getElementById('e-email').value.trim();
-  var role = document.getElementById('e-status').value;
-  var pw = document.getElementById('e-pw').value;
-  var payload = {
-    id: editingId, name: name, email: email, role: role,
-    alias: document.getElementById('e-alias').value.trim(),
-    oslovljavanje: document.getElementById('e-oslovljavanje').value,
-    ulica: document.getElementById('e-ulica').value.trim(),
-    ptt: document.getElementById('e-ptt').value.trim(),
-    grad: document.getElementById('e-grad').value.trim(),
-    telefon: document.getElementById('e-tel').value.trim(),
-    rodjadan: document.getElementById('e-rodjadan').value,
-    beleske: document.getElementById('e-beleske').value.trim()
-  };
-  if (pw) payload.password = pw;
-
-  api('/api/admin/uredi_korisnika', payload, 'POST', function(r) {
-    if (r.ok) {
-      showMsg('msg-global', 'Korisnik sačuvan!', true);
-      closeEdit();
-      loadUsers();
-    } else showMsg('msg-edit', r.error||'Greška.', false);
-  });
-}
-
-function deleteUser(id, name) {
-  if (!confirm('Obrisati korisnika "' + name + '"?')) return;
-  api('/api/admin/brisi_korisnika', {id:id}, 'POST', function(r) {
-    if (r.ok) { showMsg('msg-global','Korisnik obrisan.',true); closeEdit(); loadUsers(); }
-    else showMsg('msg-global', r.error||'Greška.', false);
-  });
-}
-
-function toggleNovi() {
-  var f = document.getElementById('form-novi');
-  f.style.display = f.style.display === 'block' ? 'none' : 'block';
-}
-
-function addUser() {
-  var name  = document.getElementById('nn').value.trim();
-  var email = document.getElementById('ne').value.trim();
-  var pw    = document.getElementById('np').value;
-  var role  = document.getElementById('nr').value;
-  if (!name||!email||!pw) { showMsg('msg-add','Sva polja su obavezna.',false); return; }
-  var tel = document.getElementById('n-tel').value.trim();
-  var beleske = document.getElementById('n-beleske').value.trim();
-  api('/api/admin/dodaj_korisnika', {name:name,email:email,password:pw,role:role,telefon:tel,beleske:beleske}, 'POST', function(r) {
-    if (r.ok) {
-      showMsg('msg-add','Korisnik uspješno dodat!',true);
-      document.getElementById('nn').value='';
-      document.getElementById('ne').value='';
-      document.getElementById('np').value='';
-      document.getElementById('n-tel').value='';
-      document.getElementById('n-beleske').value='';
-      document.getElementById('form-novi').style.display='none';
-      loadUsers();
-    } else showMsg('msg-add', r.error||'Greška.', false);
-  });
-}
-
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escQ(s){ return String(s).replace(/'/g,"\\'"); }
-
-loadUsers();
+api('/api/admin/rezervacije', function(r) {
+  if(r.ok) buildRezervacijeTable(r.rezervacije);
+  else document.getElementById('stat-rezervacije').innerHTML = '<div class="loading">Greška pri učitavanju.</div>';
+});
 </script>
 </body>
 </html>
