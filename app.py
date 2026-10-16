@@ -122,6 +122,13 @@ def admin_korisnici():
     return render_template('admin_korisnici.html')
 
 @app.route('/admin/statistika')
+
+@app.route('/admin/rezervacije')
+def admin_rezervacije_page():
+    u = current_user()
+    if not u or u['role'] != 'admin':
+        return redirect('/')
+    return render_template('admin_rezervacije.html')
 def admin_statistika():
     u = current_user()
     if not u or u['role'] != 'admin':
