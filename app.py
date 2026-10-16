@@ -61,6 +61,12 @@ def ok(data=None):
 def err(msg, code=400):
     return jsonify({'ok': False, 'error': msg}), code
 
+def admin_required():
+    u = current_user()
+    if not u or u['role'] != 'admin':
+        return redirect('/')
+    return None
+
 # ── Seed admin user if missing ────────────────────────────────────────────────
 
 def ensure_admin():
@@ -83,6 +89,7 @@ def ensure_admin():
         changed = True
     if changed:
         write(USERS_F, users)
+
 # ── Pages ─────────────────────────────────────────────────────────────────────
 
 @app.route('/')
@@ -99,9 +106,16 @@ def admin():
     if not u or u['role'] != 'admin':
         return redirect('/')
     return render_template('admin.html',
-    klub=KLUB_IME, tereni=TERENI,
-    start=START_SAT, end=END_SAT,
-    slots=list(range(START_SAT, END_SAT)))
+        klub=KLUB_IME, tereni=TERENI,
+        start=START_SAT, end=END_SAT,
+        slots=list(range(START_SAT, END_SAT)))
+
+@app.route('/admin/korisnici')
+def admin_korisnici():
+    u = current_user()
+    if not u or u['role'] != 'admin':
+        return redirect('/')
+    return render_template('admin_korisnici.html')
 
 # ── API ───────────────────────────────────────────────────────────────────────
 
@@ -131,7 +145,7 @@ def api_logout():
 def api_raspored():
     date_str = request.args.get('date', str(date.today()))
     bookings = read(BOOKINGS_F)
-    now = datetime.now(ZoneInfo('Europe/Belgrade')).replace(tzinfo=None)    
+    now = datetime.now(ZoneInfo('Europe/Belgrade')).replace(tzinfo=None)
     result = {}
     for cid, cname in TERENI.items():
         result[cid] = {'name': cname, 'slots': {}}
@@ -154,6 +168,7 @@ def api_raspored():
                     booked_by = b.get('user_name')
             result[cid]['slots'][h] = {'status': status, 'booked_by': booked_by, 'payment_status': b.get('payment_status', 'na_cekanju')}
     return ok({'date': date_str, 'courts': result})
+
 @app.route('/api/rezervisi', methods=['POST'])
 def api_rezervisi():
     u = current_user()
@@ -217,11 +232,8 @@ def api_edituj_rezervaciju():
         return err('Rezervacija nije pronađena.')
 
     old_booking = bookings[old_key].copy()
-
-    # Obrisi staru
     del bookings[old_key]
 
-    # Napravi novu
     new_key = slot_key(new_date, new_court, new_hour)
     if new_key != old_key and new_key in bookings:
         return err('Novi termin je već zauzet.')
@@ -270,6 +282,8 @@ def api_admin_set():
             'user_name': name, 'user_email': 'admin@klub.rs',
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
+    write(BOOKINGS_F, bookings)
+    return ok()
 
 @app.route('/api/admin/korisnici')
 def api_korisnici():
@@ -289,7 +303,7 @@ def api_dodaj():
     name  = (d.get('name') or '').strip()
     role  = d.get('role','user')
     if not email or not pw or not name: return err('Sva polja su obavezna.')
-    if role not in ('user','admin'): return err('Neispravan role.')
+    if role not in ('user','admin','staff'): return err('Neispravan role.')
     users = read(USERS_F)
     if any(x['email'].lower()==email.lower() for x in users):
         return err('Email već postoji.')
@@ -322,7 +336,25 @@ def api_lozinka():
             x['password'] = hp(pw)
     write(USERS_F, users)
     return ok({'message': 'Lozinka promenjena.'})
-    
+
+@app.route('/api/promeni_lozinku', methods=['POST'])
+def api_promeni_lozinku_self():
+    u = current_user()
+    if not u: return err('Niste prijavljeni.', 401)
+    d = request.json or {}
+    stara = d.get('stara', '')
+    nova  = d.get('nova', '')
+    if not stara or not nova: return err('Unesite staru i novu lozinku.')
+    users = read(USERS_F)
+    for x in users:
+        if x['id'] == u['id']:
+            if x['password'] != hp(stara):
+                return err('Stara lozinka nije ispravna.')
+            x['password'] = hp(nova)
+            write(USERS_F, users)
+            return ok({'message': 'Lozinka promijenjena.'})
+    return err('Korisnik nije pronađen.')
+
 @app.route('/api/rezervisi_pretplatu', methods=['POST'])
 def api_rezervisi_pretplatu():
     u = current_user()
@@ -367,9 +399,7 @@ def api_rezervisi_pretplatu():
 
     write(BOOKINGS_F, bookings)
     return ok({'message': f'Kreirano {kreirano} rezervacija za pretplatu!'})
-if __name__ == '__main__':
-    app.run(debug=True)
-    
+
 # ── Klijenti ──────────────────────────────────────────────────────────────────
 
 @app.route('/api/klijenti')
@@ -419,3 +449,6 @@ def api_promeni_klijenta():
             k['pretplatnik'] = not k['pretplatnik']
     write(KLIJENTI_F, klijenti)
     return ok()
+
+if __name__ == '__main__':
+    app.run(debug=True)
