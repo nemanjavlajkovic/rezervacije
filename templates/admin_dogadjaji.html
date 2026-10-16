@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="sr-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organizacija događaja – Byford Country Club</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;font-size:13px;background:#111827;color:#e5e7eb;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+
+#hdr{background:#1a1f2e;border-bottom:1px solid #2d3548;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+#hdr-logo .logo-text .name{font-size:15px;font-weight:bold;color:#fff}
+#hdr-logo .logo-text .sub{font-size:12px;color:#9ca3af}
+#hdr-divider{width:1px;height:40px;background:#2d3548;flex-shrink:0}
+#hdr-links{display:flex;align-items:center;flex:1;flex-wrap:wrap}
+.hdr-link{display:flex;align-items:center;gap:8px;padding:6px 18px;border-right:1px solid #2d3548;color:#d1d5db;font-size:12px;white-space:nowrap}
+.hdr-link:last-child{border-right:none}
+.hdr-link .icon{font-size:18px;color:#9ca3af}
+.hdr-link .lbl{font-size:11px;color:#9ca3af}
+.hdr-link .val{font-size:13px;color:#fff;font-weight:500}
+
+#main{flex:1;display:flex;padding:30px 20px;gap:20px;max-width:1200px;margin:0 auto;width:100%;align-items:flex-start}
+
+#side-left{width:140px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px}
+.side-back{display:flex;align-items:center;justify-content:center;background:#1e2536;border:1px solid #2d3548;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;text-decoration:none;color:#e5e7eb}
+.side-back:hover{background:#2d3548}
+.side-back-lbl{font-size:12px;color:#9ca3af;text-align:center}
+.side-back-sub{font-size:11px;color:#6b7280;text-align:center}
+
+#center{flex:1;min-width:0}
+
+#side-right{width:180px;flex-shrink:0}
+.related-box{background:#1e2536;border:1px solid #2d3548;border-radius:6px;padding:14px}
+.related-box h4{font-size:12px;color:#9ca3af;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.related-box a{display:block;font-size:12px;color:#60a5fa;padding:3px 0}
+.related-box a:hover{color:#93c5fd}
+.related-box a::before{content:'• ';color:#374151}
+
+.white-box{background:#fff;color:#111;border-radius:8px;padding:24px 28px;margin-bottom:20px}
+.white-box h2{font-size:20px;font-weight:700;color:#111;margin-bottom:4px}
+.white-box .desc{font-size:13px;color:#6b7280;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e5e7eb}
+
+.filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filter-row label{font-size:12px;color:#374151;font-weight:600}
+.filter-row input[type=date]{border:1px solid #d1d5db;border-radius:4px;padding:6px 10px;font-size:12px;color:#111;background:#fff;width:140px}
+.btn-filter{background:#374151;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;cursor:pointer}
+.btn-filter:hover{background:#1f2937}
+
+.dog-table{width:100%;border-collapse:collapse;font-size:12px}
+.dog-table th{background:#f9fafb;padding:9px 12px;text-align:left;font-weight:600;color:#374151;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+.dog-table td{padding:9px 12px;border-bottom:1px solid #f3f4f6;color:#111;vertical-align:middle}
+.dog-table tr:hover td{background:#f9fafb;cursor:pointer}
+.dog-table tr.selected td{background:#eff6ff}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-aktivan{background:#dcfce7;color:#166534}
+.badge-zavrsen{background:#f3f4f6;color:#374151}
+.badge-otkazan{background:#fee2e2;color:#991b1b}
+
+.nova-row{padding:14px 0 4px;border-top:1px solid #e5e7eb;margin-top:8px}
+.btn-nova{background:none;border:none;color:#2563eb;font-size:13px;font-weight:600;cursor:pointer;padding:0}
+.btn-nova:hover{text-decoration:underline}
+.btn-nova::before{content:'+ '}
+
+#edit-section{display:none;background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:20px;margin-top:16px}
+#edit-section h3{font-size:14px;font-weight:700;color:#111;margin-bottom:16px}
+#nova-section{display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:20px;margin-top:16px}
+#nova-section h3{font-size:14px;font-weight:700;color:#111;margin-bottom:16px}
+
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.edit-grid-full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
+.fld input,.fld select,.fld textarea{border:1px solid #d1d5db;border-radius:4px;padding:7px 10px;font-size:13px;color:#111;background:#fff}
+.fld textarea{resize:vertical;min-height:70px}
+
+.edit-actions{display:flex;gap:8px;margin-top:16px}
+.btn-save{background:#2563eb;color:#fff;border:none;border-radius:4px;padding:8px 20px;font-size:13px;cursor:pointer;font-weight:600}
+.btn-save:hover{background:#1d4ed8}
+.btn-del{background:#dc2626;color:#fff;border:none;border-radius:4px;padding:8px 16px;font-size:13px;cursor:pointer}
+.btn-del:hover{background:#b91c1c}
+.btn-cancel{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:4px;padding:8px 16px;font-size:13px;cursor:pointer}
+
+.msg{padding:8px 12px;border-radius:4px;font-size:12px;margin-bottom:12px;display:none}
+.msg-ok{background:#dcfce7;color:#166534}
+.msg-err{background:#fee2e2;color:#991b1b}
+.empty{text-align:center;color:#9ca3af;padding:24px;font-size:13px}
+
+footer{background:#1a1f2e;border-top:1px solid #2d3548;padding:12px 20px;text-align:center;font-size:11px;color:#6b7280;margin-top:auto}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-logo">
+    <div class="logo-text">
+      <div class="name">Byford Country Club</div>
+      <div class="sub">Rezervacije termina</div>
+    </div>
+  </div>
+  <div id="hdr-divider"></div>
+  <div id="hdr-links">
+    <div class="hdr-link">
+      <span class="icon">📞</span>
+      <div><div class="lbl">Rezervišite ili otkažite telefonom</div><div class="val">063-3-6666-4</div></div>
+    </div>
+    <div class="hdr-link">
+      <span class="icon">ℹ️</span>
+      <div><div class="lbl">Informacije</div><div class="val">byfordcountryclub.com</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="side-left">
+    <a href="/" class="side-back">&#9664;</a>
+    <div class="side-back-lbl">Nazad na:</div>
+    <div class="side-back-sub">Početna</div>
+  </div>
+
+  <div id="center">
+    <div class="white-box">
+      <h2>Organizacija događaja</h2>
+      <div class="desc">Ovde možete da kreirate, uređujete ili brišete događaje vašeg sistema.</div>
+
+      <div id="msg" class="msg"></div>
+
+      <div class="filter-row">
+        <label>Datum:</label>
+        <input type="date" id="f-od" />
+        <span style="color:#6b7280">do</span>
+        <input type="date" id="f-do" />
+        <button class="btn-filter" onclick="filterDog()">Pretraga</button>
+      </div>
+
+      <div id="dog-wrap">
+        <div class="empty">Nema događaja.</div>
+      </div>
+
+      <!-- EDIT -->
+      <div id="edit-section">
+        <h3>Uredi događaj</h3>
+        <div class="edit-grid">
+          <div class="fld"><label>Naziv događaja</label><input type="text" id="e-naziv" /></div>
+          <div class="fld"><label>Datum</label><input type="date" id="e-datum" /></div>
+          <div class="fld"><label>Vreme početka</label><input type="time" id="e-vreme" /></div>
+          <div class="fld"><label>Lokacija / teren</label><input type="text" id="e-lokacija" placeholder="npr. Teren 1" /></div>
+          <div class="fld"><label>Maksimalan broj učesnika</label><input type="number" id="e-max" min="1" /></div>
+          <div class="fld">
+            <label>Status</label>
+            <select id="e-status">
+              <option value="aktivan">Aktivan</option>
+              <option value="zavrsen">Završen</option>
+              <option value="otkazan">Otkazan</option>
+            </select>
+          </div>
+          <div class="fld edit-grid-full"><label>Opis</label><textarea id="e-opis"></textarea></div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-save" onclick="saveEdit()">Sačuvaj</button>
+          <button class="btn-del" onclick="deleteEvent()">Obriši</button>
+          <button class="btn-cancel" onclick="closeEdit()">Otkaži</button>
+        </div>
+      </div>
+
+      <!-- NOVA -->
+      <div id="nova-section">
+        <h3>Novi događaj</h3>
+        <div class="edit-grid">
+          <div class="fld"><label>Naziv događaja</label><input type="text" id="n-naziv" placeholder="npr. Turnir u tenisu" /></div>
+          <div class="fld"><label>Datum</label><input type="date" id="n-datum" /></div>
+          <div class="fld"><label>Vreme početka</label><input type="time" id="n-vreme" value="10:00" /></div>
+          <div class="fld"><label>Lokacija / teren</label><input type="text" id="n-lokacija" placeholder="npr. Teren 1" /></div>
+          <div class="fld"><label>Maksimalan broj učesnika</label><input type="number" id="n-max" min="1" value="20" /></div>
+          <div class="fld edit-grid-full"><label>Opis</label><textarea id="n-opis" placeholder="Kratak opis događaja..."></textarea></div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-save" onclick="saveNova()">Kreiraj</button>
+          <button class="btn-cancel" onclick="closeNova()">Otkaži</button>
+        </div>
+      </div>
+
+      <div class="nova-row">
+        <button class="btn-nova" onclick="openNova()">Novi događaj</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="side-right">
+    <div class="related-box">
+      <h4>Povezane stranice</h4>
+      <a href="/admin/korisnici">Administracija korisnika</a>
+      <a href="/admin/rezervacije">Administracija rezervacija</a>
+      <a href="/admin/statistika">Statistika</a>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 Byford Country Club</footer>
+
+<script>
+var allEvents = [];
+var editingId = null;
+
+var today = new Date().toISOString().slice(0,10);
+var in30 = new Date(); in30.setDate(in30.getDate()+30);
+document.getElementById('f-od').value = today;
+document.getElementById('f-do').value = in30.toISOString().slice(0,10);
+document.getElementById('n-datum').value = today;
+
+function api(url, data, method, cb) {
+  fetch(url, {
+    method: method||'GET',
+    credentials: 'same-origin',
+    headers: data ? {'Content-Type':'application/json'} : {},
+    body: data ? JSON.stringify(data) : undefined
+  }).then(function(r){return r.json();}).then(cb).catch(function(){cb({ok:false,error:'Greška'});});
+}
+
+function showMsg(txt, isErr) {
+  var el = document.getElementById('msg');
+  el.className = 'msg ' + (isErr ? 'msg-err' : 'msg-ok');
+  el.textContent = txt;
+  el.style.display = 'block';
+  setTimeout(function(){el.style.display='none';}, 3000);
+}
+
+function statusBadge(s) {
+  var labels = {aktivan:'Aktivan', zavrsen:'Završen', otkazan:'Otkazan'};
+  return '<span class="badge badge-'+s+'">'+(labels[s]||s)+'</span>';
+}
+
+function loadEvents() {
+  api('/api/admin/dogadjaji', null, 'GET', function(r) {
+    if(r.ok) { allEvents = r.dogadjaji; filterDog(); }
+    else { allEvents = []; renderTable([]); }
+  });
+}
+
+function filterDog() {
+  var od = document.getElementById('f-od').value;
+  var do_ = document.getElementById('f-do').value;
+  var f = allEvents.filter(function(d) {
+    return (!od || d.datum >= od) && (!do_ || d.datum <= do_);
+  });
+  renderTable(f);
+}
+
+function renderTable(evts) {
+  var wrap = document.getElementById('dog-wrap');
+  if(!evts.length) { wrap.innerHTML = '<div class="empty">Nema događaja za odabrani period.</div>'; return; }
+  var html = '<table class="dog-table"><thead><tr><th>Datum</th><th>Vreme</th><th>Naziv</th><th>Lokacija</th><th>Učesnici</th><th>Status</th></tr></thead><tbody>';
+  evts.forEach(function(d) {
+    html += '<tr onclick="openEdit('+d.id+')">';
+    html += '<td>'+d.datum+'</td>';
+    html += '<td>'+d.vreme+'</td>';
+    html += '<td><b>'+d.naziv+'</b>'+(d.opis?'<br><span style="color:#9ca3af;font-size:11px">'+d.opis.slice(0,60)+'...</span>':'')+'</td>';
+    html += '<td>'+(d.lokacija||'-')+'</td>';
+    html += '<td>'+(d.max_ucenika||'∞')+'</td>';
+    html += '<td>'+statusBadge(d.status||'aktivan')+'</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function openEdit(id) {
+  var d = allEvents.find(function(x){return x.id===id;});
+  if(!d) return;
+  editingId = id;
+  document.getElementById('e-naziv').value = d.naziv||'';
+  document.getElementById('e-datum').value = d.datum||'';
+  document.getElementById('e-vreme').value = d.vreme||'';
+  document.getElementById('e-lokacija').value = d.lokacija||'';
+  document.getElementById('e-max').value = d.max_ucenika||'';
+  document.getElementById('e-status').value = d.status||'aktivan';
+  document.getElementById('e-opis').value = d.opis||'';
+  document.getElementById('nova-section').style.display = 'none';
+  document.getElementById('edit-section').style.display = 'block';
+  document.getElementById('edit-section').scrollIntoView({behavior:'smooth'});
+}
+
+function closeEdit() {
+  document.getElementById('edit-section').style.display = 'none';
+  editingId = null;
+}
+
+function saveEdit() {
+  if(!editingId) return;
+  var d = {
+    id: editingId,
+    naziv: document.getElementById('e-naziv').value,
+    datum: document.getElementById('e-datum').value,
+    vreme: document.getElementById('e-vreme').value,
+    lokacija: document.getElementById('e-lokacija').value,
+    max_ucenika: parseInt(document.getElementById('e-max').value)||null,
+    status: document.getElementById('e-status').value,
+    opis: document.getElementById('e-opis').value
+  };
+  api('/api/admin/uredi_dogadjaj', d, 'POST', function(r) {
+    if(r.ok) { showMsg('Događaj sačuvan!'); closeEdit(); loadEvents(); }
+    else showMsg(r.error||'Greška', true);
+  });
+}
+
+function deleteEvent() {
+  if(!editingId || !confirm('Obrisati ovaj događaj?')) return;
+  api('/api/admin/brisi_dogadjaj', {id: editingId}, 'POST', function(r) {
+    if(r.ok) { showMsg('Događaj obrisan.'); closeEdit(); loadEvents(); }
+    else showMsg(r.error||'Greška', true);
+  });
+}
+
+function openNova() {
+  document.getElementById('edit-section').style.display = 'none';
+  document.getElementById('nova-section').style.display = 'block';
+  document.getElementById('nova-section').scrollIntoView({behavior:'smooth'});
+}
+
+function closeNova() {
+  document.getElementById('nova-section').style.display = 'none';
+}
+
+function saveNova() {
+  var naziv = document.getElementById('n-naziv').value.trim();
+  var datum = document.getElementById('n-datum').value;
+  if(!naziv || !datum) { showMsg('Unesite naziv i datum.', true); return; }
+  var d = {
+    naziv: naziv,
+    datum: datum,
+    vreme: document.getElementById('n-vreme').value,
+    lokacija: document.getElementById('n-lokacija').value,
+    max_ucenika: parseInt(document.getElementById('n-max').value)||null,
+    opis: document.getElementById('n-opis').value
+  };
+  api('/api/admin/dodaj_dogadjaj', d, 'POST', function(r) {
+    if(r.ok) { showMsg('Događaj kreiran!'); closeNova(); loadEvents(); }
+    else showMsg(r.error||'Greška', true);
+  });
+}
+
+loadEvents();
+</script>
+</body>
+</html>
