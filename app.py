@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
 
