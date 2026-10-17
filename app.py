@@ -399,12 +399,17 @@ def api_rezervisi_pretplatu():
     date_do  = d.get('date_do','')
     court    = d.get('court','')
     hour     = int(d.get('hour', 0))
-    ime      = d.get('name','')
+    ime           = d.get('name','')
+    interval_dana = int(d.get('interval_dana', 7))
+    payment_status = d.get('payment_status', 'na_cekanju')
+    beleske       = d.get('beleske', '')
+    igraci        = int(d.get('igraci', 1))
 
     if court not in TERENI: return err('Neispravan teren.')
     if hour < START_SAT or hour >= END_SAT: return err('Neispravan sat.')
     if not date_od or not date_do: return err('Unesite period.')
     if not ime: return err('Unesite ime klijenta.')
+    if interval_dana < 1: interval_dana = 1
 
     try:
         od = datetime.strptime(date_od, '%Y-%m-%d')
@@ -427,13 +432,16 @@ def api_rezervisi_pretplatu():
                     'user_id': u['id'],
                     'user_name': ime,
                     'user_email': u['email'],
+                    'payment_status': payment_status,
+                    'beleske': beleske,
+                    'igraci': igraci,
                     'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
                 kreirano += 1
-        current = current + timedelta(days=7)
+        current = current + timedelta(days=interval_dana)
 
     write(BOOKINGS_F, bookings)
-    return ok({'message': f'Kreirano {kreirano} rezervacija za pretplatu!'})
+    return ok({'message': f'Kreirano {kreirano} rezervacija!'})
 
 # ── Klijenti ──────────────────────────────────────────────────────────────────
 
