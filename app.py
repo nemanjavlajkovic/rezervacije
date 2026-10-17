@@ -2,19 +2,13 @@ from flask import Flask, request, jsonify, session, render_template, redirect
 import json, os, hashlib
 from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
-
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
 
-DATA_DIR   = os.environ.get('DATA_DIR', '/app/data')
-print(f"[STARTUP] DATA_DIR={DATA_DIR}", flush=True)
-print(f"[STARTUP] DATA_DIR exists={os.path.exists(DATA_DIR)}", flush=True)
-print(f"[STARTUP] DATA_DIR contents={os.listdir(DATA_DIR) if os.path.exists(DATA_DIR) else 'N/A'}", flush=True)
-USERS_F    = os.path.join(DATA_DIR, 'users.json')
-BOOKINGS_F = os.path.join(DATA_DIR, 'bookings.json')
-KLIJENTI_F = os.path.join(DATA_DIR, 'klijenti.json')
-DOGADJAJI_F   = os.path.join(DATA_DIR, 'dogadjaji.json')
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 KLUB_IME  = 'Byford Country Club'
 TELEFON   = '063-3-6666-4'
@@ -35,19 +29,72 @@ TERENI = {
     't9': '9',
 }
 
+# ── Database ───────────────────────────────────────────────────────────────────
+
+def get_conn():
+    return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+
+def init_db():
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    role TEXT NOT NULL DEFAULT 'user',
+                    alias TEXT DEFAULT '',
+                    oslovljavanje TEXT DEFAULT '-',
+                    ulica TEXT DEFAULT '',
+                    ptt TEXT DEFAULT '',
+                    grad TEXT DEFAULT '',
+                    telefon TEXT DEFAULT '',
+                    rodjadan TEXT DEFAULT '',
+                    beleske TEXT DEFAULT '',
+                    created_at TEXT DEFAULT ''
+                )
+            ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS bookings (
+                    key TEXT PRIMARY KEY,
+                    status TEXT NOT NULL DEFAULT 'taken',
+                    user_id INTEGER,
+                    user_name TEXT,
+                    user_email TEXT,
+                    payment_status TEXT DEFAULT 'na_cekanju',
+                    beleske TEXT DEFAULT '',
+                    igraci INTEGER DEFAULT 1,
+                    created_at TEXT DEFAULT ''
+                )
+            ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS klijenti (
+                    id SERIAL PRIMARY KEY,
+                    ime TEXT NOT NULL,
+                    telefon TEXT DEFAULT '',
+                    pretplatnik BOOLEAN DEFAULT FALSE
+                )
+            ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS dogadjaji (
+                    id SERIAL PRIMARY KEY,
+                    naziv TEXT NOT NULL,
+                    opis TEXT DEFAULT '',
+                    datum_od TEXT DEFAULT '',
+                    vreme_od TEXT DEFAULT '',
+                    datum_do TEXT DEFAULT '',
+                    vreme_do TEXT DEFAULT '',
+                    teren TEXT DEFAULT '',
+                    kapacitet INTEGER DEFAULT 0,
+                    beleske TEXT DEFAULT '',
+                    status TEXT DEFAULT 'aktivan',
+                    created_at TEXT DEFAULT ''
+                )
+            ''')
+        conn.commit()
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
-
-def read(f):
-    os.makedirs(DATA_DIR, exist_ok=True)
-    if not os.path.exists(f):
-        return [] if f == USERS_F else {}
-    with open(f, encoding='utf-8') as fp:
-        return json.load(fp)
-
-def write(f, data):
-    os.makedirs(DATA_DIR, exist_ok=True)
-    with open(f, 'w', encoding='utf-8') as fp:
-        json.dump(data, fp, ensure_ascii=False, indent=2)
 
 def hp(p):
     return hashlib.sha256(p.encode()).hexdigest()
@@ -75,28 +122,23 @@ def admin_required():
 # ── Seed admin user if missing ────────────────────────────────────────────────
 
 def ensure_admin():
-    users = read(USERS_F)
-    emails = [u['email'].lower() for u in users]
-    changed = False
-
     seed_users = [
-        {'id': 1, 'email': 'admin@klub.rs',                    'password': hp('password'),  'name': 'Administrator',    'role': 'admin'},
-        {'id': 2, 'email': 'ivanajovanovicc07@gmail.com',       'password': hp('Ivana07'),   'name': 'Ivana Jovanovic',  'role': 'admin'},
+        {'email': 'admin@klub.rs',               'password': hp('password'), 'name': 'Administrator',   'role': 'admin'},
+        {'email': 'ivanajovanovicc07@gmail.com',  'password': hp('Ivana07'),  'name': 'Ivana Jovanovic', 'role': 'admin'},
     ]
-
-    for su in seed_users:
-        if su['email'].lower() not in emails:
-            users.append(su)
-            changed = True
-        else:
-            # ensure role is admin for seed users
-            for u in users:
-                if u['email'].lower() == su['email'].lower() and u['role'] != 'admin':
-                    u['role'] = 'admin'
-                    changed = True
-
-    if changed:
-        write(USERS_F, users)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            for su in seed_users:
+                cur.execute('SELECT id, role FROM users WHERE lower(email)=lower(%s)', (su['email'],))
+                existing = cur.fetchone()
+                if not existing:
+                    cur.execute(
+                        'INSERT INTO users (email, password, name, role) VALUES (%s,%s,%s,%s)',
+                        (su['email'], su['password'], su['name'], su['role'])
+                    )
+                elif existing['role'] != 'admin':
+                    cur.execute('UPDATE users SET role=%s WHERE id=%s', ('admin', existing['id']))
+        conn.commit()
 
 # ── Pages ─────────────────────────────────────────────────────────────────────
 
@@ -145,11 +187,14 @@ def api_login():
     pw    = d.get('password') or ''
     if not email or not pw:
         return err('Unesite email i lozinku.')
-    for u in read(USERS_F):
-        if u['email'].lower() == email and u['password'] == hp(pw):
-            session['user'] = {'id':u['id'],'email':u['email'],'name':u['name'],'role':u['role']}
-            return ok({'user': session['user']})
-    return err('Pogrešan email ili lozinka.')
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM users WHERE lower(email)=%s AND password=%s', (email, hp(pw)))
+            u = cur.fetchone()
+    if not u:
+        return err('Pogrešan email ili lozinka.')
+    session['user'] = {'id': u['id'], 'email': u['email'], 'name': u['name'], 'role': u['role']}
+    return ok({'user': session['user']})
 
 @app.route('/api/logout', methods=['POST'])
 def api_logout():
@@ -159,8 +204,12 @@ def api_logout():
 @app.route('/api/raspored')
 def api_raspored():
     date_str = request.args.get('date', str(date.today()))
-    bookings = read(BOOKINGS_F)
     now = datetime.now(ZoneInfo('Europe/Belgrade')).replace(tzinfo=None)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM bookings WHERE key LIKE %s', (date_str + '|%',))
+            rows = cur.fetchall()
+    bookings = {r['key']: dict(r) for r in rows}
     result = {}
     for cid, cname in TERENI.items():
         result[cid] = {'name': cname, 'slots': {}}
@@ -179,9 +228,13 @@ def api_raspored():
                 u = current_user()
                 if status == 'past':
                     booked_by = b.get('user_name')
-                elif u and (u['role'] == 'admin' or u['email'] == b.get('user_email','')):
+                elif u and (u['role'] == 'admin' or u['email'] == b.get('user_email', '')):
                     booked_by = b.get('user_name')
-            result[cid]['slots'][h] = {'status': status, 'booked_by': booked_by, 'payment_status': b.get('payment_status', 'na_cekanju')}
+            result[cid]['slots'][h] = {
+                'status': status,
+                'booked_by': booked_by,
+                'payment_status': b.get('payment_status', 'na_cekanju')
+            }
     return ok({'date': date_str, 'courts': result})
 
 @app.route('/api/rezervisi', methods=['POST'])
@@ -189,28 +242,33 @@ def api_rezervisi():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
     d = request.json or {}
-    date_str = d.get('date','')
-    court    = d.get('court','')
+    date_str = d.get('date', '')
+    court    = d.get('court', '')
     hour     = int(d.get('hour', 0))
     if court not in TERENI: return err('Neispravan teren.')
     if hour < START_SAT or hour >= END_SAT: return err('Neispravan sat.')
     slot_dt = datetime.strptime(f"{date_str} {hour:02d}:00", "%Y-%m-%d %H:%M")
     if slot_dt < datetime.now(): return err('Ne možete rezervisati prošli termin.')
     key = slot_key(date_str, court, hour)
-    bookings = read(BOOKINGS_F)
-    if key in bookings and bookings[key]['status'] in ('taken','sub'):
-        return err('Termin je već zauzet.')
-    ime = d.get('name', u['name'])
-    status_rez = d.get('status', 'taken')
-    if status_rez not in ('taken', 'sub'):
-        status_rez = 'taken'
-    bookings[key] = {
-        'status': status_rez,
-        'user_id': u['id'], 'user_name': ime,
-        'user_email': u['email'],
-        'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    write(BOOKINGS_F, bookings)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT status FROM bookings WHERE key=%s', (key,))
+            existing = cur.fetchone()
+            if existing and existing['status'] in ('taken', 'sub'):
+                return err('Termin je već zauzet.')
+            ime = d.get('name', u['name'])
+            status_rez = d.get('status', 'taken')
+            if status_rez not in ('taken', 'sub'):
+                status_rez = 'taken'
+            cur.execute('''
+                INSERT INTO bookings (key, status, user_id, user_name, user_email, created_at)
+                VALUES (%s,%s,%s,%s,%s,%s)
+                ON CONFLICT (key) DO UPDATE SET
+                    status=EXCLUDED.status, user_id=EXCLUDED.user_id,
+                    user_name=EXCLUDED.user_name, user_email=EXCLUDED.user_email,
+                    created_at=EXCLUDED.created_at
+            ''', (key, status_rez, u['id'], ime, u['email'], datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+        conn.commit()
     return ok({'message': 'Termin uspješno rezervisan!'})
 
 @app.route('/api/otkazi', methods=['POST'])
@@ -218,13 +276,16 @@ def api_otkazi():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
     d = request.json or {}
-    key = slot_key(d.get('date',''), d.get('court',''), int(d.get('hour',0)))
-    bookings = read(BOOKINGS_F)
-    if key not in bookings: return err('Termin nije pronađen.')
-    if u['role'] != 'admin' and bookings[key].get('user_id') != u['id']:
-        return err('Nemate dozvolu.')
-    del bookings[key]
-    write(BOOKINGS_F, bookings)
+    key = slot_key(d.get('date', ''), d.get('court', ''), int(d.get('hour', 0)))
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM bookings WHERE key=%s', (key,))
+            b = cur.fetchone()
+            if not b: return err('Termin nije pronađen.')
+            if u['role'] != 'admin' and b['user_id'] != u['id']:
+                return err('Nemate dozvolu.')
+            cur.execute('DELETE FROM bookings WHERE key=%s', (key,))
+        conn.commit()
     return ok({'message': 'Rezervacija otkazana.'})
 
 @app.route('/api/edituj_rezervaciju', methods=['POST'])
@@ -232,52 +293,56 @@ def api_edituj_rezervaciju():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
     d = request.json or {}
-    old_key = d.get('old_key','')
-    new_date = d.get('new_date','')
-    new_court = d.get('new_court','')
+    old_key = d.get('old_key', '')
+    new_date = d.get('new_date', '')
+    new_court = d.get('new_court', '')
     new_hour = int(d.get('new_hour', 0))
     payment_status = d.get('payment_status', 'na_cekanju')
-
-    valid_statuses = ['na_cekanju', 'placeno', 'nedolazak', 'otkazano']
-    if payment_status not in valid_statuses:
+    if payment_status not in ('na_cekanju', 'placeno', 'nedolazak', 'otkazano'):
         return err('Neispravan status plaćanja.')
-
-    bookings = read(BOOKINGS_F)
-    if old_key not in bookings:
-        return err('Rezervacija nije pronađena.')
-
-    old_booking = bookings[old_key].copy()
-    del bookings[old_key]
-
     new_key = slot_key(new_date, new_court, new_hour)
-    if new_key != old_key and new_key in bookings:
-        return err('Novi termin je već zauzet.')
-
-    old_booking['payment_status'] = payment_status
-    bookings[new_key] = old_booking
-    write(BOOKINGS_F, bookings)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM bookings WHERE key=%s', (old_key,))
+            old_b = cur.fetchone()
+            if not old_b: return err('Rezervacija nije pronađena.')
+            if new_key != old_key:
+                cur.execute('SELECT key FROM bookings WHERE key=%s', (new_key,))
+                if cur.fetchone(): return err('Novi termin je već zauzet.')
+                cur.execute('DELETE FROM bookings WHERE key=%s', (old_key,))
+            cur.execute('''
+                INSERT INTO bookings (key, status, user_id, user_name, user_email, payment_status, beleske, igraci, created_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                ON CONFLICT (key) DO UPDATE SET
+                    payment_status=EXCLUDED.payment_status
+            ''', (new_key, old_b['status'], old_b['user_id'], old_b['user_name'],
+                  old_b['user_email'], payment_status, old_b['beleske'],
+                  old_b['igraci'], old_b['created_at']))
+        conn.commit()
     return ok({'message': 'Rezervacija ažurirana!'})
 
 @app.route('/api/admin/rezervacije')
 def api_admin_rez():
     u = current_user()
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
-    bookings = read(BOOKINGS_F)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM bookings ORDER BY key')
+            rows = cur.fetchall()
     lst = []
-    for key, val in bookings.items():
-        parts = key.split('|')
+    for r in rows:
+        parts = r['key'].split('|')
         if len(parts) != 3: continue
         dt, cid, hour = parts
         lst.append({
-            'key': key, 'date': dt, 'court_id': cid,
+            'key': r['key'], 'date': dt, 'court_id': cid,
             'court_name': TERENI.get(cid, cid),
             'hour': hour,
-            'user_name':  val.get('user_name','?'),
-            'user_email': val.get('user_email','?'),
-            'status':     val.get('status','?'),
-            'created_at': val.get('created_at',''),
+            'user_name': r['user_name'] or '?',
+            'user_email': r['user_email'] or '?',
+            'status': r['status'] or '?',
+            'created_at': r['created_at'] or '',
         })
-    lst.sort(key=lambda x: x['date']+x['hour'])
     return ok({'rezervacije': lst})
 
 @app.route('/api/admin/set', methods=['POST'])
@@ -285,32 +350,32 @@ def api_admin_set():
     u = current_user()
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     d = request.json or {}
-    key    = slot_key(d.get('date',''), d.get('court',''), int(d.get('hour',0)))
-    status = d.get('status','taken')
-    bookings = read(BOOKINGS_F)
-    if status == 'free':
-        bookings.pop(key, None)
-    else:
-        name = d.get('name', 'Admin')
-        bookings[key] = {
-            'status': status, 'user_id': 1,
-            'user_name': name, 'user_email': 'admin@klub.rs',
-            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-    write(BOOKINGS_F, bookings)
+    key    = slot_key(d.get('date', ''), d.get('court', ''), int(d.get('hour', 0)))
+    status = d.get('status', 'taken')
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            if status == 'free':
+                cur.execute('DELETE FROM bookings WHERE key=%s', (key,))
+            else:
+                name = d.get('name', 'Admin')
+                cur.execute('''
+                    INSERT INTO bookings (key, status, user_id, user_name, user_email, created_at)
+                    VALUES (%s,%s,%s,%s,%s,%s)
+                    ON CONFLICT (key) DO UPDATE SET
+                        status=EXCLUDED.status, user_name=EXCLUDED.user_name
+                ''', (key, status, 1, name, 'admin@klub.rs', datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+        conn.commit()
     return ok()
 
 @app.route('/api/admin/korisnici')
 def api_korisnici():
     u = current_user()
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
-    users = read(USERS_F)
-    safe = [{'id':x['id'],'email':x['email'],'name':x['name'],'role':x['role'],
-             'alias':x.get('alias',''),'oslovljavanje':x.get('oslovljavanje','-'),
-             'ulica':x.get('ulica',''),'ptt':x.get('ptt',''),'grad':x.get('grad',''),
-             'telefon':x.get('telefon',''),'rodjadan':x.get('rodjadan',''),
-             'beleske':x.get('beleske',''),'created_at':x.get('created_at','')} for x in users]
-    return ok({'korisnici': safe})
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT id,email,name,role,alias,oslovljavanje,ulica,ptt,grad,telefon,rodjadan,beleske,created_at FROM users ORDER BY id')
+            users = cur.fetchall()
+    return ok({'korisnici': [dict(u) for u in users]})
 
 @app.route('/api/admin/dodaj_korisnika', methods=['POST'])
 def api_dodaj():
@@ -320,16 +385,18 @@ def api_dodaj():
     email = (d.get('email') or '').strip()
     pw    = d.get('password') or ''
     name  = (d.get('name') or '').strip()
-    role  = d.get('role','user')
+    role  = d.get('role', 'user')
     if not email or not pw or not name: return err('Sva polja su obavezna.')
-    if role not in ('user','admin','staff'): return err('Neispravan role.')
-    users = read(USERS_F)
-    if any(x['email'].lower()==email.lower() for x in users):
-        return err('Email već postoji.')
-    new_id = max((x['id'] for x in users), default=0) + 1
-    users.append({'id':new_id,'email':email,'password':hp(pw),'name':name,'role':role,
-                  'telefon':d.get('telefon',''),'beleske':d.get('beleske','')})
-    write(USERS_F, users)
+    if role not in ('user', 'admin', 'staff'): return err('Neispravan role.')
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT id FROM users WHERE lower(email)=lower(%s)', (email,))
+            if cur.fetchone(): return err('Email već postoji.')
+            cur.execute('''
+                INSERT INTO users (email, password, name, role, telefon, beleske)
+                VALUES (%s,%s,%s,%s,%s,%s)
+            ''', (email, hp(pw), name, role, d.get('telefon', ''), d.get('beleske', '')))
+        conn.commit()
     return ok({'message': 'Korisnik dodat.'})
 
 @app.route('/api/admin/brisi_korisnika', methods=['POST'])
@@ -338,8 +405,10 @@ def api_brisi():
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     tid = int((request.json or {}).get('id', 0))
     if u['id'] == tid: return err('Ne možete obrisati sami sebe.')
-    users = [x for x in read(USERS_F) if x['id'] != tid]
-    write(USERS_F, users)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('DELETE FROM users WHERE id=%s', (tid,))
+        conn.commit()
     return ok()
 
 @app.route('/api/admin/uredi_korisnika', methods=['POST'])
@@ -348,18 +417,25 @@ def api_uredi_korisnika():
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     d = request.json or {}
     tid = int(d.get('id', 0))
-    users = read(USERS_F)
-    for x in users:
-        if x['id'] == tid:
-            if 'name'  in d: x['name']  = d['name']
-            if 'email' in d: x['email'] = d['email']
-            if 'role'  in d and d['role'] in ('user','admin','staff'): x['role'] = d['role']
-            if d.get('password'): x['password'] = hp(d['password'])
-            for fld in ('alias','oslovljavanje','ulica','ptt','grad','telefon','rodjadan','beleske'):
-                if fld in d: x[fld] = d[fld]
-            write(USERS_F, users)
-            return ok({'message': 'Korisnik sačuvan.'})
-    return err('Korisnik nije pronađen.')
+    fields = []
+    vals = []
+    for fld in ('name', 'email', 'alias', 'oslovljavanje', 'ulica', 'ptt', 'grad', 'telefon', 'rodjadan', 'beleske'):
+        if fld in d:
+            fields.append(f'{fld}=%s')
+            vals.append(d[fld])
+    if 'role' in d and d['role'] in ('user', 'admin', 'staff'):
+        fields.append('role=%s')
+        vals.append(d['role'])
+    if d.get('password'):
+        fields.append('password=%s')
+        vals.append(hp(d['password']))
+    if not fields: return err('Nema polja za ažuriranje.')
+    vals.append(tid)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(f'UPDATE users SET {",".join(fields)} WHERE id=%s', vals)
+        conn.commit()
+    return ok({'message': 'Korisnik sačuvan.'})
 
 @app.route('/api/admin/promeni_lozinku', methods=['POST'])
 def api_lozinka():
@@ -367,13 +443,12 @@ def api_lozinka():
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     d = request.json or {}
     tid = int(d.get('id', 0))
-    pw  = d.get('password','')
+    pw  = d.get('password', '')
     if not pw: return err('Unesite lozinku.')
-    users = read(USERS_F)
-    for x in users:
-        if x['id'] == tid:
-            x['password'] = hp(pw)
-    write(USERS_F, users)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('UPDATE users SET password=%s WHERE id=%s', (hp(pw), tid))
+        conn.commit()
     return ok({'message': 'Lozinka promenjena.'})
 
 @app.route('/api/promeni_lozinku', methods=['POST'])
@@ -384,67 +459,59 @@ def api_promeni_lozinku_self():
     stara = d.get('stara', '')
     nova  = d.get('nova', '')
     if not stara or not nova: return err('Unesite staru i novu lozinku.')
-    users = read(USERS_F)
-    for x in users:
-        if x['id'] == u['id']:
-            if x['password'] != hp(stara):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT password FROM users WHERE id=%s', (u['id'],))
+            row = cur.fetchone()
+            if not row or row['password'] != hp(stara):
                 return err('Stara lozinka nije ispravna.')
-            x['password'] = hp(nova)
-            write(USERS_F, users)
-            return ok({'message': 'Lozinka promijenjena.'})
-    return err('Korisnik nije pronađen.')
+            cur.execute('UPDATE users SET password=%s WHERE id=%s', (hp(nova), u['id']))
+        conn.commit()
+    return ok({'message': 'Lozinka promijenjena.'})
 
 @app.route('/api/rezervisi_pretplatu', methods=['POST'])
 def api_rezervisi_pretplatu():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
     d = request.json or {}
-    date_od  = d.get('date_od','')
-    date_do  = d.get('date_do','')
-    court    = d.get('court','')
+    date_od  = d.get('date_od', '')
+    date_do  = d.get('date_do', '')
+    court    = d.get('court', '')
     hour     = int(d.get('hour', 0))
-    ime           = d.get('name','')
+    ime           = d.get('name', '')
     interval_dana = int(d.get('interval_dana', 7))
     payment_status = d.get('payment_status', 'na_cekanju')
     beleske       = d.get('beleske', '')
     igraci        = int(d.get('igraci', 1))
-
     if court not in TERENI: return err('Neispravan teren.')
     if hour < START_SAT or hour >= END_SAT: return err('Neispravan sat.')
     if not date_od or not date_do: return err('Unesite period.')
     if not ime: return err('Unesite ime klijenta.')
     if interval_dana < 1: interval_dana = 1
-
     try:
         od = datetime.strptime(date_od, '%Y-%m-%d')
         do = datetime.strptime(date_do, '%Y-%m-%d')
     except:
         return err('Neispravan datum.')
-
     if do < od: return err('Krajnji datum mora biti nakon početnog.')
-
-    bookings = read(BOOKINGS_F)
     kreirano = 0
-    current = od
-    while current <= do:
-        slot_dt = current.replace(hour=hour, minute=0, second=0)
-        if slot_dt >= datetime.now():
-            key = slot_key(current.strftime('%Y-%m-%d'), court, hour)
-            if key not in bookings:
-                bookings[key] = {
-                    'status': 'sub',
-                    'user_id': u['id'],
-                    'user_name': ime,
-                    'user_email': u['email'],
-                    'payment_status': payment_status,
-                    'beleske': beleske,
-                    'igraci': igraci,
-                    'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                kreirano += 1
-        current = current + timedelta(days=interval_dana)
-
-    write(BOOKINGS_F, bookings)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            current = od
+            while current <= do:
+                slot_dt = current.replace(hour=hour, minute=0, second=0)
+                if slot_dt >= datetime.now():
+                    key = slot_key(current.strftime('%Y-%m-%d'), court, hour)
+                    cur.execute('SELECT key FROM bookings WHERE key=%s', (key,))
+                    if not cur.fetchone():
+                        cur.execute('''
+                            INSERT INTO bookings (key, status, user_id, user_name, user_email, payment_status, beleske, igraci, created_at)
+                            VALUES (%s,'sub',%s,%s,%s,%s,%s,%s,%s)
+                        ''', (key, u['id'], ime, u['email'], payment_status, beleske, igraci,
+                              datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+                        kreirano += 1
+                current = current + timedelta(days=interval_dana)
+        conn.commit()
     return ok({'message': f'Kreirano {kreirano} rezervacija!'})
 
 # ── Klijenti ──────────────────────────────────────────────────────────────────
@@ -453,11 +520,15 @@ def api_rezervisi_pretplatu():
 def api_klijenti():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
-    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
-    q = request.args.get('q','').lower()
-    if q:
-        klijenti = [k for k in klijenti if q in k['ime'].lower() or q in k.get('telefon','').lower()]
-    return ok({'klijenti': klijenti})
+    q = request.args.get('q', '').lower()
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            if q:
+                cur.execute('SELECT * FROM klijenti WHERE lower(ime) LIKE %s OR lower(telefon) LIKE %s ORDER BY ime', (f'%{q}%', f'%{q}%'))
+            else:
+                cur.execute('SELECT * FROM klijenti ORDER BY ime')
+            klijenti = cur.fetchall()
+    return ok({'klijenti': [dict(k) for k in klijenti]})
 
 @app.route('/api/dodaj_klijenta', methods=['POST'])
 def api_dodaj_klijenta():
@@ -468,10 +539,10 @@ def api_dodaj_klijenta():
     telefon = (d.get('telefon') or '').strip()
     pretplatnik = bool(d.get('pretplatnik', False))
     if not ime: return err('Unesite ime.')
-    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
-    new_id = max((k['id'] for k in klijenti), default=0) + 1
-    klijenti.append({'id': new_id, 'ime': ime, 'telefon': telefon, 'pretplatnik': pretplatnik})
-    write(KLIJENTI_F, klijenti)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('INSERT INTO klijenti (ime, telefon, pretplatnik) VALUES (%s,%s,%s)', (ime, telefon, pretplatnik))
+        conn.commit()
     return ok({'message': 'Klijent dodat.'})
 
 @app.route('/api/brisi_klijenta', methods=['POST'])
@@ -479,9 +550,10 @@ def api_brisi_klijenta():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
     kid = int((request.json or {}).get('id', 0))
-    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
-    klijenti = [k for k in klijenti if k['id'] != kid]
-    write(KLIJENTI_F, klijenti)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('DELETE FROM klijenti WHERE id=%s', (kid,))
+        conn.commit()
     return ok()
 
 @app.route('/api/promeni_klijenta', methods=['POST'])
@@ -490,15 +562,11 @@ def api_promeni_klijenta():
     if not u: return err('Niste prijavljeni.', 401)
     d = request.json or {}
     kid = int(d.get('id', 0))
-    klijenti = read(KLIJENTI_F) if os.path.exists(KLIJENTI_F) else []
-    for k in klijenti:
-        if k['id'] == kid:
-            k['pretplatnik'] = not k['pretplatnik']
-    write(KLIJENTI_F, klijenti)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('UPDATE klijenti SET pretplatnik = NOT pretplatnik WHERE id=%s', (kid,))
+        conn.commit()
     return ok()
-
-
-
 
 # ── User pages ────────────────────────────────────────────────────────────────
 
@@ -512,23 +580,23 @@ def user_bookings():
 def api_moje_rezervacije():
     u = current_user()
     if not u: return err('Niste prijavljeni.', 401)
-    bookings = read(BOOKINGS_F)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM bookings WHERE user_id=%s ORDER BY key', (u['id'],))
+            rows = cur.fetchall()
     lst = []
-    for key, val in bookings.items():
-        parts = key.split('|')
+    for r in rows:
+        parts = r['key'].split('|')
         if len(parts) != 3: continue
         dt, cid, hour = parts
-        if val.get('user_id') != u['id']:
-            continue
         lst.append({
-            'key': key, 'date': dt, 'court_id': cid,
+            'key': r['key'], 'date': dt, 'court_id': cid,
             'court_name': TERENI.get(cid, cid),
             'hour': hour,
-            'status': val.get('status', 'taken'),
-            'payment_status': val.get('payment_status', 'na_cekanju'),
-            'created_at': val.get('created_at', ''),
+            'status': r['status'] or 'taken',
+            'payment_status': r['payment_status'] or 'na_cekanju',
+            'created_at': r['created_at'] or '',
         })
-    lst.sort(key=lambda x: x['date'] + x['hour'])
     return ok({'rezervacije': lst})
 
 # ── Događaji ──────────────────────────────────────────────────────────────────
@@ -543,8 +611,11 @@ def admin_dogadjaji_page():
 def api_admin_dogadjaji():
     u = current_user()
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
-    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
-    return ok({'dogadjaji': dogadjaji})
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM dogadjaji ORDER BY datum_od')
+            dogadjaji = cur.fetchall()
+    return ok({'dogadjaji': [dict(d) for d in dogadjaji]})
 
 @app.route('/api/admin/dodaj_dogadjaj', methods=['POST'])
 def api_dodaj_dogadjaj():
@@ -554,23 +625,18 @@ def api_dodaj_dogadjaj():
     naziv = (d.get('naziv') or '').strip()
     datum = (d.get('datum_od') or d.get('datum') or '').strip()
     if not naziv or not datum: return err('Naziv i datum su obavezni.')
-    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
-    new_id = max((x['id'] for x in dogadjaji), default=0) + 1
-    dogadjaji.append({
-        'id': new_id,
-        'naziv': naziv,
-        'opis': d.get('opis', ''),
-        'datum_od': datum,
-        'vreme_od': d.get('vreme_od', d.get('vreme', '10:00')),
-        'datum_do': d.get('datum_do', datum),
-        'vreme_do': d.get('vreme_do', ''),
-        'teren': d.get('teren', d.get('lokacija', '')),
-        'kapacitet': d.get('kapacitet') or d.get('max_ucenika') or 0,
-        'beleske': d.get('beleske', ''),
-        'status': 'aktivan',
-        'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    })
-    write(DOGADJAJI_F, dogadjaji)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('''
+                INSERT INTO dogadjaji (naziv, opis, datum_od, vreme_od, datum_do, vreme_do, teren, kapacitet, beleske, status, created_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ''', (naziv, d.get('opis', ''), datum, d.get('vreme_od', d.get('vreme', '10:00')),
+                  d.get('datum_do', datum), d.get('vreme_do', ''),
+                  d.get('teren', d.get('lokacija', '')),
+                  d.get('kapacitet') or d.get('max_ucenika') or 0,
+                  d.get('beleske', ''), 'aktivan',
+                  datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+        conn.commit()
     return ok({'message': 'Događaj kreiran.'})
 
 @app.route('/api/admin/uredi_dogadjaj', methods=['POST'])
@@ -579,25 +645,45 @@ def api_uredi_dogadjaj():
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     d = request.json or {}
     tid = int(d.get('id', 0))
-    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
-    for x in dogadjaji:
-        if x['id'] == tid:
-            for fld in ('naziv', 'opis', 'datum_od', 'vreme_od', 'datum_do', 'vreme_do', 'teren', 'status', 'beleske'):
-                if fld in d: x[fld] = d[fld]
-            if 'kapacitet' in d: x['kapacitet'] = d['kapacitet'] or 0
-            write(DOGADJAJI_F, dogadjaji)
-            return ok({'message': 'Događaj sačuvan.'})
-    return err('Događaj nije pronađen.')
+    fields = []
+    vals = []
+    for fld in ('naziv', 'opis', 'datum_od', 'vreme_od', 'datum_do', 'vreme_do', 'teren', 'status', 'beleske'):
+        if fld in d:
+            fields.append(f'{fld}=%s')
+            vals.append(d[fld])
+    if 'kapacitet' in d:
+        fields.append('kapacitet=%s')
+        vals.append(d['kapacitet'] or 0)
+    if not fields: return err('Nema polja za ažuriranje.')
+    vals.append(tid)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(f'UPDATE dogadjaji SET {",".join(fields)} WHERE id=%s', vals)
+        conn.commit()
+    return ok({'message': 'Događaj sačuvan.'})
 
 @app.route('/api/admin/brisi_dogadjaj', methods=['POST'])
 def api_brisi_dogadjaj():
     u = current_user()
     if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
     tid = int((request.json or {}).get('id', 0))
-    dogadjaji = read(DOGADJAJI_F) if os.path.exists(DOGADJAJI_F) else []
-    dogadjaji = [x for x in dogadjaji if x['id'] != tid]
-    write(DOGADJAJI_F, dogadjaji)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('DELETE FROM dogadjaji WHERE id=%s', (tid,))
+        conn.commit()
     return ok({'message': 'Događaj obrisan.'})
+
+# ── Admin statistika ──────────────────────────────────────────────────────────
+
+@app.route('/admin/statistika')
+def admin_statistika():
+    u = current_user()
+    if not u or u['role'] != 'admin': return redirect('/')
+    return render_template('admin_statistika.html')
+
+# ── Init ──────────────────────────────────────────────────────────────────────
+
+init_db()
 
 if __name__ == '__main__':
     app.run(debug=True)
