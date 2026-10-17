@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
 
-DATA_DIR   = os.environ.get('DATA_DIR', '/data')
+DATA_DIR   = os.environ.get('DATA_DIR', '/app/data')
 print(f"[STARTUP] DATA_DIR={DATA_DIR}", flush=True)
 print(f"[STARTUP] DATA_DIR exists={os.path.exists(DATA_DIR)}", flush=True)
 print(f"[STARTUP] DATA_DIR contents={os.listdir(DATA_DIR) if os.path.exists(DATA_DIR) else 'N/A'}", flush=True)
