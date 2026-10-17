@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
 
-DATA_DIR   = os.path.join(os.path.dirname(__file__), 'data')
+DATA_DIR   = os.environ.get('DATA_DIR', '/data')
 USERS_F    = os.path.join(DATA_DIR, 'users.json')
 BOOKINGS_F = os.path.join(DATA_DIR, 'bookings.json')
 KLIJENTI_F = os.path.join(DATA_DIR, 'klijenti.json')
