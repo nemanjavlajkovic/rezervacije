@@ -557,7 +557,7 @@ async function render(){
       }
       var onclick='';
       if(canFree) onclick=' onclick="openM(\''+cid+'\',\''+cs[cid].name+'\','+h+')"';
-      else if(canEdit){var key=ds+'__'+cid+'__'+h;onclick=' onclick="openEdit(\''+key+'\',\''+cid+'\',\''+cs[cid].name+'\','+h+',\''+pst+'\')"';}
+      else if(canEdit){var key=ds+'|'+cid+'|'+(h<10?'0':'')+h;onclick=' onclick="openEdit(\''+key+'\',\''+cid+'\',\''+cs[cid].name+'\','+h+',\''+pst+'\')"';}
       body+='<td class="sl '+cls+(clickable?' clickable':'')+'"'+onclick+'>'+lbl+'</td>';
     }
     body+='</tr>';
@@ -622,7 +622,7 @@ function ponoviInterval(){
 
 function openEdit(key,courtId,courtName,hour,pst){
   editKey=key;editPayStatus=pst||'na_cekanju';
-  var parts=key.split('__');
+  var parts=key.split('|');
   document.getElementById('einfo').innerHTML='<strong>Teren:</strong> '+courtName+'<br><strong>Datum:</strong> '+parts[0]+'<br><strong>Vreme:</strong> '+fhLine(hour);
   var cs=document.getElementById('e-court');cs.innerHTML='';
   for(var tid in TERENI_MAP){var o=document.createElement('option');o.value=tid;o.textContent=TERENI_MAP[tid];if(tid===courtId)o.selected=true;cs.appendChild(o);}
@@ -653,7 +653,7 @@ async function saveEdit(){
 async function obrisiRezervaciju(){
   if(!editKey)return;
   if(!confirm('Obrisati ovu rezervaciju?'))return;
-  var parts=editKey.split('__');
+  var parts=editKey.split('|');
   var r=await apiAsync('/api/otkazi',{date:parts[0],court:parts[1],hour:parseInt(parts[2])},'POST');
   if(r.ok){closeEdit();render();}else alert(r.error);
 }
