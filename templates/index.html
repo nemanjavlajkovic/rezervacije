@@ -471,7 +471,7 @@ function setIn(u){
     '<button class="btn-nav" onclick="showNalog()">👤 Moj nalog</button>'+
     '<button class="btn-odjava" onclick="logout()">⏻ Odjava</button>';
   if(u.role==='admin'||u.role==='staff'){
-    loadKorisnici();
+    if(typeof loadKorisnici==='function') loadKorisnici();
   }
   render();
 }
