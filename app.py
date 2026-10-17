@@ -3,6 +3,7 @@ import json, os, hashlib
 from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
 
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
 
