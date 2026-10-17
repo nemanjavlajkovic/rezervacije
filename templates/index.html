@@ -307,7 +307,15 @@ select.rcc-input{cursor:pointer}
           <label class="rcc-lbl">Ponoviti</label>
           <select id="m-ponovi" class="rcc-input" onchange="updatePonoviUI()">
             <option value="jednom">Samo jednom</option>
-            <option value="nedeljno">Nedeljno (pretplata)</option>
+            <option value="svaki_dan">Svaki dan</option>
+            <option value="svaka_2_dana">Svaka 2 dana</option>
+            <option value="svaka_3_dana">Svaka 3 dana</option>
+            <option value="svaka_4_dana">Svaka 4 dana</option>
+            <option value="svakih_5_dana">Svakih 5 dana</option>
+            <option value="svakih_6_dana">Svakih 6 dana</option>
+            <option value="nedeljno">Nedeljno</option>
+            <option value="svake_2_nedelje">Svake 2 nedelje</option>
+            <option value="mesecno">Mesečno</option>
           </select>
         </div>
         <div id="pretplata-period" style="display:none;background:#fefce8;border:1px solid #fde68a;border-radius:4px;padding:10px;margin-top:4px">
@@ -599,13 +607,17 @@ function openM(courtId,courtName,hour){
 function closeM(){document.getElementById('mov').classList.remove('on');ps=null;}
 function updatePonoviUI(){
   var v=document.getElementById('m-ponovi').value;
-  rezStatus=v==='nedeljno'?'sub':'taken';
-  document.getElementById('pretplata-period').style.display=v==='nedeljno'?'block':'none';
+  rezStatus=v==='jednom'?'taken':'sub';
+  document.getElementById('pretplata-period').style.display=v==='jednom'?'none':'block';
 }
 function setStatus(s){
   rezStatus=s;
-  document.getElementById('m-ponovi').value=s==='sub'?'nedeljno':'jednom';
+  if(s!=='sub'){document.getElementById('m-ponovi').value='jednom';}
   document.getElementById('pretplata-period').style.display=s==='sub'?'block':'none';
+}
+function ponoviInterval(){
+  var map={svaki_dan:1,svaka_2_dana:2,svaka_3_dana:3,svaka_4_dana:4,svakih_5_dana:5,svakih_6_dana:6,nedeljno:7,svake_2_nedelje:14,mesecno:30};
+  return map[document.getElementById('m-ponovi').value]||1;
 }
 
 function openEdit(key,courtId,courtName,hour,pst){
@@ -694,8 +706,8 @@ async function confirmRez(){
   var igraci=parseInt(document.getElementById('m-igraci').value)||1;
   if(rezStatus==='sub'){
     var od=document.getElementById('date-od').value,doo=document.getElementById('date-do').value;
-    if(!od||!doo){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite period pretplate.</p>';return;}
-    var r=await apiAsync('/api/rezervisi_pretplatu',{date_od:od,date_do:doo,court:teren,hour:ps.hour,name:ime,payment_status:statusNaplate,beleske:beleske,igraci:igraci},'POST');
+    if(!od||!doo){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite period ponavljanja.</p>';return;}
+    var r=await apiAsync('/api/rezervisi_pretplatu',{date_od:od,date_do:doo,court:teren,hour:ps.hour,name:ime,payment_status:statusNaplate,beleske:beleske,igraci:igraci,interval_dana:ponoviInterval()},'POST');
     var m=document.getElementById('mmsg');
     if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
     else m.innerHTML='<p class="merr">✗ '+r.error+'</p>';
