@@ -447,7 +447,7 @@ async function apiAsync(url,data,method){
   method=method||'GET';
   var o={method:method,credentials:'include'};
   if(method==='POST'){o.headers={'Content-Type':'application/json'};o.body=JSON.stringify(data);}
-  var r=await fetch(url,o);return r.json();
+  try{var r=await fetch(url,o);return r.json();}catch(e){return {ok:false};}
 }
 function api(url,data,method,cb){
   method=method||'GET';
@@ -770,7 +770,7 @@ document.addEventListener('click',function(e){
   if(dd&&!dd.contains(e.target)&&e.target.id!=='ac-input')dd.style.display='none';
 });
 
-(async function(){await checkMe();})();
+(async function(){render();await checkMe();})();
 </script>
 </body>
 </html>
