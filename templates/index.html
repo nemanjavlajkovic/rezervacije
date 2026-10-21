@@ -434,7 +434,7 @@ var MES=['januar','februar','mart','april','maj','jun','jul','avgust','septembar
 var cd=new Date();
 cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate());
 var cu=null,ps=null,selKlijent=null,rezStatus='taken',klijentTip='regular';
-var editKey=null,editPayStatus='na_cekanju';
+var editKey=null,editPayStatus='na_cekanju',selKorisnikObj=null;
 var TERENI_MAP={};
 
 function fd(d){return DANI[d.getDay()]+'\n'+d.getDate()+'. '+MES[d.getMonth()]+' '+d.getFullYear()+'.';}
@@ -589,7 +589,7 @@ function openM(courtId,courtName,hour){
   document.getElementById('ac-input').value='';
   document.getElementById('ac-dd').style.display='none';
   document.getElementById('sel-k').style.display='none';
-  selKlijent=null;rezStatus='taken';
+  selKlijent=null;selKorisnikObj=null;rezStatus='taken';
   // Popuni polja
   var h2=('0'+hour).slice(-2);
   document.getElementById('m-vreme-od').value=h2+':00';
@@ -679,17 +679,21 @@ function acSearch(q){
   });
   fu.forEach(function(u){
     var display=u.alias?u.alias+' <span class="ac-tel">('+u.name+')</span>':u.name;
-    html+='<div class="ac-item" onclick="selKorisnik(\''+escQ(u.alias||u.name)+'\')"><span>'+display+'</span><span class="ac-tag" style="background:#dbeafe;color:#1d4ed8">korisnik</span></div>';
+    html+='<div class="ac-item" onclick="selKorisnik('+u.id+')"><span>'+display+'</span><span class="ac-tag" style="background:#dbeafe;color:#1d4ed8">korisnik</span></div>';
   });
   if(!html){dd.style.display='none';return;}
   dd.innerHTML=html;
   dd.style.display='block';
 }
-function selKorisnik(ime){
-  document.getElementById('ac-input').value=ime;
+function selKorisnik(id){
+  selKorisnikObj=sviKorisnici.find(function(u){return u.id===id;});
+  if(!selKorisnikObj)return;
+  document.getElementById('ac-input').value=selKorisnikObj.alias||selKorisnikObj.name;
   document.getElementById('ac-dd').style.display='none';
   selKlijent=null;
-  document.getElementById('sel-k').style.display='none';
+  document.getElementById('sel-k').style.display='flex';
+  document.getElementById('sel-name').textContent=(selKorisnikObj.alias||selKorisnikObj.name)+' ('+selKorisnikObj.name+')';
+  document.getElementById('sel-pret').style.display='none';
 }
 function selK(id){
   selKlijent=sviKlijenti.find(function(k){return k.id===id;});
@@ -700,11 +704,12 @@ function selK(id){
   document.getElementById('sel-pret').style.display=selKlijent.pretplatnik?'inline':'none';
   if(selKlijent.pretplatnik)setStatus('sub');
 }
-function clearSel(){selKlijent=null;document.getElementById('ac-input').value='';document.getElementById('sel-k').style.display='none';setStatus('taken');}
+function clearSel(){selKlijent=null;selKorisnikObj=null;document.getElementById('ac-input').value='';document.getElementById('sel-k').style.display='none';setStatus('taken');}
 
 async function confirmRez(){
   if(!ps)return;
-  var ime=selKlijent?selKlijent.ime:document.getElementById('ac-input').value.trim();
+  var ime=selKlijent?selKlijent.ime:(selKorisnikObj?selKorisnikObj.alias||selKorisnikObj.name:document.getElementById('ac-input').value.trim());
+  var booking_user_id=selKorisnikObj?selKorisnikObj.id:null;
   if(!ime){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite ime klijenta.</p>';return;}
   var teren=document.getElementById('m-teren').value||ps.court;
   var statusNaplate=document.getElementById('m-status-naplate').value;
@@ -713,13 +718,13 @@ async function confirmRez(){
   if(rezStatus==='sub'){
     var od=document.getElementById('date-od').value,doo=document.getElementById('date-do').value;
     if(!od||!doo){document.getElementById('mmsg').innerHTML='<p class="merr">Unesite period ponavljanja.</p>';return;}
-    var r=await apiAsync('/api/rezervisi_pretplatu',{date_od:od,date_do:doo,court:teren,hour:ps.hour,name:ime,payment_status:statusNaplate,beleske:beleske,igraci:igraci,interval_dana:ponoviInterval()},'POST');
+    var r=await apiAsync('/api/rezervisi_pretplatu',{date_od:od,date_do:doo,court:teren,hour:ps.hour,name:ime,user_id:booking_user_id,payment_status:statusNaplate,beleske:beleske,igraci:igraci,interval_dana:ponoviInterval()},'POST');
     var m=document.getElementById('mmsg');
     if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
     else m.innerHTML='<p class="merr">✗ '+r.error+'</p>';
     return;
   }
-  var r=await apiAsync('/api/rezervisi',{date:ps.date,court:teren,hour:ps.hour,status:rezStatus,name:ime,payment_status:statusNaplate,beleske:beleske,igraci:igraci},'POST');
+  var r=await apiAsync('/api/rezervisi',{date:ps.date,court:teren,hour:ps.hour,status:rezStatus,name:ime,user_id:booking_user_id,payment_status:statusNaplate,beleske:beleske,igraci:igraci},'POST');
   var m=document.getElementById('mmsg');
   if(r.ok){m.innerHTML='<p class="mok">✓ '+r.message+'</p>';document.getElementById('mbtn').style.display='none';render();}
   else m.innerHTML='<p class="merr">✗ '+r.error+'</p>';
