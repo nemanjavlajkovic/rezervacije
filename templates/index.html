@@ -172,7 +172,7 @@ select.rcc-input{cursor:pointer}
 .rcc-btn-dogadjaj:hover{text-decoration:underline}
 .rcc-mod .ac-wrap input{background:#fff;border:1px solid #d1d5db;color:#111;padding:7px 10px;border-radius:4px;font-size:13px;width:100%}
 .rcc-mod .ac-wrap input::placeholder{color:#9ca3af}
-.rcc-mod .ac-dropdown{background:#fff;border:1px solid #d1d5db;color:#111;position:fixed;z-index:9999;width:auto}
+.rcc-mod .ac-dropdown{background:#fff;border:1px solid #d1d5db;color:#111}
 .rcc-mod .ac-item{color:#111;border-bottom:1px solid #f3f4f6}
 .rcc-mod .ac-item:hover{background:#f9fafb}
 
@@ -274,7 +274,7 @@ select.rcc-input{cursor:pointer}
         <div class="rcc-field">
           <label class="rcc-lbl">Rezervisano za</label>
           <div class="ac-wrap">
-            <input type="text" id="ac-input" placeholder="Počni da kucaš ime ili telefon..." oninput="acSearchLive(this.value)" autocomplete="off">
+            <input type="text" id="ac-input" placeholder="Počni da kucaš ime ili telefon..." oninput="acSearch(this.value)" autocomplete="off">
             <div class="ac-dropdown" id="ac-dd"></div>
           </div>
           <div class="selected-klijent" id="sel-k">
@@ -443,12 +443,6 @@ async function loadKorisnici(){
   if(rk.ok) sviKorisnici=rk.korisnici||[];
   var rc=await apiAsync('/api/klijenti');
   if(rc.ok) sviKlijenti=rc.klijenti||[];
-}
-
-async function acSearchLive(q){
-  // Ako liste nisu učitane, učitaj ih sada
-  if(!sviKorisnici.length&&!sviKlijenti.length) await loadKorisnici();
-  acSearch(q);
 }
 
 function fd(d){return DANI[d.getDay()]+'\n'+d.getDate()+'. '+MES[d.getMonth()]+' '+d.getFullYear()+'.';}
@@ -680,10 +674,10 @@ async function obrisiRezervaciju(){
 
 function acSearch(q){
   var dd=document.getElementById('ac-dd');
-  var inp=document.getElementById('ac-input');
   if(!q){dd.style.display='none';return;}
   var ql=q.toLowerCase();
   var fk=sviKlijenti.filter(function(k){return k.ime.toLowerCase().includes(ql)||(k.telefon||'').includes(q);});
+  // korisnici koji imaju alias ili ime koje odgovara
   var fu=sviKorisnici.filter(function(u){
     return (u.alias||'').toLowerCase().includes(ql)||u.name.toLowerCase().includes(ql)||(u.telefon||'').includes(q);
   });
@@ -697,11 +691,6 @@ function acSearch(q){
   });
   if(!html){dd.style.display='none';return;}
   dd.innerHTML=html;
-  // Pozicioniraj dropdown tačno ispod inputa (fixed, jer modal ima overflow:auto)
-  var rect=inp.getBoundingClientRect();
-  dd.style.left=rect.left+'px';
-  dd.style.top=(rect.bottom+2)+'px';
-  dd.style.width=rect.width+'px';
   dd.style.display='block';
 }
 function selKorisnik(id){
