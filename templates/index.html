@@ -436,6 +436,14 @@ cd=new Date(cd.getFullYear(),cd.getMonth(),cd.getDate());
 var cu=null,ps=null,selKlijent=null,rezStatus='taken',klijentTip='regular';
 var editKey=null,editPayStatus='na_cekanju',selKorisnikObj=null;
 var TERENI_MAP={};
+var sviKorisnici=[],sviKlijenti=[];
+
+async function loadKorisnici(){
+  var rk=await apiAsync('/api/admin/korisnici');
+  if(rk.ok) sviKorisnici=rk.korisnici||[];
+  var rc=await apiAsync('/api/klijenti');
+  if(rc.ok) sviKlijenti=rc.klijenti||[];
+}
 
 function fd(d){return DANI[d.getDay()]+'\n'+d.getDate()+'. '+MES[d.getMonth()]+' '+d.getFullYear()+'.';}
 function fdShort(d){return d.getDate()+'. '+(d.getMonth()+1)+'. '+d.getFullYear()+'.';}
