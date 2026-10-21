@@ -5,7 +5,6 @@ from zoneinfo import ZoneInfo
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'promeni_ovo_123')
 
@@ -261,6 +260,17 @@ def api_rezervisi():
             status_rez = d.get('status', 'taken')
             if status_rez not in ('taken', 'sub'):
                 status_rez = 'taken'
+            # Ako je prosleđen user_id (admin rezerviše na ime korisnika iz sistema)
+            booking_user_id = u['id']
+            booking_user_email = u['email']
+            explicit_uid = d.get('user_id')
+            if explicit_uid and (u['role'] == 'admin' or u['role'] == 'staff'):
+                cur.execute('SELECT id, email, name, alias FROM users WHERE id=%s', (int(explicit_uid),))
+                found = cur.fetchone()
+                if found:
+                    booking_user_id = found['id']
+                    booking_user_email = found['email']
+                    ime = found['alias'] or found['name']
             cur.execute('''
                 INSERT INTO bookings (key, status, user_id, user_name, user_email, created_at)
                 VALUES (%s,%s,%s,%s,%s,%s)
@@ -268,7 +278,7 @@ def api_rezervisi():
                     status=EXCLUDED.status, user_id=EXCLUDED.user_id,
                     user_name=EXCLUDED.user_name, user_email=EXCLUDED.user_email,
                     created_at=EXCLUDED.created_at
-            ''', (key, status_rez, u['id'], ime, u['email'], datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+            ''', (key, status_rez, booking_user_id, ime, booking_user_email, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         conn.commit()
     return ok({'message': 'Termin uspješno rezervisan!'})
 
@@ -495,6 +505,19 @@ def api_rezervisi_pretplatu():
     except:
         return err('Neispravan datum.')
     if do < od: return err('Krajnji datum mora biti nakon početnog.')
+    # Ako je prosleđen user_id (admin rezerviše na ime korisnika iz sistema)
+    booking_user_id = u['id']
+    booking_user_email = u['email']
+    explicit_uid = d.get('user_id')
+    if explicit_uid and (u['role'] == 'admin' or u['role'] == 'staff'):
+        with get_conn() as conn2:
+            with conn2.cursor() as cur2:
+                cur2.execute('SELECT id, email, name, alias FROM users WHERE id=%s', (int(explicit_uid),))
+                found = cur2.fetchone()
+                if found:
+                    booking_user_id = found['id']
+                    booking_user_email = found['email']
+                    ime = found['alias'] or found['name']
     kreirano = 0
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -508,7 +531,7 @@ def api_rezervisi_pretplatu():
                         cur.execute('''
                             INSERT INTO bookings (key, status, user_id, user_name, user_email, payment_status, beleske, igraci, created_at)
                             VALUES (%s,'sub',%s,%s,%s,%s,%s,%s,%s)
-                        ''', (key, u['id'], ime, u['email'], payment_status, beleske, igraci,
+                        ''', (key, booking_user_id, ime, booking_user_email, payment_status, beleske, igraci,
                               datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
                         kreirano += 1
                 current = current + timedelta(days=interval_dana)
