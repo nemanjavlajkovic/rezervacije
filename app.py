@@ -381,7 +381,7 @@ def api_admin_set():
 @app.route('/api/admin/korisnici')
 def api_korisnici():
     u = current_user()
-    if not u or u['role'] != 'admin': return err('Nemate dozvolu.', 403)
+    if not u or u['role'] not in ('admin', 'staff'): return err('Nemate dozvolu.', 403)
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute('SELECT id,email,name,role,alias,oslovljavanje,ulica,ptt,grad,telefon,rodjadan,beleske,created_at FROM users ORDER BY id')
