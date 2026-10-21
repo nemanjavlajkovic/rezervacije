@@ -553,7 +553,13 @@ async function render(){
         var pLabel={na_cekanju:'Zauzeto',placeno:'Plaćeno',nedolazak:'Nedolazak',otkazano:'Otkazano'}[pst]||'Zauzeto';
         if(st==='sub')pLabel='Pretplata';
         lbl=pLabel;
-        if(slot.booked_by)lbl+='<br><small style="font-size:10px;opacity:.7">'+slot.booked_by+'</small>';
+        if(slot.booked_by){
+          if(isStaff){
+            lbl+='<br><small style="font-size:10px;opacity:.7">'+slot.booked_by+'</small>';
+          } else {
+            lbl='<span style="color:#86efac;font-weight:bold">✓ Moj termin</span><br><small style="font-size:10px;opacity:.7">'+slot.booked_by+'</small>';
+          }
+        }
       }
       var onclick='';
       if(canFree) onclick=' onclick="openM(\''+cid+'\',\''+cs[cid].name+'\','+h+')"';
