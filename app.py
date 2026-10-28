@@ -226,9 +226,9 @@ def api_raspored():
             booked_by = None
             if b:
                 u = current_user()
-                if status == 'past':
-                    booked_by = b.get('user_name')
-                elif u and (u['role'] == 'admin' or u['email'] == b.get('user_email', '')):
+                is_admin = u and u['role'] in ('admin', 'staff')
+                is_own = u and u['email'] == b.get('user_email', '')
+                if is_admin or is_own:
                     booked_by = b.get('user_name')
             result[cid]['slots'][h] = {
                 'status': status,
