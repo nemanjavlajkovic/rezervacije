@@ -521,7 +521,7 @@ document.addEventListener('click',function(e){
 });
 
 function slotColorClass(st,pst,booked_by){
-  if(st==='past') return booked_by ? 'past-taken' : 'past';
+  if(st==='past') return booked_by ? 'my-slot' : 'past';
   if(booked_by) return 'my-slot';
   if(st==='free') return 'free';
   if(pst==='placeno') return 'ps-placeno';
