@@ -561,7 +561,7 @@ async function render(){
       if(st==='free') lbl='Slobodno';
       else if(st==='past'){
         if(slot.booked_by) lbl='<span style="font-size:10px;opacity:.6">✓</span> '+slot.booked_by;
-        else lbl='Prošlo';
+        else lbl='Slobodno';
       }
       else{
         var pLabel={na_cekanju:'Zauzeto',placeno:'Plaćeno',nedolazak:'Nedolazak',otkazano:'Otkazano'}[pst]||'Zauzeto';
