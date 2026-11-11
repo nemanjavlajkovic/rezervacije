@@ -236,9 +236,9 @@ select.rcc-input{cursor:pointer}
   <div id="nav-left">
     <button class="nav-arr" onclick="chDate(-1)">&#9664;</button>
     <button class="nav-today" onclick="goToday()">Danas</button>
-    <div id="nav-date" onclick="document.getElementById('cal-picker').showPicker()" style="cursor:pointer" title="Izaberi datum">
+    <div id="nav-date" onclick="var cp=document.getElementById('cal-picker');cp.value=curDate;cp.showPicker()" style="cursor:pointer" title="Izaberi datum">
       <span class="cal-icon">📅</span><span id="dlbl"></span>
-      <input type="date" id="cal-picker" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" onchange="pickDate(this.value)">
+      <input type="date" id="cal-picker" min="2020-01-01" max="2035-12-31" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" onchange="pickDate(this.value)">
     </div>
     <button class="nav-arr" onclick="chDate(1)">&#9654;</button>
   </div>
@@ -298,11 +298,11 @@ select.rcc-input{cursor:pointer}
         <div class="rcc-row2">
           <div class="rcc-field">
             <label class="rcc-lbl">Datum (Početak)</label>
-            <input type="date" id="m-datum-od" class="rcc-input">
+            <input type="date" id="m-datum-od" class="rcc-input" min="2020-01-01" max="2035-12-31">
           </div>
           <div class="rcc-field">
             <label class="rcc-lbl">Datum (Kraj)</label>
-            <input type="date" id="m-datum-do" class="rcc-input" readonly style="background:#f3f4f6;color:#9ca3af">
+            <input type="date" id="m-datum-do" class="rcc-input" min="2020-01-01" max="2035-12-31" readonly style="background:#f3f4f6;color:#9ca3af">
           </div>
         </div>
         <div class="rcc-field">
@@ -323,8 +323,8 @@ select.rcc-input{cursor:pointer}
         <div id="pretplata-period" style="display:none;background:#fefce8;border:1px solid #fde68a;border-radius:4px;padding:10px;margin-top:4px">
           <p style="font-size:12px;color:#92400e;margin-bottom:8px">📅 Kreira rezervacije za svaki isti dan u sedmici u odabranom periodu.</p>
           <div style="display:flex;gap:8px">
-            <div style="flex:1"><label class="rcc-lbl">Od datuma</label><input type="date" id="date-od" class="rcc-input"></div>
-            <div style="flex:1"><label class="rcc-lbl">Do datuma</label><input type="date" id="date-do" class="rcc-input"></div>
+            <div style="flex:1"><label class="rcc-lbl">Od datuma</label><input type="date" id="date-od" class="rcc-input" min="2020-01-01" max="2035-12-31"></div>
+            <div style="flex:1"><label class="rcc-lbl">Do datuma</label><input type="date" id="date-do" class="rcc-input" min="2020-01-01" max="2035-12-31"></div>
           </div>
         </div>
       </div>
@@ -377,7 +377,7 @@ select.rcc-input{cursor:pointer}
         <button class="pbtn pbtn-ot" id="pbtn-otkazano" onclick="setPayStatus('otkazano')">❌ Otkazano</button>
       </div>
     </div>
-    <div class="edit-field"><label>Datum</label><input type="date" id="e-date"></div>
+    <div class="edit-field"><label>Datum</label><input type="date" id="e-date" min="2020-01-01" max="2035-12-31"></div>
     <div style="display:flex;gap:10px;margin-top:10px">
       <div style="flex:1"><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:4px">Teren</label><select id="e-court" class="edit-field" style="background:#0f1320;border:1px solid #3d4560;color:#e5e7eb;padding:6px 8px;border-radius:3px;font-size:12px;width:100%"></select></div>
       <div style="flex:1"><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:4px">Sat</label><select id="e-hour" style="background:#0f1320;border:1px solid #3d4560;color:#e5e7eb;padding:6px 8px;border-radius:3px;font-size:12px;width:100%"></select></div>
