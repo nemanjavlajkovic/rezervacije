@@ -572,7 +572,7 @@ async function render(){
         lbl=pLabel;
         if(slot.booked_by){
           if(isStaff){
-            lbl+='<br><small style="font-size:10px;opacity:.7">'+slot.booked_by+'</small>';
+            lbl='<span style="font-size:13px;font-weight:bold">'+slot.booked_by+'</span><br><small style="font-size:10px;opacity:.7">'+pLabel+'</small>';
           } else {
             lbl='<span style="color:#86efac;font-weight:bold">✓ Moj termin</span><br><small style="font-size:10px;opacity:.7">'+slot.booked_by+'</small>';
           }
